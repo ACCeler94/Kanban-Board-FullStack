@@ -9,6 +9,9 @@
     "start": "npx nodemon ./server.ts",
     "lint": "npx eslint ."
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
