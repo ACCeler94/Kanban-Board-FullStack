@@ -11,7 +11,7 @@ model Board {
 model UserOnBoard {
   user   User   @relation(fields: [userId], references: [id])
   userId Int
-  board  Board  @relation(fields: [boardId], references: [id])
+  board  Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId Int
 
   @@id([userId, boardId])
@@ -23,7 +23,7 @@ model Task {
   updatedAt    DateTime @updatedAt
   title        String   @db.VarChar(255)
   desc         String?
-  board        Board    @relation(fields: [boardId], references: [id])
+  board        Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId      Int
   author       User     @relation("TaskAuthor", fields: [authorId], references: [id])
   authorId     Int
@@ -33,7 +33,7 @@ model Task {
 model UserOnTask {
   user   User   @relation(fields: [userId], references: [id])
   userId Int
-  task   Task   @relation(fields: [taskId], references: [id])
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId Int
 
   @@id([userId, taskId])
