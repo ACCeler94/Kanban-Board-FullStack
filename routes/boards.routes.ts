@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import express from 'express';
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import BoardsController from '../controllers/boards.controller';
+import Router from 'express-promise-router';
 
-const router = express.Router();
+const router = Router();
 
 // GET requests
-router.route('/boards').get(BoardsController.getAll);
+router.get('/boards', BoardsController.getAll);
 
 router.route('/boards/:id').get(BoardsController.getById);
 
