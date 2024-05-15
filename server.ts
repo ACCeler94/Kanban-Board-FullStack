@@ -23,6 +23,11 @@ app.use((req, res) => {
   res.status(404).send('404 not found...');
 });
 
+app.use((err: Error, req: Request, res: Response) => {
+  console.error(err);
+  res.status(500).json({ message: 'An error occurred.' });
+});
+
 app.listen(port, () => {
   console.log(`[Server]: I am running at http://localhost:${port}`);
 });
