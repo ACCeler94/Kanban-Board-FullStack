@@ -10,21 +10,23 @@ const router = Router();
 // [TODO - delete this endpoint for production]
 router.get('/boards', BoardsController.getAll);
 
-router.route('/boards/:id').get(validateParams, BoardsController.getById);
+router.route('/boards/:boardId').get(validateParams, BoardsController.getById);
 
 // POST requests
 router.route('/boards').post(BoardsController.createBoard);
 
-router.route('/boards/:id/users/:userId').post(validateParams, BoardsController.addUserToBoard); // post used as it is creating a relation on UserOnBoard table
+router
+  .route('/boards/:boardId/users/:userId')
+  .post(validateParams, BoardsController.addUserToBoard); // post used as it is creating a relation on UserOnBoard table
 
 // PATCH requests
-router.route('/boards/:id').put(validateParams, BoardsController.editBoardTitle);
+router.route('/boards/:boardId').put(validateParams, BoardsController.editBoardTitle);
 
 // DELETE requests
-router.route('/boards/:id').delete(validateParams, BoardsController.deleteBoard);
+router.route('/boards/:boardId').delete(validateParams, BoardsController.deleteBoard);
 
 router
-  .route('/boards/:id/users/:userId')
+  .route('/boards/:boardId/users/:userId')
   .delete(validateParams, BoardsController.deleteUserFromBoard); // delete used as it is deleting a relation on UserOnBoard table
 
 export type boardsRoutes = typeof router;

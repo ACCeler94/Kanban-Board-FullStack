@@ -17,8 +17,8 @@ const BoardsController = {
 
   // [TODO - add authorization to allow getting board by ID only for author or assigned users]
   getById: async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const intId = parseInt(id);
+    const { boardId } = req.params;
+    const intId = parseInt(boardId);
 
     try {
       const board = await prisma.board.findUnique({
@@ -72,8 +72,8 @@ const BoardsController = {
 
   // [TODO - add authorization to allow editing board only by the author of the board]
   editBoardTitle: async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const intId = parseInt(id);
+    const { boardId } = req.params;
+    const intId = parseInt(boardId);
     let title;
 
     try {
@@ -108,8 +108,8 @@ const BoardsController = {
 
   // [TODO - add authorization to allow adding users to the board only by the author of the board]
   addUserToBoard: async (req: Request, res: Response, next: NextFunction) => {
-    const { id, userId } = req.params;
-    const intId = parseInt(id);
+    const { boardId, userId } = req.params;
+    const intId = parseInt(boardId);
     const intUserId = parseInt(userId);
 
     const board = await prisma.board.findUnique({
@@ -156,8 +156,8 @@ const BoardsController = {
 
   // [TODO - add authorization to allow deleting a board only by the author of the board]
   deleteBoard: async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const intId = parseInt(id);
+    const { boardId } = req.params;
+    const intId = parseInt(boardId);
 
     const board = await prisma.board.findUnique({
       where: {
@@ -188,8 +188,8 @@ const BoardsController = {
 
   // [TODO - add authorization to allow deleting a board only by the author of the board]
   deleteUserFromBoard: async (req: Request, res: Response, next: NextFunction) => {
-    const { id, userId } = req.params;
-    const intId = parseInt(id);
+    const { boardId, userId } = req.params;
+    const intId = parseInt(boardId);
     const intUserId = parseInt(userId);
 
     const board = await prisma.board.findUnique({
