@@ -3,8 +3,9 @@ import { z } from 'zod';
 
 const validateParams = (req: Request, res: Response, next: NextFunction) => {
   const ParamSchema = z.object({
-    id: z.string().regex(/^\d+$/, { message: 'ID must be a number' }),
+    boardId: z.string().regex(/^\d+$/, { message: 'Board ID must be a number' }).optional(),
     userId: z.string().regex(/^\d+$/, { message: 'User ID must be a number' }).optional(),
+    taskId: z.string().regex(/^\d+$/, { message: 'User ID must be a number' }).optional(),
   });
 
   try {
