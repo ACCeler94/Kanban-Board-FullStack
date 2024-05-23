@@ -1,9 +1,7 @@
+import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
-import { Request, Response, NextFunction } from 'express';
 import createBoardDTO from '../validators/boards/create-board.dto';
 import UpdateBoardTitleDTO from '../validators/boards/update-board-title';
-import addUserToBoardDTO from '../validators/boards/add-user-to-board.dto';
-import removeUserFromBoardDTO from '../validators/boards/remove-user-from-board.dto';
 
 const BoardsController = {
   // [TODO - delete this endpoint for production]
@@ -110,16 +108,9 @@ const BoardsController = {
 
   // [TODO - add authorization to allow adding users to the board only by the author of the board]
   addUserToBoard: async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
+    const { id, userId } = req.params;
     const intId = parseInt(id);
-    let userIdToAdd;
-
-    try {
-      const bodyObj = addUserToBoardDTO.parse(req.body);
-      userIdToAdd = bodyObj.userId;
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid data' });
-    }
+    const intUserId = parseInt(userId);
 
     const board = await prisma.board.findUnique({
       where: {
@@ -130,7 +121,7 @@ const BoardsController = {
 
     const user = await prisma.user.findUnique({
       where: {
-        id: userIdToAdd,
+        id: intUserId,
       },
     });
     if (!user) return res.status(404).json({ error: 'User not found...' });
@@ -139,7 +130,7 @@ const BoardsController = {
     const existingUserOnBoard = await prisma.userOnBoard.findUnique({
       where: {
         userId_boardId: {
-          userId: userIdToAdd,
+          userId: intUserId,
           boardId: intId,
         },
       },
@@ -152,7 +143,7 @@ const BoardsController = {
     try {
       await prisma.userOnBoard.create({
         data: {
-          userId: userIdToAdd,
+          userId: intUserId,
           boardId: intId,
         },
       });
@@ -197,16 +188,9 @@ const BoardsController = {
 
   // [TODO - add authorization to allow deleting a board only by the author of the board]
   deleteUserFromBoard: async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
+    const { id, userId } = req.params;
     const intId = parseInt(id);
-    let userIdToRemove;
-
-    try {
-      const bodyObj = removeUserFromBoardDTO.parse(req.body);
-      userIdToRemove = bodyObj.userId;
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid data' });
-    }
+    const intUserId = parseInt(userId);
 
     const board = await prisma.board.findUnique({
       where: {
@@ -217,7 +201,7 @@ const BoardsController = {
 
     const user = await prisma.user.findUnique({
       where: {
-        id: userIdToRemove,
+        id: intUserId,
       },
     });
     if (!user) return res.status(404).json({ error: 'User not found...' });
@@ -226,7 +210,7 @@ const BoardsController = {
     const existingUserOnBoard = await prisma.userOnBoard.findUnique({
       where: {
         userId_boardId: {
-          userId: userIdToRemove,
+          userId: intUserId,
           boardId: intId,
         },
       },
@@ -240,7 +224,7 @@ const BoardsController = {
       await prisma.userOnBoard.delete({
         where: {
           userId_boardId: {
-            userId: userIdToRemove,
+            userId: intUserId,
             boardId: intId,
           },
         },
