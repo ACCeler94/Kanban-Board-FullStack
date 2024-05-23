@@ -17,6 +17,12 @@ model UserOnBoard {
   @@id([userId, boardId])
 }
 
+enum TaskStatus {
+  IN_PROGRESS @map("In Progress")
+  DONE        @map("Done")
+  TO_DO       @map("To Do")
+}
+
 model Task {
   id            Int          @id @default(autoincrement())
   createdAt     DateTime     @default(now())
@@ -28,6 +34,7 @@ model Task {
   author        User         @relation("TaskAuthor", fields: [authorId], references: [id])
   authorId      Int
   assignedUsers UserOnTask[]
+  status        TaskStatus   @default(TO_DO)
 }
 
 model UserOnTask {
