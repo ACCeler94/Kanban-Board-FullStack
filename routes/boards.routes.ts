@@ -24,4 +24,5 @@ router.route('/boards/:id').delete(BoardsController.deleteBoard);
 
 router.route('/boards/:id/users').delete(BoardsController.deleteUserFromBoard); // delete used as it is deleting a relation on UserOnBoard table
 
-export default router;
+export type boardRoutes = typeof router;
+export { router as boardRoutes };

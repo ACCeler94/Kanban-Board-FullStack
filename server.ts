@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
+import { boardRoutes } from './routes/boards.routes';
 
 const app: Express = express();
 const port = 8000;
@@ -11,6 +12,9 @@ app.get('/', (req: Request, res: Response) => {
 app.use(express.urlencoded({ extended: false })); // required to handle urlencoded requests
 app.use(express.json()); // required to handle form-data request
 app.use(cors()); // middleware to enable CORS requests
+
+// endpoints
+app.use('/api', boardRoutes);
 
 // // Serve static files from the React app
 // app.use(express.static(path.join(__dirname, '/client/build')));
