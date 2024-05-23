@@ -13,7 +13,7 @@ router.get('/boards', BoardsController.getAll);
 router.route('/boards/:id').get(BoardsController.getById);
 
 // POST requests
-router.route('boards/').post(BoardsController.createBoard);
+router.route('/boards').post(BoardsController.createBoard);
 
 router
   .route('/boards/:id/users/:userId')
