@@ -83,14 +83,14 @@ const BoardsController = {
       return res.status(400).json({ error: 'Invalid data' });
     }
 
-    const board = await prisma.board.findUnique({
-      where: {
-        id: intId,
-      },
-    });
-    if (!board) return res.status(404).json({ error: 'Board not found...' });
-
     try {
+      const board = await prisma.board.findUnique({
+        where: {
+          id: intId,
+        },
+      });
+      if (!board) return res.status(404).json({ error: 'Board not found...' });
+
       await prisma.board.update({
         where: {
           id: intId,
@@ -112,35 +112,34 @@ const BoardsController = {
     const intId = parseInt(boardId);
     const intUserId = parseInt(userId);
 
-    const board = await prisma.board.findUnique({
-      where: {
-        id: intId,
-      },
-    });
-    if (!board) return res.status(404).json({ error: 'Board not found...' });
+    try {
+      const board = await prisma.board.findUnique({
+        where: { id: intId },
+      });
+      if (!board) return res.status(404).json({ error: 'Board not found...' });
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: intUserId,
-      },
-    });
-    if (!user) return res.status(404).json({ error: 'User not found...' });
-
-    // Check for an existing UserOnBoard record
-    const existingUserOnBoard = await prisma.userOnBoard.findUnique({
-      where: {
-        userId_boardId: {
-          userId: intUserId,
-          boardId: intId,
-        },
-      },
-    });
-
-    if (existingUserOnBoard) {
-      return res.status(409).json({ error: 'User is already added to the board' });
+      const user = await prisma.user.findUnique({
+        where: { id: intUserId },
+      });
+      if (!user) return res.status(404).json({ error: 'User not found...' });
+    } catch (error) {
+      return next(error);
     }
 
     try {
+      const existingUserOnBoard = await prisma.userOnBoard.findUnique({
+        where: {
+          userId_boardId: {
+            userId: intUserId,
+            boardId: intId,
+          },
+        },
+      });
+
+      if (existingUserOnBoard) {
+        return res.status(409).json({ error: 'User is already added to the board' });
+      }
+
       await prisma.userOnBoard.create({
         data: {
           userId: intUserId,
@@ -159,21 +158,21 @@ const BoardsController = {
     const { boardId } = req.params;
     const intId = parseInt(boardId);
 
-    const board = await prisma.board.findUnique({
-      where: {
-        id: intId,
-      },
-      select: {
-        author: {
-          select: {
-            id: true, // author id needed for future authorization
+    try {
+      const board = await prisma.board.findUnique({
+        where: {
+          id: intId,
+        },
+        select: {
+          author: {
+            select: {
+              id: true, // author id needed for future authorization
+            },
           },
         },
-      },
-    });
-    if (!board) return res.status(404).json({ error: 'Board not found...' });
+      });
+      if (!board) return res.status(404).json({ error: 'Board not found...' });
 
-    try {
       await prisma.board.delete({
         where: {
           id: intId,
@@ -192,35 +191,33 @@ const BoardsController = {
     const intId = parseInt(boardId);
     const intUserId = parseInt(userId);
 
-    const board = await prisma.board.findUnique({
-      where: {
-        id: intId,
-      },
-    });
-    if (!board) return res.status(404).json({ error: 'Board not found...' });
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: intUserId,
-      },
-    });
-    if (!user) return res.status(404).json({ error: 'User not found...' });
-
-    // Check for an existing UserOnBoard record
-    const existingUserOnBoard = await prisma.userOnBoard.findUnique({
-      where: {
-        userId_boardId: {
-          userId: intUserId,
-          boardId: intId,
-        },
-      },
-    });
-
-    if (!existingUserOnBoard) {
-      return res.status(400).json({ error: 'User is not added to this board' });
-    }
-
     try {
+      // Check if the board exists
+      const board = await prisma.board.findUnique({
+        where: { id: intId },
+      });
+      if (!board) return res.status(404).json({ error: 'Board not found...' });
+
+      // Check if the user exists
+      const user = await prisma.user.findUnique({
+        where: { id: intUserId },
+      });
+      if (!user) return res.status(404).json({ error: 'User not found...' });
+
+      // Check if the user is on the board
+      const existingUserOnBoard = await prisma.userOnBoard.findUnique({
+        where: {
+          userId_boardId: {
+            userId: intUserId,
+            boardId: intId,
+          },
+        },
+      });
+      if (!existingUserOnBoard) {
+        return res.status(400).json({ error: 'User is not added to this board' });
+      }
+
+      // Delete the user from the board
       await prisma.userOnBoard.delete({
         where: {
           userId_boardId: {
