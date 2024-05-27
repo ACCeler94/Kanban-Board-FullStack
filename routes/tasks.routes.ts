@@ -26,4 +26,5 @@ router
   .route('/tasks/:taskId/users/:userId')
   .delete(validateParams, TasksController.deleteUserFromTask);
 
-export default router;
+export type tasksRoutes = typeof router;
+export { router as tasksRoutes };

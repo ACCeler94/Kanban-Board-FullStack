@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import { boardsRoutes } from './routes/boards.routes';
+import { tasksRoutes } from './routes/tasks.routes';
 
 const app: Express = express();
 const port = 8000;
@@ -15,6 +16,7 @@ app.use(cors()); // middleware to enable CORS requests
 
 // endpoints
 app.use('/api', boardsRoutes);
+app.use('/api', tasksRoutes);
 
 // // Serve static files from the React app
 // app.use(express.static(path.join(__dirname, '/client/build')));
