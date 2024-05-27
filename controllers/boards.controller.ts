@@ -143,7 +143,7 @@ const BoardsController = {
         },
       });
 
-      res.status(200).json({ message: 'User added to board!' });
+      res.status(201).json({ message: 'User assigned to the board!' });
     } catch (error) {
       next(error);
     }
@@ -207,7 +207,7 @@ const BoardsController = {
         },
       });
       if (!existingUserOnBoard) {
-        return res.status(400).json({ error: 'User is not added to this board' });
+        return res.status(400).json({ error: 'User is not assigned to this board!' });
       }
 
       // Delete the user from the board
