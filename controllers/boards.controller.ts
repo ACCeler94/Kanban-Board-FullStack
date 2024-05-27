@@ -126,8 +126,8 @@ const BoardsController = {
       const existingUserOnBoard = await prisma.userOnBoard.findUnique({
         where: {
           userId_boardId: {
-            userId: userId,
-            boardId: boardId,
+            userId,
+            boardId,
           },
         },
       });
@@ -138,8 +138,8 @@ const BoardsController = {
 
       await prisma.userOnBoard.create({
         data: {
-          userId: userId,
-          boardId: boardId,
+          userId,
+          boardId,
         },
       });
 
@@ -201,8 +201,8 @@ const BoardsController = {
       const existingUserOnBoard = await prisma.userOnBoard.findUnique({
         where: {
           userId_boardId: {
-            userId: userId,
-            boardId: boardId,
+            userId,
+            boardId,
           },
         },
       });
@@ -214,8 +214,8 @@ const BoardsController = {
       await prisma.userOnBoard.delete({
         where: {
           userId_boardId: {
-            userId: userId,
-            boardId: boardId,
+            userId,
+            boardId,
           },
         },
       });
