@@ -18,11 +18,10 @@ const BoardsController = {
   // [TODO - add authorization to allow getting board by ID only for author or assigned users]
   getById: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
-    const intId = parseInt(boardId);
 
     try {
       const board = await prisma.board.findUnique({
-        where: { id: intId },
+        where: { id: boardId },
         include: {
           author: {
             select: {
@@ -73,7 +72,6 @@ const BoardsController = {
   // [TODO - add authorization to allow editing board only by the author of the board]
   editBoardTitle: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
-    const intId = parseInt(boardId);
     let title;
 
     try {
@@ -86,14 +84,14 @@ const BoardsController = {
     try {
       const board = await prisma.board.findUnique({
         where: {
-          id: intId,
+          id: boardId,
         },
       });
       if (!board) return res.status(404).json({ error: 'Board not found...' });
 
       await prisma.board.update({
         where: {
-          id: intId,
+          id: boardId,
         },
         data: {
           title,
@@ -109,17 +107,15 @@ const BoardsController = {
   // [TODO - add authorization to allow adding users to the board only by the author of the board]
   addUserToBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId, userId } = req.params;
-    const intId = parseInt(boardId);
-    const intUserId = parseInt(userId);
 
     try {
       const board = await prisma.board.findUnique({
-        where: { id: intId },
+        where: { id: boardId },
       });
       if (!board) return res.status(404).json({ error: 'Board not found...' });
 
       const user = await prisma.user.findUnique({
-        where: { id: intUserId },
+        where: { id: userId },
       });
       if (!user) return res.status(404).json({ error: 'User not found...' });
     } catch (error) {
@@ -130,8 +126,8 @@ const BoardsController = {
       const existingUserOnBoard = await prisma.userOnBoard.findUnique({
         where: {
           userId_boardId: {
-            userId: intUserId,
-            boardId: intId,
+            userId: userId,
+            boardId: boardId,
           },
         },
       });
@@ -142,8 +138,8 @@ const BoardsController = {
 
       await prisma.userOnBoard.create({
         data: {
-          userId: intUserId,
-          boardId: intId,
+          userId: userId,
+          boardId: boardId,
         },
       });
 
@@ -156,12 +152,11 @@ const BoardsController = {
   // [TODO - add authorization to allow deleting a board only by the author of the board]
   deleteBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
-    const intId = parseInt(boardId);
 
     try {
       const board = await prisma.board.findUnique({
         where: {
-          id: intId,
+          id: boardId,
         },
         select: {
           author: {
@@ -175,7 +170,7 @@ const BoardsController = {
 
       await prisma.board.delete({
         where: {
-          id: intId,
+          id: boardId,
         },
       });
 
@@ -188,19 +183,17 @@ const BoardsController = {
   // [TODO - add authorization to allow deleting a board only by the author of the board]
   deleteUserFromBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId, userId } = req.params;
-    const intId = parseInt(boardId);
-    const intUserId = parseInt(userId);
 
     try {
       // Check if the board exists
       const board = await prisma.board.findUnique({
-        where: { id: intId },
+        where: { id: boardId },
       });
       if (!board) return res.status(404).json({ error: 'Board not found...' });
 
       // Check if the user exists
       const user = await prisma.user.findUnique({
-        where: { id: intUserId },
+        where: { id: userId },
       });
       if (!user) return res.status(404).json({ error: 'User not found...' });
 
@@ -208,8 +201,8 @@ const BoardsController = {
       const existingUserOnBoard = await prisma.userOnBoard.findUnique({
         where: {
           userId_boardId: {
-            userId: intUserId,
-            boardId: intId,
+            userId: userId,
+            boardId: boardId,
           },
         },
       });
@@ -221,8 +214,8 @@ const BoardsController = {
       await prisma.userOnBoard.delete({
         where: {
           userId_boardId: {
-            userId: intUserId,
-            boardId: intId,
+            userId: userId,
+            boardId: boardId,
           },
         },
       });
