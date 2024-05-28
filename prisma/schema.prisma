@@ -49,7 +49,8 @@ model UserOnTask {
 model User {
   id             String        @id @default(uuid())
   email          String        @unique
-  name           String?
+  name           String
+  auth0Sub       String        @unique
   authoredBoards Board[]       @relation("BoardAuthor")
   boards         UserOnBoard[]
   authoredTasks  Task[]        @relation("TaskAuthor")

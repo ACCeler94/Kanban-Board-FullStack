@@ -9,6 +9,7 @@ async function main() {
     data: {
       email: 'user1@example.com',
       name: 'User One',
+      auth0Sub: '21',
     },
   });
 
@@ -16,6 +17,7 @@ async function main() {
     data: {
       email: 'user2@example.com',
       name: 'User Two',
+      auth0Sub: '211',
     },
   });
 
