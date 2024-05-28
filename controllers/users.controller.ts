@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createUserDTO from '../validators/users/create-user.dto';
+import Auth0User from '../types/Auth0User';
 
 const UsersController = {
   // GET
@@ -65,15 +66,27 @@ const UsersController = {
     try {
       userData = createUserDTO.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid data' });
+      return res.status(400).json({ error: 'Invalid name' });
     }
 
-    // check if the user with this email exists in the database (emails should be unique based on User schema)
+    const { name } = userData;
+    const authUser = req.oidc.user as Auth0User;
+
+    const sub: string = authUser.sub;
+    const email: string = authUser.email;
+
+    // check if the user with this auth0 sub exists
     try {
-      const user = await prisma.user.findUnique({ where: { email: userData.email } });
+      const user = await prisma.user.findUnique({ where: { auth0Sub: sub } });
       if (user) return res.status(400).json({ error: 'User already exists.' });
 
-      const createdUser = await prisma.user.create({ data: userData });
+      const createdUser = await prisma.user.create({
+        data: {
+          name,
+          email,
+          auth0Sub: sub,
+        },
+      });
 
       res.status(201).json(createdUser);
     } catch (error) {
