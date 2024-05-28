@@ -3,6 +3,7 @@ import cors from 'cors';
 import { boardsRoutes } from './routes/boards.routes';
 import { tasksRoutes } from './routes/tasks.routes';
 import { auth, requiresAuth } from 'express-openid-connect';
+import { userRoutes } from './routes/users.routes';
 
 const app: Express = express();
 const port = 8000;
@@ -45,6 +46,7 @@ app.get('/profile', requiresAuth(), (req, res) => {
 // endpoints
 app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
+app.use('/api', userRoutes);
 
 // // Serve static files from the React app
 // app.use(express.static(path.join(__dirname, '/client/build')));

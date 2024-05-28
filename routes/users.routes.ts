@@ -15,3 +15,6 @@ router.route('/users/search').get(UsersController.findByEmail);
 
 // POST requests
 router.route('/users').post(UsersController.createUser);
+
+export type userRoutes = typeof router;
+export { router as userRoutes };
