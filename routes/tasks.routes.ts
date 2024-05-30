@@ -1,33 +1,37 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Router from 'express-promise-router';
 import TasksController from '../controllers/tasks.controller';
-import validateParams from '../validators/validateParams';
+import validateParams from '../middleware/validateParams';
 import { requiresAuth } from 'express-openid-connect';
+import checkBoardAssignment from '../middleware/checkBoardAssignment';
 
 const router = Router();
 
 router.use(requiresAuth()); // add to all tasks routes
 
 // GET requests
-// [TODO - delete this endpoint for production]
-router.route('/tasks').get(TasksController.getAll);
-
-router.route('/tasks/:taskId').get(validateParams, TasksController.getById);
+router.route('/tasks/:taskId').get(validateParams, checkBoardAssignment, TasksController.getById);
 
 // POST requests
 router.route('/tasks').post(TasksController.createTask);
 
-router.route('/tasks/:taskId/users/:userId').post(validateParams, TasksController.addUserToTask);
+router
+  .route('/tasks/:taskId/users/:userId')
+  .post(validateParams, checkBoardAssignment, TasksController.addUserToTask);
 
 // PATCH requests
-router.route('/tasks/:taskId').patch(validateParams, TasksController.editTask);
+router
+  .route('/tasks/:taskId')
+  .patch(validateParams, checkBoardAssignment, TasksController.editTask);
 
 // DELETE requests
-router.route('/tasks/:taskId').delete(validateParams, TasksController.deleteTask);
+router
+  .route('/tasks/:taskId')
+  .delete(validateParams, checkBoardAssignment, TasksController.deleteTask);
 
 router
   .route('/tasks/:taskId/users/:userId')
-  .delete(validateParams, TasksController.deleteUserFromTask);
+  .delete(validateParams, checkBoardAssignment, TasksController.deleteUserFromTask);
 
 export type tasksRoutes = typeof router;
 export { router as tasksRoutes };
