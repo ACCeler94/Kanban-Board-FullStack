@@ -2,16 +2,19 @@
 import Router from 'express-promise-router';
 import validateParams from '../validators/validateParams';
 import UsersController from '../controllers/users.controller';
+import { requiresAuth } from 'express-openid-connect';
 
 const router = Router();
 
 // GET requests
 // [TODO - delete this endpoint for production]
-router.route('/users').get(UsersController.getAll);
+router.route('/users').get(requiresAuth, UsersController.getAll);
 
-router.route('/users/:userId').get(validateParams, UsersController.getById);
+router.route('/users/:userId').get(requiresAuth, validateParams, UsersController.getById);
 
-router.route('/users/search').get(UsersController.findByEmail);
+router.route('/users/sub').get(requiresAuth, UsersController.getBySub);
+
+router.route('/users/search').get(requiresAuth, UsersController.findByEmail);
 
 // POST requests
 router.route('/users').post(UsersController.createUser);
