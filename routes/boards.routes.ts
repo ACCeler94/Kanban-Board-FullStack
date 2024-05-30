@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import BoardsController from '../controllers/boards.controller';
 import Router from 'express-promise-router';
-import validateParams from '../validators/validateParams';
+import validateParams from '../middleware/validateParams';
 import { requiresAuth } from 'express-openid-connect';
 
 const router = Router();

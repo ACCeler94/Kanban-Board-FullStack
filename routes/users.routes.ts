@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Router from 'express-promise-router';
-import validateParams from '../validators/validateParams';
+import validateParams from '../middleware/validateParams';
 import UsersController from '../controllers/users.controller';
 import { requiresAuth } from 'express-openid-connect';
 
