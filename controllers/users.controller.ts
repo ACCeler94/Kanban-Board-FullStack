@@ -38,7 +38,26 @@ const UsersController = {
     }
   },
 
-  // returns array of users to allow partial searching
+  getBySub: async (req: Request, res: Response, next: NextFunction) => {
+    const authUser = req.oidc.user as Auth0User;
+
+    // Check if user object is available in request
+    if (!authUser || !authUser.sub) {
+      return res
+        .status(400)
+        .json({ error: 'User information is missing or incomplete. Try again. ' });
+    }
+
+    try {
+      const user = await prisma.user.findUnique({ where: { auth0Sub: authUser.sub } });
+
+      if (!user) return res.status(404).json({ error: 'No user with this sub found...' });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // [TODO - rethink partial searching due to privacy concerns] returns array of users to allow partial searching
   findByEmail: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const emailQuery = req.query.email as string;
@@ -63,6 +82,7 @@ const UsersController = {
 
   createUser: async (req: Request, res: Response, next: NextFunction) => {
     let userData;
+    let email: string;
     try {
       userData = createUserDTO.parse(req.body);
     } catch (error) {
@@ -72,14 +92,29 @@ const UsersController = {
     const { name } = userData;
     const authUser = req.oidc.user as Auth0User;
 
+    // Check if user object is available in request
+    if (!authUser || !authUser.sub) {
+      return res.status(400).json({ error: 'User information is incomplete. Try again. ' });
+    }
     const sub: string = authUser.sub;
-    const email: string = authUser.email;
 
-    // check if the user with this auth0 sub exists
+    // if the email is provided by auth0 then save it, otherwise save the email provided by the user in the registration form (userData) - the form will prompt for email only if it is not provided by auth0
+    if (authUser.email) {
+      email = authUser.email;
+    } else if (!authUser && userData.email) {
+      email = userData.email;
+    } else {
+      return res.status(400).json({ error: 'User information is incomplete. Try again.' });
+    }
+
     try {
-      const user = await prisma.user.findUnique({ where: { auth0Sub: sub } });
-      if (user) return res.status(400).json({ error: 'User already exists.' });
-
+      // check if the user with this email exists in the database - check is done with email not sub as user might use different social login method which will provide different sub but the same email
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser) {
+        return res
+          .status(409)
+          .json({ error: 'User with this email already exists, please log in.' });
+      }
       const createdUser = await prisma.user.create({
         data: {
           name,
