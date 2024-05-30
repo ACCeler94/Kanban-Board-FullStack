@@ -3,20 +3,8 @@ import prisma from '../prisma/prisma';
 import createTaskDTO from '../validators/tasks/create-task.dto';
 import editTaskDTO from '../validators/tasks/edit-task.dto';
 
-// [TODO - include authorization]
 const TasksController = {
   // GET
-  // [TODO - delete this endpoint for production]
-  getAll: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const tasks = await prisma.task.findMany({ include: { assignedUsers: true, author: true } });
-
-      res.status(200).json(tasks);
-    } catch (error) {
-      next(error);
-    }
-  },
-
   getById: async (req: Request, res: Response, next: NextFunction) => {
     const { taskId } = req.params;
 
@@ -43,7 +31,7 @@ const TasksController = {
         },
       });
 
-      if (!task) res.status(404).json({ error: 'Task not found' });
+      if (!task) return res.status(404).json({ error: 'Task not found' });
 
       res.status(200).json(task);
     } catch (error) {
@@ -62,6 +50,25 @@ const TasksController = {
     }
 
     try {
+      const board = await prisma.board.findUnique({
+        where: {
+          id: taskData.boardId,
+        },
+        include: {
+          users: true,
+        },
+      });
+
+      if (!board) return res.status(404).json({ error: 'Board not found...' });
+
+      const isUserAssigned = board.users.some(
+        (userOnBoard) => userOnBoard.userId === taskData.authorId
+      );
+      if (!isUserAssigned)
+        return res
+          .status(403)
+          .json({ error: 'Access forbidden. User is not assigned to the board.' });
+
       const task = await prisma.task.create({ data: taskData });
 
       res.status(201).json(task);
@@ -102,7 +109,6 @@ const TasksController = {
       next(error);
     }
   },
-
   // PATCH
   editTask: async (req: Request, res: Response, next: NextFunction) => {
     const { taskId } = req.params;
@@ -124,7 +130,6 @@ const TasksController = {
       next(error);
     }
   },
-
   // DELETE
   deleteTask: async (req: Request, res: Response, next: NextFunction) => {
     const { taskId } = req.params;
@@ -144,9 +149,7 @@ const TasksController = {
     const { userId, taskId } = req.params;
 
     try {
-      const task = await prisma.task.findUnique({
-        where: { id: taskId },
-      });
+      const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
       const user = await prisma.user.findUnique({ where: { id: userId } });
