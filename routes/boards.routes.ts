@@ -2,8 +2,11 @@
 import BoardsController from '../controllers/boards.controller';
 import Router from 'express-promise-router';
 import validateParams from '../validators/validateParams';
+import { requiresAuth } from 'express-openid-connect';
 
 const router = Router();
+
+router.use(requiresAuth()); // add to all board routes
 
 // GET requests
 
