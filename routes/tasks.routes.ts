@@ -2,8 +2,11 @@
 import Router from 'express-promise-router';
 import TasksController from '../controllers/tasks.controller';
 import validateParams from '../validators/validateParams';
+import { requiresAuth } from 'express-openid-connect';
 
 const router = Router();
+
+router.use(requiresAuth()); // add to all tasks routes
 
 // GET requests
 // [TODO - delete this endpoint for production]
