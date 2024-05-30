@@ -61,9 +61,23 @@ const BoardsController = {
     }
 
     try {
-      const board = await prisma.board.create({ data: boardData });
+      // if either creating the board or assigning the author fails - the creation of both should throw an error
+      const result = await prisma.$transaction(async (prisma) => {
+        // Create the board
+        const board = await prisma.board.create({ data: boardData });
 
-      res.status(201).json(board);
+        // Add author to userOnBoard (assignedUsers)
+        await prisma.userOnBoard.create({
+          data: {
+            userId: boardData.authorId,
+            boardId: board.id,
+          },
+        });
+
+        return board;
+      });
+
+      res.status(201).json(result);
     } catch (error) {
       next(error);
     }
