@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../prisma/prisma';
-import UserIdSchema from '../validators/validateUserId';
+import UserIdSchema from '../validators/UserIdSchema';
 
 const checkBoardAssignment = async (req: Request, res: Response, next: NextFunction) => {
   let requestAuthor;

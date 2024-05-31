@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createBoardDTO from '../validators/boards/create-board.dto';
 import UpdateBoardTitleDTO from '../validators/boards/update-board-title';
-import UserIdSchema from '../validators/validateUserId';
+import UserIdSchema from '../validators/UserIdSchema';
 
 const BoardsController = {
   // [TODO - delete this endpoint for production]
