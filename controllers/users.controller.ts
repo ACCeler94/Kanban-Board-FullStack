@@ -51,13 +51,14 @@ const UsersController = {
     try {
       const user = await prisma.user.findUnique({ where: { auth0Sub: authUser.sub } });
 
-      if (!user) return res.status(404).json({ error: 'No user with this sub found...' });
+      if (!user) return res.status(404).json({ error: 'User not found...' });
+
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }
   },
 
-  // [TODO - rethink partial searching due to privacy concerns] returns array of users to allow partial searching
   findByEmail: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const emailQuery = req.query.email as string;
