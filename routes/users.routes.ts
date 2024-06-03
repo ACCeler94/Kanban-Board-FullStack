@@ -17,7 +17,7 @@ router.route('/users/sub').get(requiresAuth, UsersController.getBySub);
 router.route('/users/search').get(requiresAuth, UsersController.findByEmail);
 
 // POST requests
-router.route('/users').post(UsersController.createUser);
+router.route('/users').post(requiresAuth, UsersController.createUser);
 
 export type userRoutes = typeof router;
 export { router as userRoutes };
