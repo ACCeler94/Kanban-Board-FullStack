@@ -14,7 +14,7 @@ router.route('/users/:userId').get(requiresAuth, validateUserIdParam, UsersContr
 
 router.route('/users/sub').get(requiresAuth, UsersController.getBySub);
 
-router.route('/users/search').get(requiresAuth, UsersController.findByEmail);
+router.route('/users/search').get(requiresAuth, UsersController.findByEmail); // search query (allowing partial searching) = search?email=""
 
 // POST requests
 router.route('/users').post(requiresAuth, UsersController.createUser);

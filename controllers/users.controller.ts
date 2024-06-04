@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createUserDTO from '../validators/users/create-user.dto';
 import Auth0User from '../types/Auth0User';
+import EmailSearchSchema from '../validators/EmailSearchSchema';
 
 const UsersController = {
   // GET
@@ -60,9 +61,20 @@ const UsersController = {
   },
 
   findByEmail: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const emailQuery = req.query.email as string;
+    let searchQuery;
 
+    if (!req.query || !req.query.email)
+      return res.status(400).json({ error: 'Invalid search query.' });
+
+    try {
+      searchQuery = EmailSearchSchema.parse(req.query);
+    } catch (error) {
+      return res.status(400).json({ error: 'Invalid search query.' });
+    }
+
+    const emailQuery = searchQuery.email;
+
+    try {
       const users = await prisma.user.findMany({
         where: {
           email: {
@@ -72,7 +84,7 @@ const UsersController = {
       });
 
       if (users.length === 0) {
-        return res.status(404).json({ message: 'No users found...' });
+        return res.status(404).json({ error: 'No users found...' });
       }
 
       return res.status(200).json(users);
