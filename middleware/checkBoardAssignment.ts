@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import prisma from '../prisma/prisma';
 import UserIdSchema from '../validators/UserIdSchema';
 
+// [TODO - consider caching to improve performance]
 const checkBoardAssignment = async (req: Request, res: Response, next: NextFunction) => {
   let requestAuthor;
 
@@ -15,15 +16,21 @@ const checkBoardAssignment = async (req: Request, res: Response, next: NextFunct
     const task = await prisma.task.findUnique({ where: { id: req.params.taskId } });
     if (!task) return res.status(404).json({ error: 'Task not found...' });
 
+    // Double check if the associated board exists
     const board = await prisma.board.findUnique({
       where: { id: task.boardId },
-      include: { users: true },
     });
+
     if (!board) return res.status(404).json({ error: 'Board not found...' });
 
-    const isUserAssigned = board.users.some(
-      (userOnBoard) => userOnBoard.userId === requestAuthor.userId
-    );
+    const isUserAssigned = await prisma.userOnBoard.findUnique({
+      where: {
+        userId_boardId: {
+          userId: requestAuthor.userId,
+          boardId: task.boardId,
+        },
+      },
+    });
     if (!isUserAssigned)
       return res
         .status(403)
