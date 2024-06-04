@@ -1,5 +1,5 @@
 interface Auth0User {
-  sub?: string;
+  sub: string;
   email?: string;
 }
 
