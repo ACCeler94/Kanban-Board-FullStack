@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createBoardDTO from '../validators/boards/create-board.dto';
-import UpdateBoardTitleDTO from '../validators/boards/update-board-title';
+import UpdateBoardTitleDTO from '../validators/boards/update-board-title.dto';
 import UserIdSchema from '../validators/UserIdSchema';
 
 const BoardsController = {
