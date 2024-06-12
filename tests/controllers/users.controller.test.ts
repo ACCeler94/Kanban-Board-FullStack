@@ -237,4 +237,86 @@ describe('UsersController', () => {
       expect(next).toHaveBeenCalledWith(error);
     });
   });
+
+  describe('createUser', () => {
+    let req: Partial<Request & { oidc?: RequestContext & { user?: Auth0User } }>;
+    let res: Partial<Response>;
+    let next: NextFunction;
+
+    beforeEach(() => {
+      req = {
+        oidc: {
+          user: {
+            sub: 'auth0|123456789',
+          },
+          isAuthenticated: () => true,
+          fetchUserInfo: async () => {},
+        } as unknown as RequestContext & { user: Auth0User },
+        body: {
+          name: 'John Doe',
+        },
+      };
+
+      res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      next = vi.fn() as unknown as NextFunction;
+    });
+
+    it('should return 201 status and created user when email is provided in authUser', async () => {
+      req.oidc!.user!.email = 'auth0@example.com';
+      prisma.user.create.mockResolvedValue(mockUser);
+
+      await UsersController.createUser(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith(mockUser);
+    });
+
+    it('should return 201 status and created user when email is provided in the request body object', async () => {
+      (req.body as { name: string; email: string }).email = 'john@example.com';
+      prisma.user.create.mockResolvedValue(mockUser);
+
+      await UsersController.createUser(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith(mockUser);
+    });
+
+    it('should return 400 status and invalid data error if auth0 sub is not provided', async () => {
+      req.oidc!.user!.sub = '';
+
+      await UsersController.createUser(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'User information is incomplete. Try again. ',
+      });
+    });
+
+    it('should return 400 status and invalid data error if auth0 user object is not provided', async () => {
+      req.oidc!.user = undefined;
+
+      await UsersController.createUser(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'User information is incomplete. Try again. ',
+      });
+    });
+
+    it('should return 409 status and prompt to log in if the user with this email already exists', async () => {
+      req.oidc!.user!.email = 'auth0@example.com';
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+
+      await UsersController.createUser(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'User with this email already exists, please log in.',
+      });
+    });
+  });
 });
