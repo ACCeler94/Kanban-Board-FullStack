@@ -138,6 +138,15 @@ describe('UsersController', () => {
         error: 'User not found...',
       });
     });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.user.findUnique.mockRejectedValue(error);
+
+      await UsersController.getBySub(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
   });
 
   describe('findByEmail', () => {
@@ -217,6 +226,15 @@ describe('UsersController', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({ error: 'Invalid search query.' });
+    });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.user.findMany.mockRejectedValue(error);
+
+      await UsersController.findByEmail(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
     });
   });
 });
