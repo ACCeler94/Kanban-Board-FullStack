@@ -99,7 +99,7 @@ const UsersController = {
     try {
       userData = createUserDTO.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid name' });
+      return res.status(400).json({ error: 'Invalid user data.' });
     }
 
     const { name } = userData;

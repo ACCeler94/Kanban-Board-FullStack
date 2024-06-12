@@ -307,6 +307,15 @@ describe('UsersController', () => {
       });
     });
 
+    it('should return 400 status and invalid data error if request body is invalid', async () => {
+      req.body = undefined;
+
+      await UsersController.createUser(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid user data.' });
+    });
+
     it('should return 409 status and prompt to log in if the user with this email already exists', async () => {
       req.oidc!.user!.email = 'auth0@example.com';
       prisma.user.findUnique.mockResolvedValue(mockUser);
