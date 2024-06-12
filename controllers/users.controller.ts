@@ -114,7 +114,7 @@ const UsersController = {
     // if the email is provided by auth0 then save it, otherwise save the email provided by the user in the registration form (userData) - the form will prompt for email only if it is not provided by auth0
     if (authUser.email) {
       email = authUser.email;
-    } else if (!authUser && userData.email) {
+    } else if (!authUser.email && userData.email) {
       email = userData.email;
     } else {
       return res.status(400).json({ error: 'User information is incomplete. Try again.' });
