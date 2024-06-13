@@ -31,7 +31,7 @@ const TasksController = {
         },
       });
 
-      if (!task) return res.status(404).json({ error: 'Task not found' });
+      if (!task) return res.status(404).json({ error: 'Task not found...' });
 
       res.status(200).json(task);
     } catch (error) {
@@ -46,7 +46,7 @@ const TasksController = {
     try {
       taskData = createTaskDTO.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid data' });
+      return res.status(400).json({ error: 'Invalid data.' });
     }
 
     try {
@@ -61,13 +61,14 @@ const TasksController = {
 
       if (!board) return res.status(404).json({ error: 'Board not found...' });
 
+      // check if user is assigned to the board = authorized to create a task on this board
       const isUserAssigned = board.users.some(
         (userOnBoard) => userOnBoard.userId === taskData.authorId
       );
       if (!isUserAssigned)
         return res
           .status(403)
-          .json({ error: 'Access forbidden. User is not assigned to the board.' });
+          .json({ error: 'Access forbidden! User is not assigned to the board.' });
 
       const task = await prisma.task.create({ data: taskData });
 
