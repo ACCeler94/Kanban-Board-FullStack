@@ -327,5 +327,15 @@ describe('UsersController', () => {
         error: 'User with this email already exists, please log in.',
       });
     });
+
+    it('should call next with an error if an exception occurs', async () => {
+      req.oidc!.user!.email = 'auth0@example.com';
+      const error = new Error('Database error');
+      prisma.user.create.mockRejectedValue(error);
+
+      await UsersController.createUser(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
   });
 });
