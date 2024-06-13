@@ -4,11 +4,12 @@ import UsersController from '../../controllers/users.controller';
 import prisma from '../../prisma/__mocks__/prisma';
 import Auth0User from '../../types/Auth0User';
 import { RequestContext } from 'express-openid-connect';
+import { Board, Task, User } from '@prisma/client';
 
 vi.mock('../../prisma/prisma.ts');
 
 describe('UsersController', () => {
-  const mockUser = {
+  const mockUser: User = {
     id: '1',
     name: 'John Doe',
     email: 'john@example.com',
@@ -34,7 +35,12 @@ describe('UsersController', () => {
     });
 
     it('should return the user and status 200', async () => {
-      const mockUserExtended = {
+      const mockUserExtended: User & {
+        assignedTasks: Task[];
+        boards: Board[];
+        authoredBoards: Board[];
+        authoredTasks: Task[];
+      } = {
         id: '1',
         name: 'John Doe',
         email: 'john@example.com',
@@ -168,7 +174,7 @@ describe('UsersController', () => {
     });
 
     it('should return the users array and 200 status', async () => {
-      const mockUserArr = [
+      const mockUserArr: User[] = [
         {
           id: '1',
           name: 'John Doe',
