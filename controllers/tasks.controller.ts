@@ -139,11 +139,22 @@ const TasksController = {
       return res.status(400).json({ error: 'Invalid data' });
     }
 
+    if (Object.keys(taskData).length === 0) {
+      return res.status(400).json({ error: 'Updated task data cannot be empty!' });
+    }
+
     try {
       const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
-      await prisma.task.update({ where: { id: taskId }, data: taskData });
+      // allow partial updates
+      await prisma.task.update({
+        where: { id: taskId },
+        data: {
+          ...task,
+          ...taskData,
+        },
+      });
       res.status(200).json({ message: 'Task updated!' });
     } catch (error) {
       next(error);
