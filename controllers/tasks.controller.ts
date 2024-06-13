@@ -82,16 +82,32 @@ const TasksController = {
     const { taskId, userId } = req.params;
 
     try {
-      const task = await prisma.task.findUnique({ where: { id: taskId } });
-      if (!task) return res.status(404).json({ message: 'Task not found...' });
+      const task = await prisma.task.findUnique({
+        where: { id: taskId },
+        include: {
+          board: {
+            include: {
+              users: true,
+            },
+          },
+        },
+      });
+      if (!task) return res.status(404).json({ error: 'Task not found...' });
 
       const user = await prisma.user.findUnique({ where: { id: userId } });
-      if (!user) return res.status(404).json({ message: 'User not found...' });
-    } catch (error) {
-      next(error);
-    }
+      if (!user) return res.status(404).json({ error: 'User not found...' });
 
-    try {
+      // Check if the user being added is assigned to the board
+      const isUserAssignedToBoard = task.board.users.some(
+        (userOnBoard) => userOnBoard.userId === userId
+      );
+      if (!isUserAssignedToBoard) {
+        return res
+          .status(403)
+          .json({ error: 'Access forbidden! User is not assigned to the board.' });
+      }
+
+      // Check if the user is already assigned to the task
       const existingUserOnTask = await prisma.userOnTask.findUnique({
         where: {
           userId_taskId: {
@@ -101,9 +117,11 @@ const TasksController = {
         },
       });
 
-      if (existingUserOnTask)
-        return res.status(409).json({ error: 'User is already added to the task' });
+      if (existingUserOnTask) {
+        return res.status(409).json({ error: 'User is already added to the task!' });
+      }
 
+      // Assign the user to the task
       await prisma.userOnTask.create({ data: { userId, taskId } });
       res.status(201).json({ message: 'User assigned to the task!' });
     } catch (error) {
