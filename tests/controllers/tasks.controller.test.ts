@@ -2,13 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import prisma from '../../prisma/__mocks__/prisma';
 import { RequestContext } from 'express-openid-connect';
-import { TaskStatus } from '@prisma/client';
+import { Board, Task, TaskStatus, User } from '@prisma/client';
 import TasksController from '../../controllers/tasks.controller';
 
 vi.mock('../../prisma/prisma.ts');
 
 describe('TasksController', () => {
-  const mockTask = {
+  const mockTask: Task = {
     id: '1',
     createdAt: new Date('2024-06-12 16:04:21.778'),
     updatedAt: new Date('2024-06-12 16:04:21.778'),
@@ -18,20 +18,19 @@ describe('TasksController', () => {
     authorId: '3713d558-d107-4c4b-b651-a99676e4315e',
     status: TaskStatus.TO_DO,
   };
-  const mockBoard = {
+  const mockBoard: Board & { users: { userId: string }[] } = {
     id: 'board_id',
-    name: 'Mock Board',
     createdAt: new Date('2024-06-12 16:04:21.778'),
-    updatedAt: new Date('2024-06-12 16:04:21.778'),
     title: 'Mock Board Title',
     authorId: '123',
     users: [{ userId: '3713d558-d107-4c4b-b651-a99676e4315e' }],
   };
 
-  const mockUser = {
+  const mockUser: User = {
     id: '3713d558-d107-4c4b-b651-a99676e4315e',
     name: 'John Smith',
     email: 'john@example.com',
+    auth0Sub: 'auth0|123456789',
   };
 
   describe('getById', () => {
@@ -162,6 +161,117 @@ describe('TasksController', () => {
       prisma.task.create.mockRejectedValue(error);
 
       await TasksController.createTask(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('addUserToTask', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let next: NextFunction;
+
+    const mockTaskExtended: Task & { board: Board & { users: { userId: string }[] } } = {
+      id: '1',
+      createdAt: new Date('2024-06-12 16:04:21.778'),
+      updatedAt: new Date('2024-06-12 16:04:21.778'),
+      title: 'Task one',
+      desc: 'this is task one',
+      boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
+      authorId: '3713d558-d107-4c4b-b651-a99676e4315e',
+      status: TaskStatus.TO_DO,
+      board: {
+        id: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
+        createdAt: new Date('2024-06-12 16:04:21.778'),
+        title: 'Mock Board Title',
+        authorId: '123',
+        users: [{ userId: '3713d558-d107-4c4b-b651-a99676e4315e' }],
+      },
+    };
+
+    beforeEach(() => {
+      req = {
+        params: {
+          taskId: mockTask.id,
+          userId: mockUser.id,
+        },
+      };
+
+      res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      next = vi.fn() as unknown as NextFunction;
+    });
+
+    it('should return 201 status and success message if the user was added to the task', async () => {
+      prisma.task.findUnique.mockResolvedValue(mockTaskExtended);
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.userOnTask.findUnique.mockResolvedValue(null);
+      prisma.userOnTask.create.mockResolvedValue({ userId: mockUser.id, taskId: mockTask.id });
+
+      await TasksController.addUserToTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith({ message: 'User assigned to the task!' });
+    });
+
+    it('should return 404 status and error message if task was not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(null);
+
+      await TasksController.addUserToTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Task not found...' });
+    });
+
+    it('should return 404 status and error message if user was not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(mockTaskExtended);
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await TasksController.addUserToTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'User not found...' });
+    });
+
+    it('should return 403 status and error message if added user is not assigned to the board', async () => {
+      const mockTaskWithoutUser: Task & { board: Board & { users: { userId: string }[] } } = {
+        ...mockTaskExtended,
+        board: {
+          ...mockTaskExtended.board,
+          users: [], // Empty users array indicating no user assigned to the board
+        },
+      };
+
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.task.findUnique.mockResolvedValue(mockTaskWithoutUser);
+
+      await TasksController.addUserToTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Access forbidden! User is not assigned to the board.',
+      });
+    });
+
+    it('should return 409 status and error message if user is already assigned to the task', async () => {
+      prisma.task.findUnique.mockResolvedValue(mockTaskExtended);
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.userOnTask.findUnique.mockResolvedValue({ userId: mockUser.id, taskId: mockTask.id });
+
+      await TasksController.addUserToTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.json).toHaveBeenCalledWith({ error: 'User is already added to the task!' });
+    });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.task.findUnique.mockRejectedValue(error);
+
+      await TasksController.addUserToTask(req as Request, res as Response, next);
 
       expect(next).toHaveBeenCalledWith(error);
     });
