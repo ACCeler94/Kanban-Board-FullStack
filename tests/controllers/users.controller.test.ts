@@ -55,11 +55,15 @@ describe('UsersController', () => {
       await UsersController.getById(req as Request, res as Response, next);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(prisma.user.findUnique).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { id: req.params!.userId },
-        })
-      );
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: '1' },
+        include: {
+          assignedTasks: true,
+          boards: true,
+          authoredBoards: true,
+          authoredTasks: true,
+        },
+      });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockUserExtended);
     });
