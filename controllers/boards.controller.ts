@@ -122,6 +122,10 @@ const BoardsController = {
         where: {
           id: boardId,
         },
+        select: {
+          id: true,
+          authorId: true,
+        },
       });
 
       if (!board) return res.status(404).json({ error: 'Board not found...' });
@@ -157,7 +161,12 @@ const BoardsController = {
     try {
       const board = await prisma.board.findUnique({
         where: { id: boardId },
+        select: {
+          id: true,
+          authorId: true,
+        },
       });
+
       if (!board) return res.status(404).json({ error: 'Board not found...' });
       if (board.authorId !== requestAuthor.userId)
         return res
@@ -199,7 +208,6 @@ const BoardsController = {
     }
   },
 
-  // [TODO - add authorization to allow deleting a board only by the author of the board]
   deleteBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
     let requestAuthor;
@@ -215,7 +223,12 @@ const BoardsController = {
         where: {
           id: boardId,
         },
+        select: {
+          id: true,
+          authorId: true,
+        },
       });
+
       if (!board) return res.status(404).json({ error: 'Board not found...' });
       if (board.authorId !== requestAuthor.userId)
         return res
@@ -228,13 +241,12 @@ const BoardsController = {
         },
       });
 
-      res.status(200).json({ message: 'Board successfully removed' });
+      res.status(200).json({ message: 'Board successfully removed!' });
     } catch (error) {
       next(error);
     }
   },
 
-  // [TODO - add authorization to allow deleting a board only by the author of the board]
   deleteUserFromBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId, userId } = req.params;
     let requestAuthor;
@@ -242,14 +254,19 @@ const BoardsController = {
     try {
       requestAuthor = UserIdSchema.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid user data' });
+      return res.status(400).json({ error: 'Invalid user data!' });
     }
 
     try {
       // Check if the board exists and user authorization
       const board = await prisma.board.findUnique({
         where: { id: boardId },
+        select: {
+          id: true,
+          authorId: true,
+        },
       });
+
       if (!board) return res.status(404).json({ error: 'Board not found...' });
       if (board.authorId !== requestAuthor.userId)
         return res
