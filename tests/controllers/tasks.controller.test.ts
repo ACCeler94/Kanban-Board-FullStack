@@ -18,7 +18,7 @@ describe('TasksController', () => {
     status: TaskStatus.TO_DO,
   };
   const mockBoard: Board & { users: { userId: string }[] } = {
-    id: 'board_id',
+    id: '1',
     createdAt: new Date('2024-06-12 16:04:21.778'),
     title: 'Mock Board Title',
     authorId: '123',
@@ -58,11 +58,13 @@ describe('TasksController', () => {
       await TasksController.getById(req as Request, res as Response, next);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(prisma.task.findUnique).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { id: req.params!.taskId },
-        })
-      );
+      expect(prisma.task.findUnique).toHaveBeenCalledWith({
+        where: { id: '1' },
+        include: {
+          author: { select: { id: true, name: true } },
+          assignedUsers: { select: { user: { select: { id: true, name: true } } } },
+        },
+      });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(mockTask);
     });
