@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import prisma from '../../prisma/__mocks__/prisma';
-import { RequestContext } from 'express-openid-connect';
 import { Board, Task, TaskStatus, User } from '@prisma/client';
 import TasksController from '../../controllers/tasks.controller';
 
@@ -389,6 +388,81 @@ describe('TasksController', () => {
       prisma.task.findUnique.mockRejectedValue(error);
 
       await TasksController.deleteTask(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('deleteUserFromTask ', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let next: NextFunction;
+
+    beforeEach(() => {
+      req = {
+        params: {
+          taskId: '1',
+          userId: '3713d558-d107-4c4b-b651-a99676e4315e',
+        },
+      };
+
+      res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      next = vi.fn() as unknown as NextFunction;
+    });
+
+    it('should return 200 status and success message if user was removed from the task', async () => {
+      prisma.task.findUnique.mockResolvedValue(mockTask);
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.userOnTask.findUnique.mockResolvedValue({
+        userId: '3713d558-d107-4c4b-b651-a99676e4315e',
+        taskId: '1',
+      });
+
+      await TasksController.deleteUserFromTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'User removed from the task!' });
+    });
+
+    it('should return 404 status and error message if the task was not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(null);
+
+      await TasksController.deleteUserFromTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Task not found...' });
+    });
+
+    it('should return 404 status and error message if the user was not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(mockTask);
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await TasksController.deleteUserFromTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'User not found...' });
+    });
+
+    it('should return 400 status and error message if the user was not assigned to the task in the first place', async () => {
+      prisma.task.findUnique.mockResolvedValue(mockTask);
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.userOnTask.findUnique.mockResolvedValue(null);
+
+      await TasksController.deleteUserFromTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: 'User is not assigned to this task!' });
+    });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.task.findUnique.mockRejectedValue(error);
+
+      await TasksController.deleteUserFromTask(req as Request, res as Response, next);
 
       expect(next).toHaveBeenCalledWith(error);
     });
