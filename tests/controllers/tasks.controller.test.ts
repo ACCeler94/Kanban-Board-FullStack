@@ -276,4 +276,121 @@ describe('TasksController', () => {
       expect(next).toHaveBeenCalledWith(error);
     });
   });
+
+  describe('editTask', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let next: NextFunction;
+
+    beforeEach(() => {
+      req = {
+        params: {
+          taskId: '1',
+        },
+        body: {
+          title: 'Task One edited', // one property is enough as the method allows partial updates
+        },
+      };
+
+      res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      next = vi.fn() as unknown as NextFunction;
+    });
+
+    it('should return 200 status and success message if task was updated', async () => {
+      prisma.task.findUnique.mockResolvedValue(mockTask);
+
+      await TasksController.editTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Task updated!' });
+    });
+
+    it('should return 400 status and error message if task data has invalid format', async () => {
+      req.body = { title: 1 };
+
+      await TasksController.editTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid data' });
+    });
+
+    it('should return 400 status and error message if task data is an empty object', async () => {
+      req.body = {};
+
+      await TasksController.editTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Updated task data cannot be empty!' });
+    });
+
+    it('should return 404 status and error message if task was not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(null);
+
+      await TasksController.editTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Task not found...' });
+    });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.task.findUnique.mockRejectedValue(error);
+
+      await TasksController.editTask(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('deleteTask', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let next: NextFunction;
+
+    beforeEach(() => {
+      req = {
+        params: {
+          taskId: '1',
+        },
+      };
+
+      res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      next = vi.fn() as unknown as NextFunction;
+    });
+
+    it('should return 200 status and success message if task was successfully deleted', async () => {
+      prisma.task.findUnique.mockResolvedValue(mockTask);
+
+      await TasksController.deleteTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Task successfully removed!' });
+    });
+
+    it('should return 404 status and error message if task was not found', async () => {
+      prisma.task.findUnique.mockResolvedValue(null);
+
+      await TasksController.deleteTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Task not found...' });
+    });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.task.findUnique.mockRejectedValue(error);
+
+      await TasksController.deleteTask(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
 });
