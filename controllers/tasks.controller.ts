@@ -169,7 +169,7 @@ const TasksController = {
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
       await prisma.task.delete({ where: { id: taskId } });
-      return res.status(200).json({ message: 'Task successfully removed' });
+      return res.status(200).json({ message: 'Task successfully removed!' });
     } catch (error) {
       next(error);
     }
