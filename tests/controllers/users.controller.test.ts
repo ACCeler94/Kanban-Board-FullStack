@@ -339,6 +339,15 @@ describe('UsersController', () => {
       expect(res.json).toHaveBeenCalledWith({ error: 'Invalid user data.' });
     });
 
+    it('should return 400 status and error message if email has not been provided in neither auth0 user object nor the request body', async () => {
+      await UsersController.createUser(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'User information is incomplete. Try again.',
+      });
+    });
+
     it('should return 409 status and prompt to log in if the user with this email already exists', async () => {
       req.oidc!.user!.email = 'auth0@example.com';
       prisma.user.findUnique.mockResolvedValue(mockUser);
