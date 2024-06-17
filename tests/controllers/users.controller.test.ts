@@ -41,10 +41,7 @@ describe('UsersController', () => {
         authoredBoards: Board[];
         authoredTasks: Task[];
       } = {
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        auth0Sub: 'auth0|123456789',
+        ...mockUser,
         assignedTasks: [],
         boards: [],
         authoredBoards: [],
@@ -281,16 +278,32 @@ describe('UsersController', () => {
 
       await UsersController.createUser(req as Request, res as Response, next);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.user.create).toHaveBeenCalledWith({
+        data: {
+          name: 'John Doe',
+          email: req.oidc!.user!.email,
+          auth0Sub: req.oidc!.user!.sub,
+        },
+      });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(mockUser);
     });
 
     it('should return 201 status and created user when email is provided in the request body object', async () => {
-      (req.body as { name: string; email: string }).email = 'john@example.com';
+      req.body = { name: 'John Doe', email: 'john@example.com' };
       prisma.user.create.mockResolvedValue(mockUser);
 
       await UsersController.createUser(req as Request, res as Response, next);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.user.create).toHaveBeenCalledWith({
+        data: {
+          name: 'John Doe',
+          email: 'john@example.com',
+          auth0Sub: req.oidc!.user!.sub,
+        },
+      });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(mockUser);
     });
