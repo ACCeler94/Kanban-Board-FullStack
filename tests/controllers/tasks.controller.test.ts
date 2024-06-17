@@ -117,6 +117,15 @@ describe('TasksController', () => {
 
       await TasksController.createTask(req as Request, res as Response, next);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.task.create).toHaveBeenCalledWith({
+        data: {
+          title: 'Task one',
+          desc: 'this is task one',
+          authorId: '3713d558-d107-4c4b-b651-a99676e4315e',
+          boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
+        },
+      });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(mockTask);
     });
@@ -214,6 +223,10 @@ describe('TasksController', () => {
 
       await TasksController.addUserToTask(req as Request, res as Response, next);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.userOnTask.create).toHaveBeenCalledWith({
+        data: { userId: req.params!.userId, taskId: req.params!.taskId },
+      });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({ message: 'User assigned to the task!' });
     });
@@ -302,10 +315,20 @@ describe('TasksController', () => {
     });
 
     it('should return 200 status and success message if task was updated', async () => {
+      const mockTaskUpdated = { ...mockTask, title: 'Task One edited' };
       prisma.task.findUnique.mockResolvedValue(mockTask);
+      prisma.task.update.mockResolvedValue(mockTaskUpdated);
 
       await TasksController.editTask(req as Request, res as Response, next);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.task.update).toHaveBeenCalledWith({
+        where: { id: req.params!.taskId },
+        data: {
+          ...mockTask,
+          title: 'Task One edited',
+        },
+      });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ message: 'Task updated!' });
     });
@@ -369,9 +392,12 @@ describe('TasksController', () => {
 
     it('should return 200 status and success message if task was successfully deleted', async () => {
       prisma.task.findUnique.mockResolvedValue(mockTask);
+      prisma.task.delete.mockResolvedValue(mockTask);
 
       await TasksController.deleteTask(req as Request, res as Response, next);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.task.delete).toHaveBeenCalledWith({ where: { id: req.params!.taskId } });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ message: 'Task successfully removed!' });
     });
@@ -423,9 +449,22 @@ describe('TasksController', () => {
         userId: '3713d558-d107-4c4b-b651-a99676e4315e',
         taskId: '1',
       });
+      prisma.userOnTask.delete.mockResolvedValue({
+        userId: '3713d558-d107-4c4b-b651-a99676e4315e',
+        taskId: '1',
+      });
 
       await TasksController.deleteUserFromTask(req as Request, res as Response, next);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.userOnTask.delete).toHaveBeenCalledWith({
+        where: {
+          userId_taskId: {
+            userId: req.params!.userId,
+            taskId: req.params!.taskId,
+          },
+        },
+      });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ message: 'User removed from the task!' });
     });
