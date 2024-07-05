@@ -4,7 +4,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./client:/app
+      - ./client:/app:cached
+      - /app/node_modules
     environment:
       - NODE_ENV=development
     env_file:
@@ -15,7 +16,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
+      - ./backend:/app:cached
+      - /app/node_modules
     environment:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
