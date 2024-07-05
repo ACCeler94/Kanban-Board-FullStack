@@ -6,18 +6,19 @@ import validateUserIdParam from '../middleware/validateUserIdParam';
 
 const router = Router();
 
+router.use(requiresAuth()); // add to all user routes
 // GET requests
 // [TODO - delete this endpoint for production]
-router.route('/users').get(requiresAuth, UsersController.getAll);
+router.route('/users').get(UsersController.getAll);
 
-router.route('/users/:userId').get(requiresAuth, validateUserIdParam, UsersController.getById);
+router.route('/users/:userId').get(validateUserIdParam, UsersController.getById);
 
-router.route('/users/sub').get(requiresAuth, UsersController.getBySub);
+router.route('/users/sub').get(UsersController.getBySub);
 
-router.route('/users/search').get(requiresAuth, UsersController.findByEmail); // search query (allowing partial searching) = search?email=""
+router.route('/users/search').get(UsersController.findByEmail); // search query (allowing partial searching) = search?email=""
 
 // POST requests
-router.route('/users').post(requiresAuth, UsersController.createUser);
+router.route('/users').post(UsersController.createUser);
 
 export type userRoutes = typeof router;
 export { router as userRoutes };
