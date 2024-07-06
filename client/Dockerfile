@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm install;
 
 # Install the missing dependency thrown by Docker
 RUN npm install @rollup/rollup-linux-arm64-gnu --save-dev

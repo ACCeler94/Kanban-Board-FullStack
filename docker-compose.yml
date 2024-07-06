@@ -4,7 +4,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./client:/app:cached
+      - ./client:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
@@ -16,7 +16,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app:cached
+      - ./backend:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
