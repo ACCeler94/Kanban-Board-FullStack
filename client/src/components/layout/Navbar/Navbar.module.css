@@ -1,0 +1,13 @@
+.navbar {
+  height: 80px;
+}
+
+.navbar, .titleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  font-weight: 900;
+  margin: 0 15px;
+}
