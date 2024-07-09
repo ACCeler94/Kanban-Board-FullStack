@@ -1,13 +1,33 @@
 .navbar {
-  height: 80px;
+  height: 90px;
+  border-bottom: 1px solid var(--light-blue);
+  background-color: var(--white);
 }
 
-.navbar, .titleContainer {
+.navbar, .titleContainer, .wrapper {
   display: flex;
   align-items: center;
 }
 
+.wrapper {
+  height: 100%;
+}
+
 .title {
-  font-weight: 900;
+  font-weight: 800;
   margin: 0 15px;
+}
+
+.titleContainer {
+  height: 100%;
+  padding-right: 30px;
+  border-right: 1px solid var(--light-blue);
+}
+
+.utilityBar {
+  padding-left: 30px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
 }
