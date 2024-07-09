@@ -1,5 +1,4 @@
 :root {
-  font-family: var(--main-font);
   font-weight: 400;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -7,11 +6,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  background-color: var(--very-light-blue);
-}
-
 a {
   text-decoration: none;
   color: inherit;
+}
+
+
+.button-small {
+  height: 40px;
+  width: 200px;
+}
+
+.button-large {
+  height: 48px;
+  width: 200px;
 }
