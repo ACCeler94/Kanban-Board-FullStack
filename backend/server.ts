@@ -2,13 +2,21 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import { boardsRoutes } from './routes/boards.routes';
 import { tasksRoutes } from './routes/tasks.routes';
-import { auth, requiresAuth } from 'express-openid-connect';
+import { auth, ConfigParams, requiresAuth } from 'express-openid-connect';
 import { userRoutes } from './routes/users.routes';
+import session from 'express-session';
+import { authRoutes } from './routes/auth.routes';
+
+declare module 'express-session' {
+  interface SessionData {
+    userId: string;
+  }
+}
 
 const app: Express = express();
 const port = 8000;
 
-const config = {
+export const auth0Config: ConfigParams = {
   authRequired: false,
   auth0Logout: true,
   secret: process.env.AUTH_SECRET,
@@ -26,11 +34,24 @@ const config = {
       secure: process.env.NODE_ENV === 'production',
     },
     rolling: true,
-    rollingDuration: 86400, // 1 day
-    absoluteDuration: 604800, // 7 days
+    absoluteDuration: 86400, // 1 day
   },
 };
-app.use(auth(config));
+
+// Express session configuration
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 86400,
+    },
+  })
+);
+app.use(auth(auth0Config));
 app.use(express.urlencoded({ extended: false })); // required to handle urlencoded requests
 app.use(express.json()); // required to handle form-data request
 app.use(cors()); // middleware to enable CORS requests
@@ -47,6 +68,7 @@ app.get('/profile', requiresAuth(), (req, res) => {
 app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
+app.use('/auth', authRoutes);
 
 // // Serve static files from the React app
 // app.use(express.static(path.join(__dirname, '/client/build')));
