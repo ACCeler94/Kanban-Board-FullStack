@@ -20,14 +20,9 @@ export const auth0Config: ConfigParams = {
   authRequired: false,
   auth0Logout: true,
   secret: process.env.AUTH_SECRET,
-  baseURL: 'http://localhost:8000/',
+  baseURL: 'http://localhost:8000',
   clientID: process.env.AUTH0_CLIENT_ID,
   issuerBaseURL: process.env.AUTH0_DOMAIN,
-  routes: {
-    login: '/auth/login',
-    logout: '/auth/logout',
-    callback: '/auth/callback',
-  },
   session: {
     cookie: {
       httpOnly: true,
@@ -36,39 +31,55 @@ export const auth0Config: ConfigParams = {
     rolling: true,
     absoluteDuration: 86400, // 1 day
   },
+  authorizationParams: {
+    scope: 'openid profile email',
+  },
 };
 
 // Express session configuration
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET!,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 86400,
-    },
-  })
-);
-app.use(auth(auth0Config));
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET!,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === 'production',
+//       maxAge: 86400,
+//     },
+//   })
+// );
+
 app.use(express.urlencoded({ extended: false })); // required to handle urlencoded requests
 app.use(express.json()); // required to handle form-data request
 app.use(cors()); // middleware to enable CORS requests
+
+// middleware to log request to the console
+app.use((req, res, next) => {
+  console.log(`Request: ${req.method} ${req.url}`);
+  next();
+});
+
+app.use(auth(auth0Config));
+
+app.post('/callback', (req, res) => {
+  console.log('Callback route reached - TEST 2');
+  res.redirect('http://localhost:3000');
+});
 
 app.get('/', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
 });
 
-app.get('/profile', requiresAuth(), (req, res) => {
-  res.send(JSON.stringify(req.oidc.user));
-});
+// app.get('/profile', requiresAuth(), (req, res) => {
+//   res.send(JSON.stringify(req.oidc.user));
+// });
 
 // endpoints
+app.use('/test', authRoutes);
 app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
-app.use('/auth', authRoutes);
 
 // // Serve static files from the React app
 // app.use(express.static(path.join(__dirname, '/client/build')));

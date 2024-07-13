@@ -7,6 +7,7 @@ const AuthController = {
   // fetch user by auth0 sub and attach userId from the db to the session
   // [TODO if the user does not exist in db redirect to post login form ]
   PostLogin: async (req: Request, res: Response, next: NextFunction) => {
+    console.log('Callback route reached');
     const authUser = req.oidc.user as Auth0User;
     try {
       let user;
@@ -26,9 +27,18 @@ const AuthController = {
         });
       }
 
-      if (!user) return res.status(404).json({ error: 'User not found... Try again.' });
+      if (!user) user = { id: 'abc' };
 
       req.session.userId = user.id;
+      console.log('user id added' + user.id);
+
+      req.session.save((err) => {
+        if (err) {
+          console.error('Error saving session:', err);
+          return next(err);
+        }
+      });
+      res.redirect('/not-working');
     } catch (error) {
       next(error);
     }
@@ -39,8 +49,11 @@ const AuthController = {
     const logoutURL = `https://${auth0Config.issuerBaseURL}/v2/logout?client_id=${auth0Config.clientID}&returnTo=${returnTo}`;
 
     req.session.destroy((err: Error) => {
+      console.log('session removed');
       if (err) {
         console.log('Error clearing session:', err);
+      } else {
+        res.clearCookie('connect.sid');
       }
 
       res.redirect(logoutURL);

@@ -5,7 +5,7 @@ import { requiresAuth } from 'express-openid-connect';
 
 const router = Router();
 
-router.route('/callback').get(AuthController.PostLogin);
+router.route('/callback').post(AuthController.PostLogin);
 
 router.route('/logout').get(requiresAuth(), AuthController.Logout);
 
