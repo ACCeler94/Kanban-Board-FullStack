@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import { boardsRoutes } from './routes/boards.routes';
@@ -34,21 +35,25 @@ export const auth0Config: ConfigParams = {
   authorizationParams: {
     scope: 'openid profile email',
   },
+  routes: {
+    login: false,
+    callback: false,
+  },
 };
 
 // Express session configuration
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET!,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === 'production',
-//       maxAge: 86400,
-//     },
-//   })
-// );
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 86400,
+    },
+  })
+);
 
 app.use(express.urlencoded({ extended: false })); // required to handle urlencoded requests
 app.use(express.json()); // required to handle form-data request
@@ -62,21 +67,32 @@ app.use((req, res, next) => {
 
 app.use(auth(auth0Config));
 
-app.post('/callback', (req, res) => {
-  console.log('Callback route reached - TEST 2');
-  res.redirect('http://localhost:3000');
-});
+// auth0 routes
+app.get('/login', (req, res) =>
+  res.oidc.login({
+    returnTo: '/auth/post-login',
+    authorizationParams: {
+      redirect_uri: 'http://localhost:8000/callback',
+    },
+  })
+);
+
+app.post('/callback', express.urlencoded({ extended: false }), (req, res) =>
+  res.oidc.callback({
+    redirectUri: 'http://localhost:8000/callback',
+  })
+);
 
 app.get('/', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
 });
 
-// app.get('/profile', requiresAuth(), (req, res) => {
-//   res.send(JSON.stringify(req.oidc.user));
-// });
+app.get('/profile', requiresAuth(), (req, res) => {
+  res.send(JSON.stringify(req.oidc.user));
+});
 
 // endpoints
-app.use('/test', authRoutes);
+app.use('/auth', authRoutes);
 app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
