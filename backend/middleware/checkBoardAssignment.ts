@@ -1,16 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../prisma/prisma';
-import UserIdSchema from '../validators/UserIdSchema';
 
 // [TODO - consider caching to improve performance]
 const checkBoardAssignment = async (req: Request, res: Response, next: NextFunction) => {
-  let requestAuthor;
+  const requestAuthorId = req.session.userId;
 
-  try {
-    requestAuthor = UserIdSchema.parse(req.body);
-  } catch (error) {
-    return res.status(400).json({ error: 'Invalid user data' });
-  }
+  if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
   try {
     const task = await prisma.task.findUnique({ where: { id: req.params.taskId } });
@@ -26,7 +21,7 @@ const checkBoardAssignment = async (req: Request, res: Response, next: NextFunct
     const isUserAssigned = await prisma.userOnBoard.findUnique({
       where: {
         userId_boardId: {
-          userId: requestAuthor.userId,
+          userId: requestAuthorId,
           boardId: task.boardId,
         },
       },

@@ -3,6 +3,7 @@ import prisma from '../prisma/prisma';
 import createTaskDTO from '../validators/tasks/create-task.dto';
 import editTaskDTO from '../validators/tasks/edit-task.dto';
 
+// task operations can be performed by any user assigned to the board - this condition is checked by checkBoardAssignment middleware
 const TasksController = {
   // GET
   getById: async (req: Request, res: Response, next: NextFunction) => {
@@ -42,6 +43,9 @@ const TasksController = {
   // POST
   createTask: async (req: Request, res: Response, next: NextFunction) => {
     let taskData;
+    const requestAuthorId = req.session.userId;
+
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
       taskData = createTaskDTO.parse(req.body);
@@ -63,14 +67,14 @@ const TasksController = {
 
       // check if user is assigned to the board = authorized to create a task on this board
       const isUserAssigned = board.users.some(
-        (userOnBoard) => userOnBoard.userId === taskData.authorId
+        (userOnBoard) => userOnBoard.userId === requestAuthorId
       );
       if (!isUserAssigned)
         return res
           .status(403)
           .json({ error: 'Access forbidden! User is not assigned to the board.' });
 
-      const task = await prisma.task.create({ data: taskData });
+      const task = await prisma.task.create({ data: { ...taskData, authorId: requestAuthorId } });
 
       res.status(201).json(task);
     } catch (error) {
