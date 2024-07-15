@@ -20,6 +20,14 @@ const UsersController = {
   getById: async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
 
+    // allow only the user to get this information
+
+    const requestAuthorId = req.session.userId;
+
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
+
+    if (userId !== requestAuthorId) return res.status(403).json({ error: 'Access Forbidden!' });
+
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -80,6 +88,10 @@ const UsersController = {
           email: {
             contains: emailQuery,
           },
+        },
+        select: {
+          name: true,
+          email: true,
         },
       });
 
