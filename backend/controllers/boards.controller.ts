@@ -19,19 +19,16 @@ const BoardsController = {
   // getting board by ID is allowed only for  assigned users
   getById: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
-    let requestAuthor;
-    try {
-      requestAuthor = UserIdSchema.parse(req.body);
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid user data.' });
-    }
+    const requestAuthorId = req.session.userId;
+
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
       // check if user who made the request is assigned to the board
       const assignedUser = await prisma.userOnBoard.findUnique({
         where: {
           userId_boardId: {
-            userId: requestAuthor.userId,
+            userId: requestAuthorId,
             boardId,
           },
         },
@@ -78,16 +75,25 @@ const BoardsController = {
       return res.status(400).json({ error: 'Invalid board data!' });
     }
 
+    const requestAuthorId = req.session.userId;
+
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
+
     try {
       // if either creating the board or assigning the author fails - the creation of both should throw an error
       const result = await prisma.$transaction(async (prisma) => {
         // Create the board
-        const board = await prisma.board.create({ data: boardData });
+        const board = await prisma.board.create({
+          data: {
+            title: boardData.title,
+            authorId: requestAuthorId,
+          },
+        });
 
         // Add author to userOnBoard (assignedUsers)
         await prisma.userOnBoard.create({
           data: {
-            userId: boardData.authorId,
+            userId: requestAuthorId,
             boardId: board.id,
           },
         });
@@ -104,14 +110,14 @@ const BoardsController = {
   // editing board title available only for the board's author
   editBoardTitle: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
-
     let title;
-    let requestAuthor;
+    const requestAuthorId = req.session.userId;
+
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
       const bodyObj = UpdateBoardTitleDTO.parse(req.body);
       title = bodyObj.title;
-      requestAuthor = bodyObj.userId;
     } catch (error) {
       return res.status(400).json({ error: 'Invalid data!' });
     }
@@ -128,7 +134,8 @@ const BoardsController = {
       });
 
       if (!board) return res.status(404).json({ error: 'Board not found...' });
-      if (board.authorId !== requestAuthor)
+
+      if (board.authorId !== requestAuthorId)
         return res.status(403).json({ error: 'Editing the board is only allowed by the author!' });
 
       await prisma.board.update({
@@ -149,13 +156,9 @@ const BoardsController = {
   // adding users to the board allowed only for the author of the board
   addUserToBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId, userId } = req.params;
+    const requestAuthorId = req.session.userId;
 
-    let requestAuthor;
-    try {
-      requestAuthor = UserIdSchema.parse(req.body);
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid user data!' });
-    }
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
       const board = await prisma.board.findUnique({
@@ -167,7 +170,7 @@ const BoardsController = {
       });
 
       if (!board) return res.status(404).json({ error: 'Board not found...' });
-      if (board.authorId !== requestAuthor.userId)
+      if (board.authorId !== requestAuthorId)
         return res
           .status(403)
           .json({ error: 'Adding users only allowed by the creator of the board.' });
@@ -209,13 +212,9 @@ const BoardsController = {
 
   deleteBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
-    let requestAuthor;
+    const requestAuthorId = req.session.userId;
 
-    try {
-      requestAuthor = UserIdSchema.parse(req.body);
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid user data!' });
-    }
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
       const board = await prisma.board.findUnique({
@@ -229,7 +228,7 @@ const BoardsController = {
       });
 
       if (!board) return res.status(404).json({ error: 'Board not found...' });
-      if (board.authorId !== requestAuthor.userId)
+      if (board.authorId !== requestAuthorId)
         return res
           .status(403)
           .json({ error: "Deleting the board is only allowed by it's author." });
@@ -248,13 +247,9 @@ const BoardsController = {
 
   deleteUserFromBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId, userId } = req.params;
-    let requestAuthor;
+    const requestAuthorId = req.session.userId;
 
-    try {
-      requestAuthor = UserIdSchema.parse(req.body);
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid user data!' });
-    }
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
       // Check if the board exists and user authorization
@@ -267,7 +262,7 @@ const BoardsController = {
       });
 
       if (!board) return res.status(404).json({ error: 'Board not found...' });
-      if (board.authorId !== requestAuthor.userId)
+      if (board.authorId !== requestAuthorId)
         return res
           .status(403)
           .json({ error: "Removing users from the board is only allowed by it's author." });
