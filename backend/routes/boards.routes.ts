@@ -27,11 +27,11 @@ router
 router.route('/boards/:boardId').put(validateBoardIdParams, BoardsController.editBoardTitle);
 
 // DELETE requests
-router.route('/boards/:boardId').delete(validateBoardIdParams, BoardsController.deleteBoard);
-
 router
   .route('/boards/:boardId/users/:userId')
   .delete(validateBoardIdParams, validateUserIdParam, BoardsController.deleteUserFromBoard); // delete used as it is deleting a relation on UserOnBoard table
+
+router.route('/boards/:boardId').delete(validateBoardIdParams, BoardsController.deleteBoard);
 
 export type boardsRoutes = typeof router;
 export { router as boardsRoutes };

@@ -35,10 +35,6 @@ router
 
 // DELETE requests
 router
-  .route('/tasks/:taskId')
-  .delete(validateTaskIdParam, checkBoardAssignment, TasksController.deleteTask);
-
-router
   .route('/tasks/:taskId/users/:userId')
   .delete(
     validateTaskIdParam,
@@ -46,6 +42,10 @@ router
     checkBoardAssignment,
     TasksController.deleteUserFromTask
   );
+
+router
+  .route('/tasks/:taskId')
+  .delete(validateTaskIdParam, checkBoardAssignment, TasksController.deleteTask);
 
 export type tasksRoutes = typeof router;
 export { router as tasksRoutes };

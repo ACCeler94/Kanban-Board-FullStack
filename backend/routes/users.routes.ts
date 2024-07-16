@@ -11,11 +11,13 @@ router.use(requiresAuth()); // add to all user routes
 // [TODO - delete this endpoint for production]
 router.route('/users').get(UsersController.getAll);
 
-router.route('/users/:userId').get(validateUserIdParam, UsersController.getById);
-
 router.route('/users/sub').get(UsersController.getBySub);
 
 router.route('/users/search').get(UsersController.findByEmail); // search query (allowing partial searching) = search?email=""
+
+router.route('/users/:userId/extended').get(validateUserIdParam, UsersController.getByIdExtended);
+
+router.route('/users/:userId').get(validateUserIdParam, UsersController.getById);
 
 // POST requests
 router.route('/users').post(UsersController.createUser);
