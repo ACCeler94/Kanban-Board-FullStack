@@ -9,15 +9,34 @@ const fetchUserById = async (userId: string) => {
   return data;
 };
 
+const fetchUserByIdExtended = async (userId: string) => {
+  const { data } = await axios.get(`${apiUrl}/users/${userId}/extended`);
+
+  return data;
+};
+
 // hooks
 const useUserById = (userId: string) => {
   const {
     data: user,
     error,
     isPending,
-  } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUserById(userId) });
+  } = useQuery({ queryKey: ['user', userId, 'basic'], queryFn: () => fetchUserById(userId) });
 
   return { user, error, isPending };
 };
 
-export { useUserById };
+const useUserByIdExtended = (userId: string) => {
+  const {
+    data: user,
+    error,
+    isPending,
+  } = useQuery({
+    queryKey: ['user', userId, 'extended'],
+    queryFn: () => fetchUserByIdExtended(userId),
+  });
+
+  return { user, error, isPending };
+};
+
+export { useUserById, useUserByIdExtended };
