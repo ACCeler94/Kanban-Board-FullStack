@@ -3,12 +3,15 @@ import prisma from '../prisma/prisma';
 import Auth0User from '../types/Auth0User';
 
 const AuthController = {
-  // fetch user by auth0 sub and attach userId from the db to the session
+  // fetch user by auth0 sub and attach userId from the db to the session to authorize certain operations based on userId
   // [TODO if the user does not exist in db redirect to post login form ]
   PostLogin: async (req: Request, res: Response, next: NextFunction) => {
     console.log('Callback route reached');
+
     const authUser = req.oidc.user as Auth0User;
+
     console.log(authUser.email);
+
     try {
       let user;
       if (authUser.email) {
@@ -21,7 +24,7 @@ const AuthController = {
       }
 
       // [TODO change to redirect to the post login form!]
-      if (!user) user = { id: 'abc' };
+      if (!user) user = { id: 'abc' }; // debugging value
 
       req.session.userId = user.id;
       console.log('user id added ' + req.session.userId);

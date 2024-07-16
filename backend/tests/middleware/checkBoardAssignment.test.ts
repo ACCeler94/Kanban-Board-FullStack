@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import prisma from '../../prisma/__mocks__/prisma';
 import { TaskStatus } from '@prisma/client';
 import checkBoardAssignment from '../../middleware/checkBoardAssignment';
+import { Session, SessionData } from 'express-session';
 
 vi.mock('../../prisma/prisma.ts');
 
@@ -40,6 +41,7 @@ describe('checkBoardAssignment', () => {
     req = {
       params: {},
       body: {},
+      session: { userId } as Session & Partial<SessionData>,
     };
 
     res = {
@@ -51,9 +53,7 @@ describe('checkBoardAssignment', () => {
   });
 
   it('should call next function if the user is assigned', async () => {
-    req.body = {
-      userId,
-    };
+    req.session!.userId = userId;
     req.params = { taskId: mockTask.id };
 
     prisma.task.findUnique.mockResolvedValue(mockTask);
@@ -74,6 +74,7 @@ describe('checkBoardAssignment', () => {
   it('should return 400 status and invalid user data error if userId is missing', async () => {
     req.body = {};
     req.params = { taskId: mockTask.id };
+    req.session!.userId = '';
 
     prisma.task.findUnique.mockResolvedValue(mockTask);
     prisma.board.findUnique.mockResolvedValue(mockBoard);
@@ -82,21 +83,7 @@ describe('checkBoardAssignment', () => {
     await checkBoardAssignment(req as Request, res as Response, next);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid user data' });
-  });
-
-  it('should return 400 status and invalid user data error if userId is not UUID', async () => {
-    req.body = { userId: 123 };
-    req.params = { taskId: mockTask.id };
-
-    prisma.task.findUnique.mockResolvedValue(mockTask);
-    prisma.board.findUnique.mockResolvedValue(mockBoard);
-    prisma.userOnBoard.findUnique.mockResolvedValue(mockUserOnBoard);
-
-    await checkBoardAssignment(req as Request, res as Response, next);
-
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid user data' });
+    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid user data.' });
   });
 
   it('should return 404 status and not found error if task was not found', async () => {
