@@ -5,6 +5,7 @@ import prisma from '../../prisma/__mocks__/prisma';
 import Auth0User from '../../types/Auth0User';
 import { RequestContext } from 'express-openid-connect';
 import { Board, Task, User } from '@prisma/client';
+import { Session, SessionData } from 'express-session';
 
 vi.mock('../../prisma/prisma.ts');
 
@@ -16,6 +17,8 @@ describe('UsersController', () => {
     auth0Sub: 'auth0|123456789',
   };
 
+  const userId = '83d9930a-bdbe-4d70-9bb3-540910cb7ff4';
+
   describe('getById', () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
@@ -23,7 +26,72 @@ describe('UsersController', () => {
 
     beforeEach(() => {
       req = {
-        params: { userId: '1' },
+        params: { userId },
+        session: { userId } as Session & Partial<SessionData>,
+      };
+
+      res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      next = vi.fn() as unknown as NextFunction;
+    });
+
+    it('should return the user and status 200', async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        id: mockUser.id,
+        name: mockUser.name,
+        email: mockUser.email,
+      } as User);
+
+      await UsersController.getById(req as Request, res as Response, next);
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: userId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        id: mockUser.id,
+        name: mockUser.name,
+        email: mockUser.email,
+      });
+    });
+
+    it('should return 404 if user is not found', async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await UsersController.getById(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'User not found...' });
+    });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.user.findUnique.mockRejectedValue(error);
+
+      await UsersController.getById(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('getByIdExtended', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let next: NextFunction;
+
+    beforeEach(() => {
+      req = {
+        params: { userId },
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -49,11 +117,11 @@ describe('UsersController', () => {
       };
       prisma.user.findUnique.mockResolvedValue(mockUserExtended);
 
-      await UsersController.getById(req as Request, res as Response, next);
+      await UsersController.getByIdExtended(req as Request, res as Response, next);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
-        where: { id: '1' },
+        where: { id: userId },
         include: {
           assignedTasks: true,
           boards: true,
@@ -65,10 +133,10 @@ describe('UsersController', () => {
       expect(res.json).toHaveBeenCalledWith(mockUserExtended);
     });
 
-    it('should return 404 if user is not found', async () => {
+    it('should return 404 status if user is not found', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await UsersController.getById(req as Request, res as Response, next);
+      await UsersController.getByIdExtended(req as Request, res as Response, next);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({ error: 'User not found...' });
@@ -78,9 +146,33 @@ describe('UsersController', () => {
       const error = new Error('Database error');
       prisma.user.findUnique.mockRejectedValue(error);
 
-      await UsersController.getById(req as Request, res as Response, next);
+      await UsersController.getByIdExtended(req as Request, res as Response, next);
 
       expect(next).toHaveBeenCalledWith(error);
+    });
+
+    it('should return a 403 status if the requested user does not match the author of the request', async () => {
+      const notMatchingId = '4f9dbb99-5d24-4787-8f26-f05f99e46e47';
+      req.params!.userId = notMatchingId;
+
+      const mockUserExtended: User & {
+        assignedTasks: Task[];
+        boards: Board[];
+        authoredBoards: Board[];
+        authoredTasks: Task[];
+      } = {
+        ...mockUser,
+        assignedTasks: [],
+        boards: [],
+        authoredBoards: [],
+        authoredTasks: [],
+      };
+      prisma.user.findUnique.mockResolvedValue({ ...mockUserExtended, id: notMatchingId });
+
+      await UsersController.getByIdExtended(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Access Forbidden!' });
     });
   });
 
