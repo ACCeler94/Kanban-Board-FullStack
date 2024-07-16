@@ -38,16 +38,10 @@ const UsersController = {
     }
   },
 
-  getByIdExtended: async (req: Request, res: Response, next: NextFunction) => {
-    const { userId } = req.params;
+  getUserData: async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.session.userId;
 
-    // allow only the user to get this information
-
-    const requestAuthorId = req.session.userId;
-
-    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
-
-    if (userId !== requestAuthorId) return res.status(403).json({ error: 'Access Forbidden!' });
+    if (!userId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
       const user = await prisma.user.findUnique({

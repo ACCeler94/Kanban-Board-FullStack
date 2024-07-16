@@ -15,7 +15,7 @@ router.route('/users/sub').get(UsersController.getBySub);
 
 router.route('/users/search').get(UsersController.findByEmail); // search query (allowing partial searching) = search?email=""
 
-router.route('/users/:userId/extended').get(validateUserIdParam, UsersController.getByIdExtended);
+router.route('/users/profile').get(validateUserIdParam, UsersController.getUserData);
 
 router.route('/users/:userId').get(validateUserIdParam, UsersController.getById);
 
