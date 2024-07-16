@@ -3,10 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import prisma from '../../prisma/__mocks__/prisma';
 import { Board, Task, TaskStatus, User } from '@prisma/client';
 import TasksController from '../../controllers/tasks.controller';
+import { Session, SessionData } from 'express-session';
 
 vi.mock('../../prisma/prisma.ts');
 
 describe('TasksController', () => {
+  const userId = '83d9930a-bdbe-4d70-9bb3-540910cb7ff4';
+
   const mockTask: Task = {
     id: '1',
     createdAt: new Date('2024-06-12 16:04:21.778'),
@@ -14,7 +17,7 @@ describe('TasksController', () => {
     title: 'Task one',
     desc: 'this is task one',
     boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
-    authorId: '3713d558-d107-4c4b-b651-a99676e4315e',
+    authorId: userId,
     status: TaskStatus.TO_DO,
   };
   const mockBoard: Board & { users: { userId: string }[] } = {
@@ -22,7 +25,7 @@ describe('TasksController', () => {
     createdAt: new Date('2024-06-12 16:04:21.778'),
     title: 'Mock Board Title',
     authorId: '123',
-    users: [{ userId: '3713d558-d107-4c4b-b651-a99676e4315e' }],
+    users: [{ userId }],
   };
 
   const mockUser: User = {
@@ -42,6 +45,7 @@ describe('TasksController', () => {
         params: {
           taskId: '1',
         },
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -98,9 +102,9 @@ describe('TasksController', () => {
         body: {
           title: 'Task one',
           desc: 'this is task one',
-          authorId: '3713d558-d107-4c4b-b651-a99676e4315e',
           boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
         },
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -122,7 +126,7 @@ describe('TasksController', () => {
         data: {
           title: 'Task one',
           desc: 'this is task one',
-          authorId: '3713d558-d107-4c4b-b651-a99676e4315e',
+          authorId: req.session!.userId,
           boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
         },
       });
@@ -152,10 +156,18 @@ describe('TasksController', () => {
       req.body = {
         title: 'Task one',
         desc: 'this is task one',
-        authorId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
         boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
       };
-      prisma.board.findUnique.mockResolvedValue(mockBoard);
+
+      const mockBoardWithDifferentUser: Board & { users: { userId: string }[] } = {
+        id: '1',
+        createdAt: new Date('2024-06-12 16:04:21.778'),
+        title: 'Mock Board Title',
+        authorId: '123',
+        users: [{ userId: '1234567788998766' }], // random string to simulate task author not being assigned to the board
+      };
+
+      prisma.board.findUnique.mockResolvedValue(mockBoardWithDifferentUser);
 
       await TasksController.createTask(req as Request, res as Response, next);
 
@@ -188,7 +200,7 @@ describe('TasksController', () => {
       title: 'Task one',
       desc: 'this is task one',
       boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
-      authorId: '3713d558-d107-4c4b-b651-a99676e4315e',
+      authorId: userId,
       status: TaskStatus.TO_DO,
       board: {
         id: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
