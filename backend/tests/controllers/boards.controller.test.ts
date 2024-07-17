@@ -3,15 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import prisma from '../../prisma/__mocks__/prisma';
 import { Board, User } from '@prisma/client';
 import BoardsController from '../../controllers/boards.controller';
+import { Session, SessionData } from 'express-session';
 
 vi.mock('../../prisma/prisma.ts');
 
 describe('BoardsController', () => {
+  const userId = '83d9930a-bdbe-4d70-9bb3-540910cb7ff4';
+
   const mockBoard: Board = {
     id: '1',
     createdAt: new Date('2024-06-12 16:04:21.778'),
     title: 'Mock Board Title',
-    authorId: '3713d558-d107-4c4b-b651-a99676e4315e',
+    authorId: userId,
   };
   const mockUser: User = {
     id: '3713d558-d107-4c4b-b651-a99676e4315e',
@@ -30,7 +33,7 @@ describe('BoardsController', () => {
         params: {
           boardId: '1',
         },
-        body: { userId: mockBoard.authorId }, // request author userId
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -63,8 +66,8 @@ describe('BoardsController', () => {
       expect(res.json).toHaveBeenCalledWith(mockBoard);
     });
 
-    it('should return 400 status and error message if request body does not contain valid userId', async () => {
-      req.body = { userId: '1' };
+    it('should return 400 status and error message if session data does not contain valid userId', async () => {
+      req.session!.userId = '';
 
       await BoardsController.getById(req as Request, res as Response, next);
 
@@ -112,7 +115,8 @@ describe('BoardsController', () => {
 
     beforeEach(() => {
       req = {
-        body: { title: 'example board', authorId: '3713d558-d107-4c4b-b651-a99676e4315e' },
+        body: { title: 'example board' },
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -131,7 +135,7 @@ describe('BoardsController', () => {
 
       prisma.board.create.mockResolvedValue(mockBoard);
       prisma.userOnBoard.create.mockResolvedValue({
-        userId: '3713d558-d107-4c4b-b651-a99676e4315e',
+        userId: userId,
         boardId: '1',
       });
 
@@ -139,7 +143,7 @@ describe('BoardsController', () => {
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(prisma.board.create).toHaveBeenCalledWith({
-        data: { title: 'example board', authorId: '3713d558-d107-4c4b-b651-a99676e4315e' },
+        data: { title: 'example board', authorId: userId },
       });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(mockBoard);
@@ -176,8 +180,8 @@ describe('BoardsController', () => {
         params: { boardId: '1' },
         body: {
           title: 'new title',
-          userId: mockBoard.authorId,
         },
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -228,10 +232,8 @@ describe('BoardsController', () => {
     });
 
     it('should return 403 status and error message if the request author is not the author of the board', async () => {
-      req.body = {
-        title: 'new title',
-        userId: 'e97498f4-4485-4481-9435-af35385e46b4',
-      };
+      req.body = { title: 'new title' };
+      req.session!.userId = 'e97498f4-4485-4481-9435-af35385e46b4';
       prisma.board.findUnique.mockResolvedValue(mockBoard);
 
       await BoardsController.editBoardTitle(req as Request, res as Response, next);
@@ -260,9 +262,7 @@ describe('BoardsController', () => {
     beforeEach(() => {
       req = {
         params: { boardId: '1', userId: '101bb551-a405-4e38-aa86-e9d102b288ed' },
-        body: {
-          userId: mockBoard.authorId,
-        },
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -295,15 +295,6 @@ describe('BoardsController', () => {
       expect(res.json).toHaveBeenCalledWith({ message: 'User assigned to the board!' });
     });
 
-    it('should return 400 status and error message if request body has invalid format or is missing', async () => {
-      req.body = {};
-
-      await BoardsController.addUserToBoard(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid user data!' });
-    });
-
     it('should return 404 status and error message if board was not found', async () => {
       prisma.board.findUnique.mockResolvedValue(null);
 
@@ -314,7 +305,7 @@ describe('BoardsController', () => {
     });
 
     it('should return 403 status and error message if request author is not the author of the board', async () => {
-      req.body = { userId: 'c1bea54c-4d77-46fa-82f4-4f1028616e6b' };
+      req.session!.userId = 'c1bea54c-4d77-46fa-82f4-4f1028616e6b';
       prisma.board.findUnique.mockResolvedValue(mockBoard);
 
       await BoardsController.addUserToBoard(req as Request, res as Response, next);
@@ -367,9 +358,7 @@ describe('BoardsController', () => {
     beforeEach(() => {
       req = {
         params: { boardId: '1' },
-        body: {
-          userId: mockBoard.authorId,
-        },
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -396,15 +385,6 @@ describe('BoardsController', () => {
       expect(res.json).toHaveBeenCalledWith({ message: 'Board successfully removed!' });
     });
 
-    it('should return 400 status and error message if request body has invalid format or is missing', async () => {
-      req.body = {};
-
-      await BoardsController.deleteBoard(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid user data!' });
-    });
-
     it('should return 404 status and error message if the board was not found', async () => {
       prisma.board.findUnique.mockResolvedValue(null);
 
@@ -415,7 +395,7 @@ describe('BoardsController', () => {
     });
 
     it('should return 403 status and error message if request author is not the author of the board ', async () => {
-      req.body = { userId: 'c1bea54c-4d77-46fa-82f4-4f1028616e6b' };
+      req.session!.userId = 'c1bea54c-4d77-46fa-82f4-4f1028616e6b';
       prisma.board.findUnique.mockResolvedValue(mockBoard);
 
       await BoardsController.deleteBoard(req as Request, res as Response, next);
@@ -444,9 +424,7 @@ describe('BoardsController', () => {
     beforeEach(() => {
       req = {
         params: { boardId: '1', userId: '101bb551-a405-4e38-aa86-e9d102b288ed' },
-        body: {
-          userId: mockBoard.authorId,
-        },
+        session: { userId } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -484,15 +462,6 @@ describe('BoardsController', () => {
       expect(res.json).toHaveBeenCalledWith({ message: 'User removed from the board!' });
     });
 
-    it('should return 400 status and error message if request body has invalid format or is missing', async () => {
-      req.body = {};
-
-      await BoardsController.deleteUserFromBoard(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid user data!' });
-    });
-
     it('should return 404 status and error status if board was not found', async () => {
       prisma.board.findUnique.mockResolvedValue(null);
 
@@ -503,7 +472,7 @@ describe('BoardsController', () => {
     });
 
     it('should return 403 status and error message if request author is not the author of the board', async () => {
-      req.body = { userId: 'f593937f-7c12-467e-82ac-a0407a12ff97' };
+      req.session!.userId = 'f593937f-7c12-467e-82ac-a0407a12ff97';
       prisma.board.findUnique.mockResolvedValue(mockBoard);
 
       await BoardsController.deleteUserFromBoard(req as Request, res as Response, next);
