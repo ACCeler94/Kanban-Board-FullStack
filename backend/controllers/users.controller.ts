@@ -63,7 +63,7 @@ const UsersController = {
   },
 
   getBySub: async (req: Request, res: Response, next: NextFunction) => {
-    const authUser = req.oidc.user as Auth0User;
+    const authUser = req.session.auth0User;
 
     // Check if user object is available in request
     if (!authUser || !authUser.sub) {
@@ -130,7 +130,7 @@ const UsersController = {
     }
 
     const { name } = userData;
-    const authUser = req.oidc.user as Auth0User;
+    const authUser = req.session.auth0User;
 
     // Check if user object is available in request
     if (!authUser || !authUser.sub) {
