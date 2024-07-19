@@ -1,6 +1,7 @@
+import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
-import { apiUrl } from './config';
 import axios from 'axios';
+import { apiUrl } from './config';
 
 // actions
 const fetchUserById = async (userId: string) => {
@@ -9,10 +10,23 @@ const fetchUserById = async (userId: string) => {
   return data;
 };
 
-const fetchUserByIdExtended = async (userId: string) => {
-  const { data } = await axios.get(`${apiUrl}/users/${userId}/extended`);
-
-  return data;
+const fetchUserData = async (token: string) => {
+  try {
+    const { data } = await axios.get(`${apiUrl}/users/profile`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `Failed to fetch user data: ${error.response?.status} ${error.response?.statusText}`
+      );
+    } else {
+      throw new Error('An unexpected error occurred');
+    }
+  }
 };
 
 // hooks
@@ -21,22 +35,30 @@ const useUserById = (userId: string) => {
     data: user,
     error,
     isPending,
-  } = useQuery({ queryKey: ['user', userId, 'basic'], queryFn: () => fetchUserById(userId) });
+  } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUserById(userId) });
 
   return { user, error, isPending };
 };
 
-const useUserByIdExtended = (userId: string) => {
+const useUserData = () => {
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+
   const {
-    data: user,
+    data: userData,
     error,
     isPending,
   } = useQuery({
-    queryKey: ['user', userId, 'extended'],
-    queryFn: () => fetchUserByIdExtended(userId),
+    queryKey: ['userData'],
+    queryFn: async () => {
+      const token = await getAccessTokenSilently();
+      return fetchUserData(token);
+    },
+    retry: false,
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000, // 1 minute
   });
 
-  return { user, error, isPending };
+  return { userData, error, isPending };
 };
 
-export { useUserById, useUserByIdExtended };
+export { useUserById, useUserData };
