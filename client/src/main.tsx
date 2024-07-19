@@ -25,6 +25,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       clientId={auth0ClientId}
       authorizationParams={{
         redirect_uri: window.location.origin,
+        audience: 'KanbanBoardAPI',
+        scope: 'openid profile email',
       }}
     >
       <QueryClientProvider client={queryClient}>
