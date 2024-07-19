@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import BoardsController from '../controllers/boards.controller';
 import Router from 'express-promise-router';
-import { requiresAuth } from 'express-openid-connect';
 import validateBoardIdParams from '../middleware/validateBoardIdParam';
 import validateUserIdParam from '../middleware/validateUserIdParam';
+import verifyJwt from '../middleware/verifyJwt';
 
 const router = Router();
 
-router.use(requiresAuth()); // add to all board routes
+router.use(verifyJwt); // add to all board routes
 
 // GET requests
 

@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Router from 'express-promise-router';
 import TasksController from '../controllers/tasks.controller';
-import { requiresAuth } from 'express-openid-connect';
 import checkBoardAssignment from '../middleware/checkBoardAssignment';
 import validateTaskIdParam from '../middleware/validateTaskIdParam';
 import validateUserIdParam from '../middleware/validateUserIdParam';
+import verifyJwt from '../middleware/verifyJwt';
 
 const router = Router();
 
-router.use(requiresAuth()); // add to all tasks routes
+router.use(verifyJwt); // add to all tasks routes
 
 // checkBoardAssignment used to prevent random users (not assigned to the board) from interacting with board's tasks
 // GET requests
