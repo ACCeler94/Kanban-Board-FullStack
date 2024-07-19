@@ -1,16 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
-import Auth0User from '../types/Auth0User';
 
 const AuthController = {
   // fetch user by auth0 sub and attach userId from the db to the session to authorize certain operations based on userId
-  // [TODO if the user does not exist in db redirect to post login form ]
   PostLogin: async (req: Request, res: Response, next: NextFunction) => {
     console.log('Callback route reached');
 
-    const authUser = req.oidc.user as Auth0User;
+    const authUser = req.session.auth0User;
 
-    console.log(authUser.email);
+    // Check if user object is available in request
+    if (!authUser || !authUser.sub) {
+      return res
+        .status(400)
+        .json({ error: 'User information is missing or incomplete. Try again. ' });
+    }
 
     try {
       let user;
@@ -23,19 +26,26 @@ const AuthController = {
         });
       }
 
-      // [TODO change to redirect to the post login form!]
-      if (!user) user = { id: 'abc' }; // debugging value
+      if (!user)
+        return res.redirect(
+          process.env.NODE_ENV === 'production'
+            ? '/post-login/user-form'
+            : 'http://localhost:3000/post-login/user-form'
+        );
 
       req.session.userId = user.id;
       console.log('user id added ' + req.session.userId);
 
+      // Save session and handle errors
       req.session.save((err) => {
         if (err) {
           return next(err);
         }
+        // Redirect after session is saved
+        res.redirect(
+          process.env.NODE_ENV === 'production' ? '/boards' : 'http://localhost:3000/boards'
+        );
       });
-
-      res.redirect('/profile');
     } catch (error) {
       next(error);
     }
@@ -49,7 +59,7 @@ const AuthController = {
       } else {
         res.clearCookie('connect.sid');
         // redirect to auth0 logout endpoint
-        res.redirect('/logout');
+        res.redirect(process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:3000/');
       }
     });
   },
