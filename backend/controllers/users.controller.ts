@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createUserDTO from '../validators/users/create-user.dto';
-import Auth0User from '../types/Auth0User';
 import EmailSearchSchema from '../validators/EmailSearchSchema';
 
 const UsersController = {
