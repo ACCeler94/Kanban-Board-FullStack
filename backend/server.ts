@@ -1,45 +1,22 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
-import { boardsRoutes } from './routes/boards.routes';
-import { tasksRoutes } from './routes/tasks.routes';
-import { auth, ConfigParams, requiresAuth } from 'express-openid-connect';
-import { userRoutes } from './routes/users.routes';
+import express, { Express, Request, Response } from 'express';
 import session from 'express-session';
 import { authRoutes } from './routes/auth.routes';
+import { boardsRoutes } from './routes/boards.routes';
+import { tasksRoutes } from './routes/tasks.routes';
+import { userRoutes } from './routes/users.routes';
+import Auth0User from './types/Auth0User';
 
 declare module 'express-session' {
   interface SessionData {
     userId: string;
+    auth0User: Auth0User;
   }
 }
 
 const app: Express = express();
 const port = 8000;
-
-export const auth0Config: ConfigParams = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: process.env.AUTH_SECRET,
-  baseURL: 'http://localhost:8000',
-  clientID: process.env.AUTH0_CLIENT_ID,
-  issuerBaseURL: process.env.AUTH0_DOMAIN,
-  session: {
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-    },
-    rolling: true,
-    absoluteDuration: 86400, // 1 day
-  },
-  authorizationParams: {
-    scope: 'openid profile email',
-  },
-  routes: {
-    login: false,
-    callback: false,
-  },
-};
 
 // Express session configuration
 app.use(
@@ -65,32 +42,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(auth(auth0Config));
-
-// auth0 routes
-app.get('/login', (req, res) =>
-  res.oidc.login({
-    returnTo: '/auth/post-login',
-    authorizationParams: {
-      redirect_uri: 'http://localhost:8000/callback',
-    },
-  })
-);
-
-app.post('/callback', express.urlencoded({ extended: false }), (req, res) =>
-  res.oidc.callback({
-    redirectUri: 'http://localhost:8000/callback',
-  })
-);
-
-app.get('/', (req, res) => {
-  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
-});
-
-app.get('/profile', requiresAuth(), (req, res) => {
-  res.send(JSON.stringify(req.oidc.user));
-});
-
 // endpoints
 app.use('/auth', authRoutes);
 app.use('/api', boardsRoutes);
@@ -109,8 +60,8 @@ app.use((req, res) => {
 });
 
 app.use((err: Error, req: Request, res: Response) => {
-  console.error(err);
-  res.status(500).json({ message: 'An error occurred.' });
+  const message = err.message || 'Internal server error.';
+  res.status(500).json({ message });
 });
 
 app.listen(port, () => {
