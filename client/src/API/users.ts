@@ -16,6 +16,7 @@ const fetchUserData = async (token: string) => {
       headers: {
         authorization: `Bearer ${token}`,
       },
+      withCredentials: true,
     });
     return data;
   } catch (error) {
