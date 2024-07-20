@@ -1,6 +1,7 @@
 import { GetVerificationKey, expressjwt as jwt } from 'express-jwt';
 import jwks from 'jwks-rsa';
 
+// JWT verification middleware
 const verifyJwt = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
@@ -9,7 +10,7 @@ const verifyJwt = jwt({
     jwksUri: `https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`,
   }) as GetVerificationKey,
   audience: process.env.AUTH0_AUDIENCE,
-  issuer: 'https://acceler945.eu.auth0.com/',
+  issuer: `https://${process.env.AUTH0_DOMAIN}/`,
   algorithms: ['RS256'],
 });
 
