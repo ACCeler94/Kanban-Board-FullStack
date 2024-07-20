@@ -18,6 +18,15 @@ declare module 'express-session' {
 const app: Express = express();
 const port = 8000;
 
+// middleware to enable CORS requests
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  })
+);
+
 // Express session configuration
 app.use(
   session({
@@ -27,14 +36,13 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 86400,
+      maxAge: 86400000,
     },
   })
 );
 
 app.use(express.urlencoded({ extended: false })); // required to handle urlencoded requests
 app.use(express.json()); // required to handle form-data request
-app.use(cors()); // middleware to enable CORS requests
 
 // middleware to log request to the console
 app.use((req, res, next) => {
