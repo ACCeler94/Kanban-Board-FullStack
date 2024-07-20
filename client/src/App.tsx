@@ -1,16 +1,18 @@
-import { Route, Routes } from 'react-router-dom';
-import Navbar from './components/layout/Navbar/Navbar';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Route, Routes } from 'react-router-dom';
+import BoardPage from './pages/BoardPage/BoardPage';
+import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
 
-function App() {
+const App = () => {
   return (
     <>
       <Routes>
-        <Route path='/boards' element={<Navbar />} />
+        <Route path='/boards' element={<BoardPage />} />
+        <Route path='/post-login' element={<PostLoginPage />} />
       </Routes>
       <ReactQueryDevtools initialIsOpen={false} />
     </>
   );
-}
+};
 
 export default App;
