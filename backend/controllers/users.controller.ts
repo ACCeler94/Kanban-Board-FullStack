@@ -47,7 +47,16 @@ const UsersController = {
         where: { id: userId },
         include: {
           assignedTasks: true,
-          boards: true,
+          boards: {
+            select: {
+              board: {
+                select: {
+                  title: true,
+                  id: true,
+                },
+              },
+            },
+          },
           authoredBoards: true,
           authoredTasks: true,
         },
