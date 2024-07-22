@@ -34,17 +34,13 @@ const AuthController = {
         );
 
       req.session.userId = user.id;
-      console.log('user id added ' + req.session.userId);
 
       // Save session and handle errors
       req.session.save((err) => {
         if (err) {
           return next(err);
         }
-        // Redirect after session is saved
-        res.redirect(
-          process.env.NODE_ENV === 'production' ? '/boards' : 'http://localhost:3000/boards'
-        );
+        res.status(200).json({ message: 'Session saved' });
       });
     } catch (error) {
       next(error);
@@ -53,14 +49,13 @@ const AuthController = {
 
   Logout: (req: Request, res: Response) => {
     req.session.destroy((err: Error) => {
-      console.log('session removed');
       if (err) {
         console.log('Error clearing session:', err);
       } else {
         res.clearCookie('connect.sid');
-        // redirect to auth0 logout endpoint
-        res.redirect(process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:3000/');
       }
+      // redirect to auth0 logout endpoint
+      res.redirect(process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:3000/');
     });
   },
 };
