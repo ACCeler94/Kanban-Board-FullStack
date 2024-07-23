@@ -1,11 +1,9 @@
-import BoardsList from '../../components/features/BoardsList/BoardsList';
-import SideBar from '../../components/features/SideBar/SideBar';
+import MainLayout from '../../components/layout/MainLayout/MainLayout';
 
 const BoardPage = () => {
   return (
     <div>
-      <SideBar />
-      <BoardsList />
+      <MainLayout />
     </div>
   );
 };
