@@ -1,0 +1,23 @@
+.sideBar {
+  background-color: var(--white);
+  width: calc(250px + 3%);
+  height: calc(100vh - 90px);
+  border-right: 1px solid var(--light-blue);
+  margin-top: -1px;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.actionButtons {
+  border-top: 1px solid var(--light-blue);
+  display: flex;
+  align-items: center;
+  padding: 25px 0;
+}
+
+.actionButtons button {
+  max-width: 40%;
+  margin: 0 5%;
+}
