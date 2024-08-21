@@ -22,6 +22,8 @@
   height: 100%;
   padding-right: 30px;
   border-right: 1px solid var(--light-blue);
+  width: 250px;
+  min-width: 250px;
 }
 
 .utilityBar {
