@@ -1,0 +1,26 @@
+.boardsListHeader {
+  margin-top: 0;
+  padding-left: 20px;
+}
+
+.boardsList {
+  list-style-type: none;
+  padding-left: 0;
+  padding-right: 30px;
+}
+
+.boardsListItem {
+  margin: 10px 0;
+  color: var(--medium-grey);
+  padding: 10px 0;
+  padding-left: 20px;
+  font-weight: 600;
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+
+}
+
+.boardsListItem.active {
+  background-color: var(--main-purple);
+  color: var(--white);
+}
