@@ -3,6 +3,7 @@ import Icon from '../../../assets/icon.svg?react';
 import Container from '../../common/Container/Container';
 import styles from './Navbar.module.css';
 import { Link } from 'react-router-dom';
+import { FaPlus } from 'react-icons/fa';
 
 const Navbar = () => {
   return (
@@ -16,7 +17,8 @@ const Navbar = () => {
           <div className={styles.utilityBar}>
             <h2>Select Board...</h2>
             <Button color='primary' variant='contained' className='button-small' disabled>
-              Add New Task
+              <FaPlus />
+              <span>Add New Task</span>
             </Button>
           </div>
         </div>

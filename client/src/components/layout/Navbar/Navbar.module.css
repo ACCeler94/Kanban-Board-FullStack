@@ -33,3 +33,12 @@
   width: 100%;
   align-items: center;
 }
+
+.utilityBar button {
+  display: flex;
+  align-items: center;
+}
+
+.utilityBar button svg {
+  margin-right: 5px;
+}
