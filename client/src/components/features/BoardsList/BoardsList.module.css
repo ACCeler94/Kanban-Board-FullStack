@@ -10,6 +10,8 @@
 }
 
 .boardsListItem {
+  display: flex;
+  align-items: center;
   margin: 10px 0;
   color: var(--medium-grey);
   padding: 10px 0;
@@ -17,10 +19,38 @@
   font-weight: 600;
   border-top-right-radius: 50px;
   border-bottom-right-radius: 50px;
-
+  cursor: pointer;
 }
 
 .boardsListItem.active {
   background-color: var(--main-purple);
   color: var(--white);
+}
+
+.boardsListItem:not(.active):hover {
+  background-color: var(--very-light-purple);
+  color: var(--white);
+  transition-duration: 250ms;
+}
+
+.addBoardButton {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  margin: 10px 0;
+  color: var(--main-purple);
+  margin-top: 20px;
+  padding: 10px 0;
+  padding-left: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addBoardButton:hover {
+  color: var(--very-light-purple);
+  transition-duration: 250ms;
+}
+
+.addBoardButton svg {
+  margin-right: 5px;
 }

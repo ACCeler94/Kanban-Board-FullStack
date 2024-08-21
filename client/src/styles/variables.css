@@ -2,6 +2,7 @@
   /* Colors */
   --main-purple: #635FC7;
   --light-purple: #A8A4FF;
+  --very-light-purple: #c2c0f3;
   --black: #000112;
   --very-dark-grey: #20212C;
   --dark-grey: #2B2C37;
@@ -12,6 +13,7 @@
   --white: #FFF;
   --red: #EA5555;
   --light-red: #FF9898;
+
 
   /* Typography */
   --main-font: 'Plus Jakarta Sans Variable', sans-serif;

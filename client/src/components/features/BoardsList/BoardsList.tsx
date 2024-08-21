@@ -1,4 +1,5 @@
 import styles from './BoardsList.module.css';
+import { FaPlus } from 'react-icons/fa';
 
 interface Board {
   board: {
@@ -32,6 +33,10 @@ const BoardsList = ({ boards }: BoardsListProps) => {
             </li>
           );
         })}
+        <li className={styles.addBoardButton}>
+          <FaPlus />
+          <span>Create new board</span>
+        </li>
       </ul>
     </div>
   );
