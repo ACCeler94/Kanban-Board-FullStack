@@ -1,0 +1,32 @@
+.wrapper {
+  display: flex;
+}
+
+.contentWrapper {
+  transition: margin var(--duration) ease-in-out;
+  margin-left: 20px;
+}
+
+.contentWrapper.sidebarHidden {
+  margin-left: -250px;
+}
+
+.showButton {
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  position: absolute;
+  bottom: 10%;
+  background-color: var(--main-purple);
+  color: var(--white);
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+  font-size: 1.25em;
+  cursor: pointer;
+}
+
+.showButton:hover {
+  background-color: var(--light-purple);
+  transition-duration: var(--duration);
+}

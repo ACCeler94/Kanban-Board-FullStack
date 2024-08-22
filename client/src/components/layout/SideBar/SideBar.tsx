@@ -1,17 +1,20 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import { useState } from 'react';
 import { authUrl } from '../../../API/config';
 import { useUserData } from '../../../API/users';
 import BoardsList from '../../features/BoardsList/BoardsList';
 import styles from './SideBar.module.css';
 import Button from '@mui/material/Button';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEyeSlash } from 'react-icons/fa';
 
-const SideBar = () => {
+interface SideBarProps {
+  isHidden: boolean;
+  toggleIsHidden: () => void;
+}
+
+const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
   const { isPending, error, userData } = useUserData();
   const { logout, getAccessTokenSilently } = useAuth0();
-  const [isHidden, setIsHidden] = useState(false);
 
   const handleLogout = async () => {
     const token = await getAccessTokenSilently();
@@ -41,10 +44,16 @@ const SideBar = () => {
 
   if (error)
     return (
-      <div>
+      <div
+        className={isHidden ? `${styles.sideBarWrapper} ${styles.hidden}` : styles.sideBarWrapper}
+      >
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
           <div>{error.message}</div>
           <div className={styles.actionButtons}>
+            <div className={styles.hideButton} onClick={toggleIsHidden}>
+              <FaEyeSlash />
+              Hide Sidebar
+            </div>
             <Button
               color='error'
               variant='contained'
@@ -60,11 +69,13 @@ const SideBar = () => {
 
   if (!isPending && !error)
     return (
-      <div>
+      <div
+        className={isHidden ? `${styles.sideBarWrapper} ${styles.hidden}` : styles.sideBarWrapper}
+      >
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
           <BoardsList boards={userData.boards} />
           <div className={styles.actionButtons}>
-            <div className={styles.hideButton} onClick={() => setIsHidden(true)}>
+            <div className={styles.hideButton} onClick={toggleIsHidden}>
               <FaEyeSlash />
               Hide Sidebar
             </div>
@@ -78,14 +89,6 @@ const SideBar = () => {
             </Button>
           </div>
         </aside>
-
-        {isHidden ? (
-          <div className={styles.showButton} onClick={() => setIsHidden(false)}>
-            <FaEye />
-          </div>
-        ) : (
-          ''
-        )}
       </div>
     );
 };
