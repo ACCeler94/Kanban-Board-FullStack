@@ -24,8 +24,9 @@ const BoardsPage = () => {
   if (isAuthenticated) {
     return (
       <div>
-        <MainLayout />
-        <Outlet /> {/* This renders either <Board /> or nested routes like <EditBoardPage /> */}
+        <MainLayout>
+          <Outlet />
+        </MainLayout>
       </div>
     );
   }
