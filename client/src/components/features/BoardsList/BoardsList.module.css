@@ -9,7 +9,7 @@
   padding-right: 30px;
 }
 
-.boardsListItem {
+.boardItem {
   display: flex;
   align-items: center;
   margin: 10px 0;
@@ -22,12 +22,12 @@
   cursor: pointer;
 }
 
-.boardsListItem.active {
+.boardItem.active {
   background-color: var(--main-purple);
   color: var(--white);
 }
 
-.boardsListItem:not(.active):hover {
+.boardItem:not(.active):hover {
   background-color: var(--very-light-purple);
   color: var(--white);
   transition-duration: var(--duration);
