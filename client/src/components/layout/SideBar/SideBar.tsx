@@ -6,6 +6,7 @@ import { useUserData } from '../../../API/users';
 import BoardsList from '../../features/BoardsList/BoardsList';
 import styles from './SideBar.module.css';
 import Button from '@mui/material/Button';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const SideBar = () => {
   const { isPending, error, userData } = useUserData();
@@ -30,34 +31,62 @@ const SideBar = () => {
 
   if (isPending) {
     return (
-      <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
-        <div>Loading...</div>
-      </aside>
+      <div>
+        <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
+          <div>Loading...</div>
+        </aside>
+      </div>
     );
   }
 
   if (error)
     return (
-      <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
-        <div>{error.message}</div>
-        <div className={styles.actionButtons}>
-          <Button color='error' variant='contained' className='button-small' onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
-      </aside>
+      <div>
+        <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
+          <div>{error.message}</div>
+          <div className={styles.actionButtons}>
+            <Button
+              color='error'
+              variant='contained'
+              className='button-small'
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
+        </aside>
+      </div>
     );
 
   if (!isPending && !error)
     return (
-      <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
-        <BoardsList boards={userData.boards} />
-        <div className={styles.actionButtons}>
-          <Button color='error' variant='contained' className='button-small' onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
-      </aside>
+      <div>
+        <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
+          <BoardsList boards={userData.boards} />
+          <div className={styles.actionButtons}>
+            <div className={styles.hideButton} onClick={() => setIsHidden(true)}>
+              <FaEyeSlash />
+              Hide Sidebar
+            </div>
+            <Button
+              color='error'
+              variant='contained'
+              className='button-small'
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </div>
+        </aside>
+
+        {isHidden ? (
+          <div className={styles.showButton} onClick={() => setIsHidden(false)}>
+            <FaEye />
+          </div>
+        ) : (
+          ''
+        )}
+      </div>
     );
 };
 

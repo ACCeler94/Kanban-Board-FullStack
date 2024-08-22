@@ -30,7 +30,7 @@
 .boardsListItem:not(.active):hover {
   background-color: var(--very-light-purple);
   color: var(--white);
-  transition-duration: 250ms;
+  transition-duration: var(--duration);
 }
 
 .addBoardButton {
@@ -48,7 +48,7 @@
 
 .addBoardButton:hover {
   color: var(--very-light-purple);
-  transition-duration: 250ms;
+  transition-duration: var(--duration);
 }
 
 .addBoardButton svg {

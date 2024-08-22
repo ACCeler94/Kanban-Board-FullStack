@@ -8,16 +8,60 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transform: translateX(0);
+  transition: transform var(--duration) ease-in-out;
+}
+
+.sideBar.hidden {
+  transform: translateX(-100%);
+
 }
 
 .actionButtons {
   border-top: 1px solid var(--light-blue);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 25px 0;
 }
 
 .actionButtons button {
   max-width: 40%;
   margin: 0 5%;
+}
+
+.hideButton {
+  margin: 0 5%;
+  margin-bottom: 50px;
+  color: var(--grey);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hideButton svg {
+  margin-right: 10px;
+}
+
+.hideButton:hover {
+  color: var(--light-grey);
+  transition-duration: var(--duration);
+}
+
+.showButton {
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 10%;
+  background-color: var(--main-purple);
+  color: var(--white);
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+  font-size: 1.25em;
+  cursor: pointer;
+}
+
+.showButton:hover {
+  background-color: var(--light-purple);
+  transition-duration: var(--duration);
 }

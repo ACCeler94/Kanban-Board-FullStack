@@ -8,6 +8,7 @@
   --dark-grey: #2B2C37;
   --medium-grey: #3E3F4E;
   --grey: #828FA3;
+  --light-grey: #c1bcbc;
   --light-blue: #E4EBFA;
   --very-light-blue: #F4F7FD;
   --white: #FFF;
@@ -17,4 +18,8 @@
 
   /* Typography */
   --main-font: 'Plus Jakarta Sans Variable', sans-serif;
+
+  /* Animations */
+  --duration: 250ms;
 }
+
