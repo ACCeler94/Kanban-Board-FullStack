@@ -5,6 +5,11 @@ import { apiUrl } from './config';
 
 // actions
 const fetchUserById = async (userId: string) => {
+  if (typeof userId !== 'string' || !userId) {
+    // check if id is not a string or is an empty string
+    throw new Error('User ID must be a non-empty string');
+  }
+
   const { data } = await axios.get(`${apiUrl}/users/${userId}`);
 
   return data;
@@ -36,7 +41,11 @@ const useUserById = (userId: string) => {
     data: user,
     error,
     isPending,
-  } = useQuery({ queryKey: ['user', userId], queryFn: () => fetchUserById(userId) });
+  } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUserById(userId),
+    enabled: !!userId,
+  });
 
   return { user, error, isPending };
 };
@@ -51,8 +60,12 @@ const useUserData = () => {
   } = useQuery({
     queryKey: ['userData'],
     queryFn: async () => {
-      const token = await getAccessTokenSilently();
-      return fetchUserData(token);
+      try {
+        const token = await getAccessTokenSilently();
+        return fetchUserData(token);
+      } catch (error) {
+        throw new Error('Failed to authenticate. Please try logging in again.');
+      }
     },
     retry: false,
     enabled: isAuthenticated,
