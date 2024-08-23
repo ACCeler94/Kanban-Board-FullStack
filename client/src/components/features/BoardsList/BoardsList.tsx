@@ -1,7 +1,7 @@
 import styles from './BoardsList.module.css';
 import { FaPlus } from 'react-icons/fa';
 import useStore from '../../../store/useStore';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 
 interface Board {
@@ -18,11 +18,15 @@ interface BoardsListProps {
 const BoardsList = ({ boards }: BoardsListProps) => {
   const activeBoard = useStore((state) => state.activeBoard);
   const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const { id } = useParams();
 
-  // reset activeBoard on mount
+  // set active board if the component re-mounted with proper id or set to null
   useEffect(() => {
-    setActiveBoard(null);
-  }, [setActiveBoard]);
+    if (id) {
+      const boardToSet = boards.find((elem) => elem.board.id === id);
+      setActiveBoard(boardToSet?.board || null);
+    } else setActiveBoard(null);
+  }, [setActiveBoard, boards, id]);
 
   return (
     <div>
