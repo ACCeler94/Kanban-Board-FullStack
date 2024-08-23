@@ -6,6 +6,7 @@ import BoardsList from '../../features/BoardsList/BoardsList';
 import styles from './SideBar.module.css';
 import Button from '@mui/material/Button';
 import { FaEyeSlash } from 'react-icons/fa';
+import { useState } from 'react';
 
 interface SideBarProps {
   isHidden: boolean;
@@ -15,9 +16,18 @@ interface SideBarProps {
 const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
   const { isPending, error, userData } = useUserData();
   const { logout, getAccessTokenSilently } = useAuth0();
+  const [logoutError, setLogoutError] = useState('');
 
   const handleLogout = async () => {
-    const token = await getAccessTokenSilently();
+    let token: string | undefined;
+    try {
+      token = await getAccessTokenSilently();
+    } catch (error) {
+      console.log(error);
+      setLogoutError('Logout failed. Please try again.');
+      return;
+    }
+
     try {
       await axios.get(`${authUrl}/logout`, {
         headers: {
@@ -27,8 +37,10 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         // withCredentials: true,
       });
       logout();
+      setLogoutError('');
     } catch (error) {
       console.log(error);
+      setLogoutError('Logout failed. Please try again.');
     }
   };
 
@@ -42,13 +54,13 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
     );
   }
 
-  if (error)
+  if (error || logoutError)
     return (
       <div
         className={isHidden ? `${styles.sideBarWrapper} ${styles.hidden}` : styles.sideBarWrapper}
       >
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
-          <div>{error.message}</div>
+          <div>{error ? error.message : logoutError}</div>
           <div className={styles.actionButtons}>
             <div className={styles.hideButton} onClick={toggleIsHidden}>
               <FaEyeSlash />
