@@ -1,0 +1,11 @@
+.skeletonContainer {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.columnWrapper {
+  width: 31.5%;
+  display: flex;
+  flex-direction: column;
+}
