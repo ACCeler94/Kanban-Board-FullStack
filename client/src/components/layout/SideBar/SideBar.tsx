@@ -14,7 +14,7 @@ interface SideBarProps {
 }
 
 const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
-  const { isPending, error, userData } = useUserData();
+  const { isPending, error, data: userData } = useUserData();
   const { logout, getAccessTokenSilently } = useAuth0();
   const [logoutError, setLogoutError] = useState('');
 
@@ -79,7 +79,7 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
       </div>
     );
 
-  if (!isPending && !error)
+  if (userData && !isPending && !error)
     return (
       <div
         className={isHidden ? `${styles.sideBarWrapper} ${styles.hidden}` : styles.sideBarWrapper}
