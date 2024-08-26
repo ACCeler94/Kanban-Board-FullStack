@@ -3,6 +3,7 @@ import axios from 'axios';
 import { apiUrl } from './config';
 import { validate as uuidValidate } from 'uuid';
 import { useAuth0 } from '@auth0/auth0-react';
+import { BoardType } from '../types/types';
 
 // actions
 const fetchBoardById = async (id: string | undefined, token: string) => {
@@ -22,7 +23,7 @@ const fetchBoardById = async (id: string | undefined, token: string) => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(
-        `Failed to fetch user data: ${error.response?.status} ${error.response?.statusText}`
+        `Failed to fetch board data: ${error.response?.status} ${error.response?.statusText}`
       );
     } else {
       throw new Error('An unexpected error occurred');
@@ -31,14 +32,17 @@ const fetchBoardById = async (id: string | undefined, token: string) => {
 };
 
 // hooks
-const useBoardById = (id: string | undefined) => {
+
+interface UseBoardByIdReturnType {
+  data: BoardType | undefined;
+  error: Error | null;
+  isPending: boolean;
+}
+
+const useBoardById = (id: string | undefined): UseBoardByIdReturnType => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const {
-    data: boardData,
-    error,
-    isPending,
-  } = useQuery({
+  const { data, error, isPending } = useQuery({
     queryKey: ['board', id],
     queryFn: async () => {
       try {
@@ -52,7 +56,7 @@ const useBoardById = (id: string | undefined) => {
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
-  return { boardData, error, isPending };
+  return { data, error, isPending };
 };
 
 export { useBoardById };
