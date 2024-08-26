@@ -4,11 +4,15 @@
 
 .contentWrapper {
   transition: margin var(--duration) ease-in-out;
-  margin-left: 20px;
+  margin-left: 40px;
+  margin-right: 40px;
+  width: 100%;
+  padding: 1.5% 0;
 }
 
 .contentWrapper.sidebarHidden {
   margin-left: -250px;
+  margin-right: 3%;
 }
 
 .showButton {
