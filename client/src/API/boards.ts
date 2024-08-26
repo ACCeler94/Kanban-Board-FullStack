@@ -6,7 +6,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { BoardType } from '../types/types';
 
 // actions
-const fetchBoardById = async (id: string | undefined, token: string) => {
+const fetchBoardById = async (
+  id: string | undefined,
+  token: string
+): Promise<BoardType | undefined> => {
   if (!id) {
     // check if id exists and is valid uuid
     throw new Error('Invalid Board ID.');
@@ -32,14 +35,7 @@ const fetchBoardById = async (id: string | undefined, token: string) => {
 };
 
 // hooks
-
-interface UseBoardByIdReturnType {
-  data: BoardType | undefined;
-  error: Error | null;
-  isPending: boolean;
-}
-
-const useBoardById = (id: string | undefined): UseBoardByIdReturnType => {
+const useBoardById = (id: string | undefined) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
   const { data, error, isPending } = useQuery({

@@ -3,16 +3,10 @@ import { FaPlus } from 'react-icons/fa';
 import useStore from '../../../store/useStore';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-
-interface Board {
-  board: {
-    title: string;
-    id: string;
-  };
-}
+import { BoardPreview } from '../../../types/types';
 
 interface BoardsListProps {
-  boards: Board[];
+  boards: BoardPreview[];
 }
 
 const BoardsList = ({ boards }: BoardsListProps) => {

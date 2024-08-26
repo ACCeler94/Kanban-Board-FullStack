@@ -2,9 +2,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { apiUrl } from './config';
+import { UserData, UserDataPreview } from '../types/types';
 
 // actions
-const fetchUserById = async (userId: string) => {
+const fetchUserById = async (userId: string): Promise<UserDataPreview> => {
   if (typeof userId !== 'string' || !userId) {
     // check if id is not a string or is an empty string
     throw new Error('User ID must be a non-empty string');
@@ -15,7 +16,7 @@ const fetchUserById = async (userId: string) => {
   return data;
 };
 
-const fetchUserData = async (token: string) => {
+const fetchUserData = async (token: string): Promise<UserData | undefined> => {
   try {
     const { data } = await axios.get(`${apiUrl}/users/profile`, {
       headers: {
@@ -53,11 +54,7 @@ const useUserById = (userId: string) => {
 const useUserData = () => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const {
-    data: userData,
-    error,
-    isPending,
-  } = useQuery({
+  const { data, error, isPending } = useQuery({
     queryKey: ['userData'],
     queryFn: async () => {
       try {
@@ -72,7 +69,7 @@ const useUserData = () => {
     staleTime: 60 * 1000, // 1 minute
   });
 
-  return { userData, error, isPending };
+  return { data, error, isPending };
 };
 
 export { useUserById, useUserData };
