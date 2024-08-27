@@ -1,7 +1,7 @@
-enum TaskStatus {
-  IN_PROGRESS = 'In Progress',
-  DONE = 'Done',
-  TO_DO = 'To Do',
+export enum TaskStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+  TO_DO = 'TO_DO',
 }
 
 interface TaskType {
@@ -59,4 +59,4 @@ interface UserData {
   authoredTasks: TaskType[];
 }
 
-export type { TaskType, BoardType, BoardPreview, UserData, UserDataPreview };
+export type { TaskType, BoardType, BoardPreview, UserData, UserDataPreview }; // + TaskStatus exported as a value
