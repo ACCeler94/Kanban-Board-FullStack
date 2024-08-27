@@ -7,6 +7,7 @@ import styles from './SideBar.module.css';
 import Button from '@mui/material/Button';
 import { FaEyeSlash } from 'react-icons/fa';
 import { useState } from 'react';
+import Error from '../../common/Error/Error';
 
 interface SideBarProps {
   isHidden: boolean;
@@ -60,7 +61,7 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         className={isHidden ? `${styles.sideBarWrapper} ${styles.hidden}` : styles.sideBarWrapper}
       >
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
-          <div>{error ? error.message : logoutError}</div>
+          <Error message={error ? error.message : logoutError} />
           <div className={styles.actionButtons}>
             <div className={styles.hideButton} onClick={toggleIsHidden}>
               <FaEyeSlash />
