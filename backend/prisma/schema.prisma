@@ -23,11 +23,21 @@ enum TaskStatus {
   TO_DO       @map("To Do")
 }
 
+model Subtask {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId    String
+  desc      String   @db.VarChar(280)
+  finished  Boolean
+}
+
 model Task {
   id            String       @id @default(uuid())
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
-  title         String       @default("Untitled") @db.VarChar(255)
+  title         String       @default("Untitled") @db.VarChar(100)
   desc          String?
   board         Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId       String
@@ -35,6 +45,7 @@ model Task {
   authorId      String
   assignedUsers UserOnTask[]
   status        TaskStatus   @default(TO_DO)
+  Subtasks      Subtask[]
 }
 
 model UserOnTask {

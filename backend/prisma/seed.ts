@@ -49,6 +49,18 @@ async function main() {
     },
   });
 
+  await prisma.subtask.create({
+    data: {
+      desc: 'This is subtask one',
+      finished: false,
+      task: {
+        connect: {
+          id: task1.id,
+        },
+      },
+    },
+  });
+
   await prisma.userOnBoard.create({
     data: {
       user: {
