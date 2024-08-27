@@ -52,7 +52,11 @@ const BoardsController = {
               },
             },
           },
-          tasks: true,
+          tasks: {
+            include: {
+              subtasks: true,
+            },
+          },
         },
       });
 
