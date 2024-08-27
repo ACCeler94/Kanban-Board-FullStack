@@ -1,0 +1,28 @@
+.boardGrid {
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.columnHeaderWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.columnHeader {
+  font-size: 1em;
+  color: var(--grey);
+  margin-left: 10px;
+}
+
+.columnHeaderWrapper.toDo svg {
+  color: var(--todo-dot);
+}
+
+.columnHeaderWrapper.inProgress svg {
+  color: var(--in-progress-dot);
+}
+
+.columnHeaderWrapper.done svg {
+  color: var(--done-dot);
+}

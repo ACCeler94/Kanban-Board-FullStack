@@ -14,6 +14,9 @@
   --white: #FFF;
   --red: #EA5555;
   --light-red: #FF9898;
+  --todo-dot: #49C4E5;
+  --in-progress-dot: #8471F2;
+  --done-dot: #67E2AE;
 
 
   /* Typography */
