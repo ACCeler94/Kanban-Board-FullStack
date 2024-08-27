@@ -45,7 +45,7 @@ model Task {
   authorId      String
   assignedUsers UserOnTask[]
   status        TaskStatus   @default(TO_DO)
-  Subtasks      Subtask[]
+  subtasks      Subtask[]
 }
 
 model UserOnTask {
