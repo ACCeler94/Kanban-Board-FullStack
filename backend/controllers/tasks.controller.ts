@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createTaskDTO from '../validators/tasks/create-task.dto';
-import editTaskDTO from '../validators/tasks/edit-task.dto';
+import { editTaskDTO } from '../validators/tasks/edit-task.dto';
 
 // task operations can be performed by any user assigned to the board - this condition is checked by checkBoardAssignment middleware
 const TasksController = {
@@ -29,6 +29,7 @@ const TasksController = {
               },
             },
           },
+          subtasks: true,
         },
       });
 
@@ -42,16 +43,18 @@ const TasksController = {
 
   // POST
   createTask: async (req: Request, res: Response, next: NextFunction) => {
-    let taskData;
-    const requestAuthorId = req.session.userId;
+    let validatedData;
 
+    const requestAuthorId = req.session.userId;
     if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
-      taskData = createTaskDTO.parse(req.body);
+      validatedData = createTaskDTO.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid data.' });
+      return res.status(400).json({ error: 'Invalid data' });
     }
+
+    const { taskData, subtaskData } = validatedData;
 
     try {
       const board = await prisma.board.findUnique({
@@ -76,6 +79,45 @@ const TasksController = {
 
       const task = await prisma.task.create({ data: { ...taskData, authorId: requestAuthorId } });
 
+      // check if task was created
+      if (task) {
+        // if subtaskData exists in the request create and assign subtasks to newly created task
+        if (subtaskData && subtaskData.length !== 0) {
+          try {
+            await prisma.$transaction(async (tx) => {
+              const subtaskCreationPromises = subtaskData.map((subtask) =>
+                tx.subtask.create({
+                  data: { ...subtask, taskId: task.id, finished: false },
+                })
+              );
+
+              await Promise.all(subtaskCreationPromises);
+            });
+          } catch (error) {
+            // handle subtask creation errors, with the task is already created
+            res.status(500).json({
+              error:
+                'Failed to create some or all subtasks. The main task was created successfully.',
+            });
+          }
+          // fetch task with added subtasks and return it in the response
+          try {
+            const taskWithSubtasks = await prisma.task.findUnique({
+              where: {
+                id: task.id,
+              },
+              include: {
+                subtasks: true,
+              },
+            });
+            res.status(201).json(taskWithSubtasks);
+          } catch (error) {
+            next(error);
+          }
+        }
+      }
+
+      // send newly created task if there were no subtasks to create
       res.status(201).json(task);
     } catch (error) {
       next(error);
@@ -135,15 +177,17 @@ const TasksController = {
   // PATCH
   editTask: async (req: Request, res: Response, next: NextFunction) => {
     const { taskId } = req.params;
-    let taskData;
+    let validatedData;
 
     try {
-      taskData = editTaskDTO.parse(req.body);
+      validatedData = editTaskDTO.parse(req.body);
     } catch (error) {
       return res.status(400).json({ error: 'Invalid data' });
     }
 
-    if (Object.keys(taskData).length === 0) {
+    const { taskData, subtaskData } = validatedData;
+
+    if (Object.keys(taskData).length === 0 && (!subtaskData || subtaskData.length === 0)) {
       return res.status(400).json({ error: 'Updated task data cannot be empty!' });
     }
 
@@ -151,19 +195,66 @@ const TasksController = {
       const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
-      // allow partial updates
-      await prisma.task.update({
-        where: { id: taskId },
-        data: {
-          ...task,
-          ...taskData,
-        },
-      });
-      res.status(200).json({ message: 'Task updated!' });
+      // check if taskData is not empty
+      if (Object.keys(taskData).length !== 0) {
+        // allow partial updates
+        await prisma.task.update({
+          where: { id: taskId },
+          data: {
+            ...task,
+            ...taskData,
+          },
+        });
+        res.status(200).json({ message: 'Task updated!' });
+      }
     } catch (error) {
       next(error);
     }
+
+    // update subtasks if subtask data is present and is not an empty array
+    if (subtaskData && subtaskData.length !== 0) {
+      for (const subtask of subtaskData) {
+        if (subtask.id) {
+          try {
+            // existing subtask - id was provided
+            const existingSubtask = await prisma.subtask.findUnique({
+              where: {
+                id: subtask.id,
+              },
+            });
+
+            if (!existingSubtask) {
+              return res.status(404).json({ error: 'Subtask not found...' });
+            }
+
+            // update existing subtask
+            await prisma.subtask.update({
+              where: { id: existingSubtask.id },
+              data: {
+                desc: subtask.desc,
+              },
+            });
+          } catch (error) {
+            next(error);
+          }
+        } else {
+          try {
+            // new subtask - no id provided
+            await prisma.subtask.create({
+              data: {
+                taskId,
+                desc: subtask.desc,
+                finished: false,
+              },
+            });
+          } catch (error) {
+            next(error);
+          }
+        }
+      }
+    }
   },
+
   // DELETE
   deleteTask: async (req: Request, res: Response, next: NextFunction) => {
     const { taskId } = req.params;
