@@ -59,7 +59,11 @@ describe('BoardsController', () => {
         include: {
           author: { select: { id: true, name: true } },
           users: { select: { user: { select: { id: true, name: true } } } },
-          tasks: true,
+          tasks: {
+            include: {
+              subtasks: true,
+            },
+          },
         },
       });
       expect(res.status).toHaveBeenCalledWith(200);
