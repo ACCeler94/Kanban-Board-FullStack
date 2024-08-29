@@ -4,6 +4,15 @@ export enum TaskStatus {
   TO_DO = 'TO_DO',
 }
 
+interface Subtask {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  taskId: string;
+  desc: string;
+  finished: boolean;
+}
+
 interface TaskType {
   id: string;
   createdAt: Date;
@@ -13,6 +22,7 @@ interface TaskType {
   boardId: string;
   authorId: string;
   status: TaskStatus;
+  substasks: Subtask[];
 }
 
 interface User {
