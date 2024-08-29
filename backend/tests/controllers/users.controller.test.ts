@@ -2,8 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import UsersController from '../../controllers/users.controller';
 import prisma from '../../prisma/__mocks__/prisma';
-import Auth0User from '../../types/Auth0User';
-import { RequestContext } from 'express-openid-connect';
 import { Board, Task, User } from '@prisma/client';
 import { Session, SessionData } from 'express-session';
 
@@ -123,7 +121,16 @@ describe('UsersController', () => {
         where: { id: userId },
         include: {
           assignedTasks: true,
-          boards: true,
+          boards: {
+            select: {
+              board: {
+                select: {
+                  title: true,
+                  id: true,
+                },
+              },
+            },
+          },
           authoredBoards: true,
           authoredTasks: true,
         },
@@ -152,19 +159,24 @@ describe('UsersController', () => {
   });
 
   describe('getBySub', () => {
-    let req: Partial<Request & { oidc?: RequestContext & { user?: Auth0User } }>;
+    let req: Partial<Request>;
     let res: Partial<Response>;
     let next: NextFunction;
 
     beforeEach(() => {
       req = {
-        oidc: {
-          user: {
-            sub: 'auth0|123456789',
+        session: {
+          auth0User: {
+            sub: 'auth0|66d094172fa4b2a600a5533b',
+            nickname: 'test12345',
+            name: 'test12345@gmail.com',
+            picture:
+              'https://s.gravatar.com/avatar/674ffcfe49d3c0a8343e089464fc1d02?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fte.png',
+            email: 'test12345@gmail.com',
+            email_verified: false,
           },
-          isAuthenticated: () => true,
-          fetchUserInfo: async () => {},
-        } as unknown as RequestContext & { user: Auth0User },
+          userId: '034ff530-bb54-4526-877c-4fba3a83e8fe',
+        } as Session & Partial<SessionData>,
       };
 
       res = {
@@ -183,7 +195,7 @@ describe('UsersController', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(prisma.user.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { auth0Sub: req.oidc!.user!.sub },
+          where: { auth0Sub: req.session?.auth0User?.sub },
         })
       );
 
@@ -192,7 +204,7 @@ describe('UsersController', () => {
     });
 
     it('should return 400 status and the error message if the user object is not in the request', async () => {
-      req.oidc!.user = undefined;
+      req.session!.auth0User = undefined;
 
       await UsersController.getBySub(req as Request, res as Response, next);
 
@@ -313,19 +325,24 @@ describe('UsersController', () => {
   });
 
   describe('createUser', () => {
-    let req: Partial<Request & { oidc?: RequestContext & { user?: Auth0User } }>;
+    let req: Partial<Request>;
     let res: Partial<Response>;
     let next: NextFunction;
 
     beforeEach(() => {
       req = {
-        oidc: {
-          user: {
-            sub: 'auth0|123456789',
+        session: {
+          auth0User: {
+            sub: 'auth0|66d094172fa4b2a600a5533b',
+            nickname: 'test12345',
+            name: 'John Doe',
+            picture:
+              'https://s.gravatar.com/avatar/674ffcfe49d3c0a8343e089464fc1d02?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fte.png',
+            email: 'john@example.com',
+            email_verified: false,
           },
-          isAuthenticated: () => true,
-          fetchUserInfo: async () => {},
-        } as unknown as RequestContext & { user: Auth0User },
+          userId: '034ff530-bb54-4526-877c-4fba3a83e8fe',
+        } as Session & Partial<SessionData>,
         body: {
           name: 'John Doe',
         },
@@ -340,7 +357,6 @@ describe('UsersController', () => {
     });
 
     it('should return 201 status and created user when email is provided in authUser', async () => {
-      req.oidc!.user!.email = 'auth0@example.com';
       prisma.user.create.mockResolvedValue(mockUser);
 
       await UsersController.createUser(req as Request, res as Response, next);
@@ -349,8 +365,8 @@ describe('UsersController', () => {
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: {
           name: 'John Doe',
-          email: req.oidc!.user!.email,
-          auth0Sub: req.oidc!.user!.sub,
+          email: req.session!.auth0User!.email,
+          auth0Sub: req.session!.auth0User!.sub,
         },
       });
       expect(res.status).toHaveBeenCalledWith(201);
@@ -358,6 +374,7 @@ describe('UsersController', () => {
     });
 
     it('should return 201 status and created user when email is provided in the request body object', async () => {
+      req.session!.auth0User!.email = undefined;
       req.body = { name: 'John Doe', email: 'john@example.com' };
       prisma.user.create.mockResolvedValue(mockUser);
 
@@ -368,7 +385,7 @@ describe('UsersController', () => {
         data: {
           name: 'John Doe',
           email: 'john@example.com',
-          auth0Sub: req.oidc!.user!.sub,
+          auth0Sub: req.session!.auth0User!.sub,
         },
       });
       expect(res.status).toHaveBeenCalledWith(201);
@@ -376,7 +393,7 @@ describe('UsersController', () => {
     });
 
     it('should return 400 status and invalid data error if auth0 sub is not provided', async () => {
-      req.oidc!.user!.sub = '';
+      req.session!.auth0User!.sub = '';
 
       await UsersController.createUser(req as Request, res as Response, next);
 
@@ -387,7 +404,7 @@ describe('UsersController', () => {
     });
 
     it('should return 400 status and invalid data error if auth0 user object is not provided', async () => {
-      req.oidc!.user = undefined;
+      req.session!.auth0User = undefined;
 
       await UsersController.createUser(req as Request, res as Response, next);
 
@@ -407,6 +424,9 @@ describe('UsersController', () => {
     });
 
     it('should return 400 status and error message if email has not been provided in neither auth0 user object nor the request body', async () => {
+      req.session!.auth0User!.email = undefined;
+      req.body = { name: 'John Doe' };
+
       await UsersController.createUser(req as Request, res as Response, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
@@ -416,7 +436,7 @@ describe('UsersController', () => {
     });
 
     it('should return 409 status and prompt to log in if the user with this email already exists', async () => {
-      req.oidc!.user!.email = 'auth0@example.com';
+      req.session!.auth0User!.email = 'john@example.com'; // the same as mock user
       prisma.user.findUnique.mockResolvedValue(mockUser);
 
       await UsersController.createUser(req as Request, res as Response, next);
@@ -428,7 +448,6 @@ describe('UsersController', () => {
     });
 
     it('should call next with an error if an exception occurs', async () => {
-      req.oidc!.user!.email = 'auth0@example.com';
       const error = new Error('Database error');
       prisma.user.create.mockRejectedValue(error);
 
