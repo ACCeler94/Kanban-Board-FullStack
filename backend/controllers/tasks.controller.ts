@@ -51,7 +51,7 @@ const TasksController = {
     try {
       validatedData = createTaskDTO.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid data' });
+      return res.status(400).json({ error: 'Invalid data.' });
     }
 
     const { taskData, subtaskData } = validatedData;
@@ -61,64 +61,52 @@ const TasksController = {
         where: {
           id: taskData.boardId,
         },
-        include: {
-          users: true,
-        },
       });
 
       if (!board) return res.status(404).json({ error: 'Board not found...' });
 
-      // check if user is assigned to the board = authorized to create a task on this board
-      const isUserAssigned = board.users.some(
-        (userOnBoard) => userOnBoard.userId === requestAuthorId
-      );
+      const isUserAssigned = await prisma.userOnBoard.findUnique({
+        where: {
+          userId_boardId: {
+            userId: requestAuthorId,
+            boardId: taskData.boardId,
+          },
+        },
+      });
       if (!isUserAssigned)
         return res
           .status(403)
           .json({ error: 'Access forbidden! User is not assigned to the board.' });
 
-      const task = await prisma.task.create({ data: { ...taskData, authorId: requestAuthorId } });
+      const task = await prisma.task.create({
+        data: { ...taskData, authorId: requestAuthorId },
+      });
 
-      // check if task was created
-      if (task) {
-        // if subtaskData exists in the request create and assign subtasks to newly created task
-        if (subtaskData && subtaskData.length !== 0) {
-          try {
-            await prisma.$transaction(async (tx) => {
-              const subtaskCreationPromises = subtaskData.map((subtask) =>
-                tx.subtask.create({
-                  data: { ...subtask, taskId: task.id, finished: false },
-                })
-              );
-
-              await Promise.all(subtaskCreationPromises);
+      if (subtaskData && subtaskData.length !== 0) {
+        try {
+          await prisma.$transaction(async (tx) => {
+            await tx.subtask.createMany({
+              data: subtaskData.map((subtask) => ({
+                ...subtask,
+                taskId: task.id,
+                finished: false,
+              })),
             });
-          } catch (error) {
-            // handle subtask creation errors, with the task is already created
-            res.status(500).json({
-              error:
-                'Failed to create some or all subtasks. The main task was created successfully.',
-            });
-          }
-          // fetch task with added subtasks and return it in the response
-          try {
-            const taskWithSubtasks = await prisma.task.findUnique({
-              where: {
-                id: task.id,
-              },
-              include: {
-                subtasks: true,
-              },
-            });
-            res.status(201).json(taskWithSubtasks);
-          } catch (error) {
-            next(error);
-          }
+          });
+        } catch (error) {
+          return res.status(500).json({
+            error: 'Failed to create some or all subtasks. The main task was created successfully.',
+          });
         }
       }
 
-      // send newly created task if there were no subtasks to create
-      res.status(201).json(task);
+      // Fetch the task with subtasks and send the response - if no subtasks were created it will be an empty array
+      const taskWithSubtasks = await prisma.task.findUnique({
+        where: { id: task.id },
+        include: { subtasks: true },
+      });
+
+      res.status(201).json(taskWithSubtasks);
     } catch (error) {
       next(error);
     }
@@ -187,7 +175,10 @@ const TasksController = {
 
     const { taskData, subtaskData } = validatedData;
 
-    if (Object.keys(taskData).length === 0 && (!subtaskData || subtaskData.length === 0)) {
+    if (
+      (!taskData || Object.keys(taskData).length === 0) &&
+      (!subtaskData || subtaskData.length === 0)
+    ) {
       return res.status(400).json({ error: 'Updated task data cannot be empty!' });
     }
 
@@ -195,9 +186,8 @@ const TasksController = {
       const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
-      // check if taskData is not empty
-      if (Object.keys(taskData).length !== 0) {
-        // allow partial updates
+      // update task if taskData is provided
+      if (taskData && Object.keys(taskData).length !== 0) {
         await prisma.task.update({
           where: { id: taskId },
           data: {
@@ -205,53 +195,35 @@ const TasksController = {
             ...taskData,
           },
         });
-        res.status(200).json({ message: 'Task updated!' });
       }
-    } catch (error) {
-      next(error);
-    }
 
-    // update subtasks if subtask data is present and is not an empty array
-    if (subtaskData && subtaskData.length !== 0) {
-      for (const subtask of subtaskData) {
-        if (subtask.id) {
-          try {
-            // existing subtask - id was provided
+      // update/create subtasks if subtaskData is provided
+      if (subtaskData && subtaskData.length !== 0) {
+        for (const subtask of subtaskData) {
+          if (subtask.id) {
+            // Update existing subtask
             const existingSubtask = await prisma.subtask.findUnique({
-              where: {
-                id: subtask.id,
-              },
+              where: { id: subtask.id },
             });
-
             if (!existingSubtask) {
               return res.status(404).json({ error: 'Subtask not found...' });
             }
-
-            // update existing subtask
             await prisma.subtask.update({
               where: { id: existingSubtask.id },
-              data: {
-                desc: subtask.desc,
-              },
+              data: { desc: subtask.desc },
             });
-          } catch (error) {
-            next(error);
-          }
-        } else {
-          try {
-            // new subtask - no id provided
+          } else {
+            // create new subtask
             await prisma.subtask.create({
-              data: {
-                taskId,
-                desc: subtask.desc,
-                finished: false,
-              },
+              data: { taskId, desc: subtask.desc, finished: false },
             });
-          } catch (error) {
-            next(error);
           }
         }
       }
+
+      res.status(200).json({ message: 'Task updated!' });
+    } catch (error) {
+      next(error);
     }
   },
 
