@@ -57,11 +57,32 @@ describe('BoardsController', () => {
       expect(prisma.board.findUnique).toHaveBeenCalledWith({
         where: { id: '1' },
         include: {
-          author: { select: { id: true, name: true } },
-          users: { select: { user: { select: { id: true, name: true } } } },
+          author: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          users: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
           tasks: {
+            orderBy: {
+              createdAt: 'asc',
+            },
             include: {
-              subtasks: true,
+              subtasks: {
+                orderBy: {
+                  createdAt: 'asc',
+                },
+              },
             },
           },
         },
