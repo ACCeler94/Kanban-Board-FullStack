@@ -22,7 +22,7 @@ interface TaskType {
   boardId: string;
   authorId: string;
   status: TaskStatus;
-  substasks: Subtask[];
+  subtasks: Subtask[];
 }
 
 interface User {
