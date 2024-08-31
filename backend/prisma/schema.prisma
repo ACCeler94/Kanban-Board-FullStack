@@ -6,6 +6,8 @@ model Board {
   authorId  String
   tasks     Task[]
   users     UserOnBoard[]
+
+  @@index([createdAt])
 }
 
 model UserOnBoard {
@@ -31,6 +33,8 @@ model Subtask {
   taskId    String
   desc      String   @db.VarChar(280)
   finished  Boolean
+
+  @@index([createdAt])
 }
 
 model Task {
@@ -46,6 +50,8 @@ model Task {
   assignedUsers UserOnTask[]
   status        TaskStatus   @default(TO_DO)
   subtasks      Subtask[]
+
+  @@index([createdAt])
 }
 
 model UserOnTask {
