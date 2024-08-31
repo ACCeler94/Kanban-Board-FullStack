@@ -6,7 +6,10 @@ const createTaskDTO = z.object({
       .string()
       .min(1, { message: 'Title is required' })
       .max(100, { message: 'Title cannot be longer than 100 characters' }),
-    desc: z.string().optional(),
+    desc: z
+      .string()
+      .max(500, { message: 'Description cannot be longer than 500 characters' })
+      .optional(),
     boardId: z.string().uuid({ message: 'Board ID must be a non-negative integer' }),
   }),
   subtaskData: z
@@ -14,7 +17,7 @@ const createTaskDTO = z.object({
       desc: z
         .string()
         .min(1, { message: 'Description must be at least 1 character' })
-        .max(100, { message: 'Description cannot be longer than 280 characters' }),
+        .max(200, { message: 'Description cannot be longer than 200 characters' }),
     })
     .array()
     .optional(),
