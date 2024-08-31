@@ -41,7 +41,7 @@ describe('validateBoardIdParam', () => {
     });
   });
 
-  it('should return 400 status and invalid board id error if the boardId param does not exist', () => {
+  it('should return 400 status and invalid board id error if the boardId param is not valid UUID', () => {
     req.params = { boardId: 'abc' };
 
     validateBoardIdParam(req as Request, res as Response, next);
