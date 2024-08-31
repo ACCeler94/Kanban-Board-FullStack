@@ -53,12 +53,31 @@ const UsersController = {
                 select: {
                   title: true,
                   id: true,
+                  createdAt: true,
+                  tasks: {
+                    orderBy: {
+                      createdAt: 'asc',
+                    },
+                  },
                 },
               },
             },
+            orderBy: {
+              board: {
+                createdAt: 'asc',
+              },
+            },
           },
-          authoredBoards: true,
-          authoredTasks: true,
+          authoredBoards: {
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
+          authoredTasks: {
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
         },
       });
 
