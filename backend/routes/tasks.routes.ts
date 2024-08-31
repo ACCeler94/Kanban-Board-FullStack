@@ -5,6 +5,7 @@ import checkBoardAssignment from '../middleware/checkBoardAssignment';
 import validateTaskIdParam from '../middleware/validateTaskIdParam';
 import validateUserIdParam from '../middleware/validateUserIdParam';
 import verifyJwt from '../middleware/verifyJwt';
+import validateSubtaskIdParam from '../middleware/validateSubtaskIdParam';
 
 const router = Router();
 
@@ -46,6 +47,16 @@ router
 router
   .route('/tasks/:taskId')
   .delete(validateTaskIdParam, checkBoardAssignment, TasksController.deleteTask);
+
+// taskId needed only for checkBoardAssignment middleware
+router
+  .route('tasks/:taskId/subtasks/:subtaskId')
+  .delete(
+    validateTaskIdParam,
+    validateSubtaskIdParam,
+    checkBoardAssignment,
+    TasksController.deleteSubtask
+  );
 
 export type tasksRoutes = typeof router;
 export { router as tasksRoutes };

@@ -635,4 +635,55 @@ describe('TasksController', () => {
       expect(next).toHaveBeenCalledWith(error);
     });
   });
+
+  describe('deleteSubtask', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let next: NextFunction;
+
+    beforeEach(() => {
+      req = {
+        params: {
+          subtaskId: '1',
+        },
+      };
+
+      res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      next = vi.fn() as unknown as NextFunction;
+    });
+
+    it('should return 200 status and success message if subtask was successfully deleted', async () => {
+      prisma.subtask.findUnique.mockResolvedValue(mockSubtask);
+      prisma.subtask.delete.mockResolvedValue(mockSubtask);
+
+      await TasksController.deleteSubtask(req as Request, res as Response, next);
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.subtask.delete).toHaveBeenCalledWith({ where: { id: req.params!.subtaskId } });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Subtask successfully removed!' });
+    });
+
+    it('should return 404 status and error message if subtask was not found', async () => {
+      prisma.subtask.findUnique.mockResolvedValue(null);
+
+      await TasksController.deleteSubtask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Subtask not found...' });
+    });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.subtask.findUnique.mockRejectedValue(error);
+
+      await TasksController.deleteSubtask(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
 });

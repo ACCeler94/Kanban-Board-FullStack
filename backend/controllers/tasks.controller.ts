@@ -280,6 +280,20 @@ const TasksController = {
       next(error);
     }
   },
+
+  deleteSubtask: async (req: Request, res: Response, next: NextFunction) => {
+    const { subtaskId } = req.params;
+
+    try {
+      const subtask = await prisma.subtask.findUnique({ where: { id: subtaskId } });
+      if (!subtask) return res.status(404).json({ error: 'Subtask not found...' });
+
+      await prisma.subtask.delete({ where: { id: subtaskId } });
+      return res.status(200).json({ message: 'Subtask successfully removed!' });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 export default TasksController;
