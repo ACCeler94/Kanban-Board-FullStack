@@ -1,0 +1,28 @@
+.taskCard {
+  background-color: var(--white);
+  padding: 30px 25px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  transition: var(--duration);
+  cursor: pointer;
+  -webkit-box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.07);
+  box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.07);
+}
+
+.taskCard h3 {
+  font-size: 1.4em;
+  margin: 0;
+  margin-bottom: 5px;
+  word-break: break-all;
+}
+
+.taskCard p {
+  font-weight: 700;
+  margin: 0;
+  color: var(--grey);
+  font-size: 1.1em;
+}
+
+.taskCard:hover {
+  background-color: rgba(0, 0, 0, 15%);
+}
