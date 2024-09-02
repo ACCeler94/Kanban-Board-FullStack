@@ -37,6 +37,47 @@ const UsersController = {
     }
   },
 
+  getUserBoards: async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.session.userId;
+
+    if (!userId) return res.status(400).json({ error: 'Invalid user data.' });
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          boards: {
+            select: {
+              board: {
+                select: {
+                  title: true,
+                  id: true,
+                  createdAt: true,
+                  tasks: {
+                    orderBy: {
+                      createdAt: 'asc',
+                    },
+                  },
+                },
+              },
+            },
+            orderBy: {
+              board: {
+                createdAt: 'asc',
+              },
+            },
+          },
+        },
+      });
+
+      if (!user) return res.status(404).json({ error: 'User not found...' });
+
+      res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   getUserData: async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.session.userId;
 

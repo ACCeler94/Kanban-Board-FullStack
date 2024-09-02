@@ -17,6 +17,8 @@ router.route('/users/search').get(UsersController.findByEmail); // search query 
 
 router.route('/users/profile').get(UsersController.getUserData);
 
+router.route('/users/profile/boards').get(UsersController.getUserBoards);
+
 router.route('/users/:userId').get(validateUserIdParam, UsersController.getById);
 
 // POST requests

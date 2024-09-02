@@ -54,12 +54,21 @@ const BoardsController = {
           },
           tasks: {
             orderBy: {
-              createdAt: 'asc', // sort tasks by createdAt in ascending order
+              createdAt: 'asc',
             },
-            include: {
+            select: {
+              id: true,
+              title: true,
+              boardId: true,
+              status: true,
               subtasks: {
                 orderBy: {
-                  createdAt: 'asc', // sort subtasks by createdAt in ascending order
+                  createdAt: 'asc',
+                },
+                select: {
+                  id: true,
+                  desc: true,
+                  finished: true,
                 },
               },
             },
