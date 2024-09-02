@@ -3,13 +3,13 @@ import axios from 'axios';
 import { apiUrl } from './config';
 import { validate as uuidValidate } from 'uuid';
 import { useAuth0 } from '@auth0/auth0-react';
-import { BoardType } from '../types/types';
+import { BoardQuery } from '../types/types';
 
 // actions
 const fetchBoardById = async (
   id: string | undefined,
   token: string
-): Promise<BoardType | undefined> => {
+): Promise<BoardQuery | undefined> => {
   if (!id) {
     // check if id exists and is valid uuid
     throw new Error('Invalid Board ID.');
