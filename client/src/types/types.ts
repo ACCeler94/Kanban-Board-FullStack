@@ -30,6 +30,34 @@ interface User {
   name: string;
 }
 
+interface BoardQuery {
+  id: string;
+  createdAt: Date;
+  title: string;
+  authorId: string;
+  author: {
+    id: string;
+    name: string;
+  };
+  users: {
+    user: {
+      id: string;
+      name: string;
+    };
+  }[];
+  tasks: {
+    id: string;
+    title: string;
+    boardId: string;
+    status: TaskStatus;
+    subtasks: {
+      id: string;
+      desc: string;
+      finished: boolean;
+    }[];
+  }[];
+}
+
 interface BoardType {
   id: string;
   createdAt: Date;
@@ -52,10 +80,24 @@ type BoardPreview = {
 
 type AuthoredBoardPreview = BoardPreview & { createdAt: Date; authorId: string };
 
+type BoardPreviewWithCreatedAt = BoardPreview & { createdAt: Date };
+
 interface UserDataPreview {
   id: string;
   email: string;
   name: string;
+}
+
+interface UserBoardData {
+  id: string;
+  email: string;
+  name: string;
+  auth0Sub: string;
+  assignedTasks: {
+    taskId: string;
+    userId: string;
+  }[];
+  boards: BoardPreviewWithCreatedAt[];
 }
 
 interface UserData {
@@ -69,4 +111,12 @@ interface UserData {
   authoredTasks: TaskType[];
 }
 
-export type { TaskType, BoardType, BoardPreview, UserData, UserDataPreview }; // + TaskStatus exported as a value
+export type {
+  TaskType,
+  BoardType,
+  BoardQuery,
+  BoardPreview,
+  UserData,
+  UserBoardData,
+  UserDataPreview,
+}; // + TaskStatus exported as a value
