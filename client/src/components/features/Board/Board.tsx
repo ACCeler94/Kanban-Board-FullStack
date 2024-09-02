@@ -7,6 +7,7 @@ import Error from '../../common/Error/Error';
 import { useEffect, useState } from 'react';
 import { TaskStatus, TaskType } from '../../../types/types';
 import { FaCircle } from 'react-icons/fa';
+import TaskCard from '../TaskCard/TaskCard';
 
 const Board = () => {
   const { id } = useParams();
@@ -57,18 +58,45 @@ const Board = () => {
             <FaCircle />
             <h2 className={styles.columnHeader}>TO DO ({toDos.length})</h2>
           </div>
+          <ul className={styles.tasksList}>
+            {toDos.map((task) => {
+              return (
+                <li key={task.id}>
+                  <TaskCard taskData={task} />
+                </li>
+              );
+            })}
+          </ul>
         </div>
         <div className={styles.boardColumn}>
           <div className={`${styles.columnHeaderWrapper} ${styles.inProgress}`}>
             <FaCircle />
             <h2 className={styles.columnHeader}>IN PROGRESS ({inProgress.length})</h2>
           </div>
+          <ul className={styles.tasksList}>
+            {inProgress.map((task) => {
+              return (
+                <li key={task.id}>
+                  <TaskCard taskData={task} />
+                </li>
+              );
+            })}
+          </ul>
         </div>
         <div className={styles.boardColumn}>
           <div className={`${styles.columnHeaderWrapper} ${styles.done}`}>
             <FaCircle />
             <h2 className={styles.columnHeader}>DONE ({done.length})</h2>
           </div>
+          <ul className={styles.tasksList}>
+            {done.map((task) => {
+              return (
+                <li key={task.id}>
+                  <TaskCard taskData={task} />
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </div>
     );
