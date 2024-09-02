@@ -6,7 +6,7 @@ import { FaPlus } from 'react-icons/fa';
 import useStore from '../../../store/useStore';
 import { useParams } from 'react-router-dom';
 import { useBoardById } from '../../../API/boards';
-import { useUserData } from '../../../API/users';
+import { useUserBoardData } from '../../../API/users';
 import { useEffect, useState } from 'react';
 
 const Navbar = () => {
@@ -14,12 +14,16 @@ const Navbar = () => {
   const [isAuthor, setIsAuthor] = useState(false);
   const { id } = useParams();
   const { data: boardData, isPending: isPendingBoardData, error: boardError } = useBoardById(id);
-  const { data: userData, isPending: isPendingUserData, error: userDataError } = useUserData();
+  const {
+    data: userBoardData,
+    isPending: isPendingUserData,
+    error: userDataError,
+  } = useUserBoardData();
 
   // check if the user is the author of the chosen board to show related buttons as active
   useEffect(() => {
     if (!isPendingBoardData && !isPendingUserData && !userDataError && !boardError) {
-      if (userData?.id === boardData?.authorId) {
+      if (userBoardData?.id === boardData?.authorId) {
         setIsAuthor(true);
       } else {
         setIsAuthor(false);
@@ -30,7 +34,7 @@ const Navbar = () => {
     boardError,
     isPendingBoardData,
     isPendingUserData,
-    userData?.id,
+    userBoardData?.id,
     userDataError,
   ]);
 
