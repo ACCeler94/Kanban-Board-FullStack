@@ -53,11 +53,6 @@ const UsersController = {
                   title: true,
                   id: true,
                   createdAt: true,
-                  tasks: {
-                    orderBy: {
-                      createdAt: 'asc',
-                    },
-                  },
                 },
               },
             },
