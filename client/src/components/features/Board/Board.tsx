@@ -5,22 +5,22 @@ import { validate as uuidValidate } from 'uuid';
 import Loader from '../../common/BoardLoader/BoardLoader';
 import Error from '../../common/Error/Error';
 import { useEffect, useState } from 'react';
-import { TaskStatus, TaskType } from '../../../types/types';
+import { TaskStatus, TaskTypePartial } from '../../../types/types';
 import { FaCircle } from 'react-icons/fa';
 import TaskCard from '../TaskCard/TaskCard';
 
 const Board = () => {
   const { id } = useParams();
   const { data: boardData, isPending, error } = useBoardById(id);
-  const [toDos, setToDos] = useState<TaskType[]>([]);
-  const [inProgress, setInProgress] = useState<TaskType[]>([]);
-  const [done, setDone] = useState<TaskType[]>([]);
+  const [toDos, setToDos] = useState<TaskTypePartial[]>([]);
+  const [inProgress, setInProgress] = useState<TaskTypePartial[]>([]);
+  const [done, setDone] = useState<TaskTypePartial[]>([]);
 
   useEffect(() => {
     if (boardData && !error && !isPending) {
-      const tasksToDo: TaskType[] = [];
-      const tasksInProgress: TaskType[] = [];
-      const tasksDone: TaskType[] = [];
+      const tasksToDo: TaskTypePartial[] = [];
+      const tasksInProgress: TaskTypePartial[] = [];
+      const tasksDone: TaskTypePartial[] = [];
 
       for (const task of boardData.tasks) {
         if (task.status === TaskStatus.TO_DO) {
