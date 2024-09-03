@@ -25,6 +25,18 @@ interface TaskType {
   subtasks: Subtask[];
 }
 
+interface TaskTypePartial {
+  id: string;
+  title: string;
+  boardId: string;
+  status: TaskStatus;
+  subtasks: {
+    id: string;
+    desc: string;
+    finished: boolean;
+  }[];
+}
+
 interface User {
   id: string;
   name: string;
@@ -113,6 +125,7 @@ interface UserData {
 
 export type {
   TaskType,
+  TaskTypePartial,
   BoardType,
   BoardQuery,
   BoardPreview,
