@@ -8,12 +8,22 @@ import { UserBoardData, UserData, UserDataPreview } from '../types/types';
 const fetchUserById = async (userId: string): Promise<UserDataPreview> => {
   if (typeof userId !== 'string' || !userId) {
     // check if id is not a string or is an empty string
-    throw new Error('User ID must be a non-empty string');
+    throw new Error('Invalid User ID.');
   }
 
-  const { data } = await axios.get(`${apiUrl}/users/${userId}`);
+  try {
+    const { data } = await axios.get(`${apiUrl}/users/${userId}`);
 
-  return data;
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `Failed to fetch user data: ${error.response?.status} ${error.response?.statusText}`
+      );
+    } else {
+      throw new Error('An unexpected error occurred');
+    }
+  }
 };
 
 const fetchUserData = async (token: string): Promise<UserData | undefined> => {
