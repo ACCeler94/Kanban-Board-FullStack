@@ -209,11 +209,14 @@ const TasksController = {
               return res.status(404).json({ error: 'Subtask not found...' });
             }
             await prisma.subtask.update({
-              where: { id: existingSubtask.id },
-              data: { desc: subtask.desc },
+              where: { id: subtask.id },
+              data: { desc: subtask.desc, finished: subtask.finished },
             });
           } else {
             // create new subtask
+            if (!subtask.desc)
+              return res.status(400).json({ error: 'New subtask requires description.' });
+
             await prisma.subtask.create({
               data: { taskId, desc: subtask.desc, finished: false },
             });
