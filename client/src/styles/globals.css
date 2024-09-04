@@ -6,6 +6,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  word-break: break-all;
+}
+
 a {
   text-decoration: none;
   color: inherit;
