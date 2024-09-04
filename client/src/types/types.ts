@@ -126,6 +126,7 @@ interface UserData {
 export type {
   TaskType,
   TaskTypePartial,
+  Subtask,
   BoardType,
   BoardQuery,
   BoardPreview,
