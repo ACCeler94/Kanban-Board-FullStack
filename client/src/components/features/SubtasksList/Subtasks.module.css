@@ -1,0 +1,25 @@
+.subtasksList {
+  list-style: none;
+  padding: 0;
+  font-weight: 600;
+}
+
+.subtask {
+  background-color: var(--very-light-blue);
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.subtask.finished {
+  color: var(--grey);
+  text-decoration: line-through;
+}
+
+
+.subtasksList input[type=checkbox] {
+  height: 1.15em;
+  width: 1.15em;
+  margin-right: 15px;
+  accent-color: var(--main-purple);
+}
