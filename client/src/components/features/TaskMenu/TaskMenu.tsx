@@ -43,8 +43,8 @@ const TaskMenu = () => {
           horizontal: 'right',
         }}
       >
-        <MenuItem onClick={handleClose}>
-          <Link to='edit'>Edit</Link>
+        <MenuItem component={Link} to='edit' onClick={handleClose}>
+          Edit
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={handleClose} sx={{ color: 'var(--red)', fontWeight: '700' }}>
