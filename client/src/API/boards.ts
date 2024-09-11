@@ -38,7 +38,7 @@ const fetchBoardById = async (
 const useBoardById = (id: string | undefined) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const { data, error, isPending } = useQuery({
+  const { data, error, isPending, refetch } = useQuery({
     queryKey: ['board', id],
     queryFn: async () => {
       try {
@@ -52,7 +52,7 @@ const useBoardById = (id: string | undefined) => {
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
-  return { data, error, isPending };
+  return { data, error, isPending, refetch };
 };
 
 export { useBoardById };

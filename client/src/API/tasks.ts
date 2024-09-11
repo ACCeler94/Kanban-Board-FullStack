@@ -31,7 +31,7 @@ const fetchTaskById = async (taskId: string, token: string): Promise<TaskType | 
 const useTaskData = (taskId: string) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const { data, error, isPending } = useQuery({
+  const { data, error, isPending, refetch } = useQuery({
     queryKey: ['task', taskId],
     queryFn: async () => {
       try {
@@ -45,7 +45,7 @@ const useTaskData = (taskId: string) => {
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 
-  return { data, error, isPending };
+  return { data, error, isPending, refetch };
 };
 
 export { useTaskData };

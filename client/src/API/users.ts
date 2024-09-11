@@ -72,19 +72,20 @@ const useUserById = (userId: string) => {
     data: user,
     error,
     isPending,
+    refetch,
   } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => fetchUserById(userId),
     enabled: !!userId,
   });
 
-  return { user, error, isPending };
+  return { user, error, isPending, refetch };
 };
 
 const useUserData = () => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const { data, error, isPending } = useQuery({
+  const { data, error, isPending, refetch } = useQuery({
     queryKey: ['userData'],
     queryFn: async () => {
       try {
@@ -99,13 +100,13 @@ const useUserData = () => {
     staleTime: 60 * 1000, // 1 minute
   });
 
-  return { data, error, isPending };
+  return { data, error, isPending, refetch };
 };
 
 const useUserBoardData = () => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const { data, error, isPending } = useQuery({
+  const { data, error, isPending, refetch } = useQuery({
     queryKey: ['userBoardData'],
     queryFn: async () => {
       try {
@@ -120,7 +121,7 @@ const useUserBoardData = () => {
     staleTime: 60 * 1000, // 1 minute
   });
 
-  return { data, error, isPending };
+  return { data, error, isPending, refetch };
 };
 
 export { useUserById, useUserData, useUserBoardData };
