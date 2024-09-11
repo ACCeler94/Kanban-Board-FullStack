@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 15px;
+  padding: 25px;
 }
 
 .taskTitle {
@@ -27,12 +27,17 @@
 
 
 .dialogContent {
-  padding: 0 15px;
+  padding: 0 25px;
+  padding-bottom: 10px;
 }
 
 .dialogContent h4 {
   color: var(--grey);
   font-size: 1.1rem;
+}
+
+.spinnerWrapper {
+  text-align: center;
 }
 
 .taskDescription {
