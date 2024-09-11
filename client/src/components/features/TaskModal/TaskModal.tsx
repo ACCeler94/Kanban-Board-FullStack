@@ -110,19 +110,20 @@ const TaskModal = ({ isOpen, handleClose, setIsOpen, taskId }: TaskModalProps) =
           {taskData.subtasks.length !== 0 ? (
             <SubtasksList subtasks={taskData.subtasks} setIsModified={setIsModified} />
           ) : null}
+
+          {isModified ? (
+            <Button
+              color='primary'
+              variant='contained'
+              className='button-small'
+              sx={{ margin: '10px 0', marginBottom: '25px' }}
+            >
+              Save changes
+            </Button>
+          ) : (
+            ''
+          )}
         </div>
-        {isModified ? (
-          <Button
-            color='primary'
-            variant='contained'
-            className='button-small'
-            sx={{ margin: '10px 25px', marginBottom: '25px' }}
-          >
-            Save changes
-          </Button>
-        ) : (
-          ''
-        )}
       </Dialog>
     );
 };
