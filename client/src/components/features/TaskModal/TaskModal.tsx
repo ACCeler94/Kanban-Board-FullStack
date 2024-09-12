@@ -6,6 +6,7 @@ import SubtasksList from '../SubtasksList/SubtasksList';
 import { useState } from 'react';
 import TaskMenu from '../TaskMenu/TaskMenu';
 import { Button, CircularProgress } from '@mui/material';
+import DeleteTaskModal from '../DeleteTaskModal/DeleteTaskModal';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -17,6 +18,11 @@ interface TaskModalProps {
 const TaskModal = ({ isOpen, handleClose, setIsOpen, taskId }: TaskModalProps) => {
   const { data: taskData, error, isPending, refetch } = useTaskData(taskId);
   const [isModified, setIsModified] = useState(false);
+  const [isNestedModalOpen, setIsNestedModalOpen] = useState(false);
+
+  const handleCloseNested = () => {
+    setIsNestedModalOpen(false);
+  };
 
   if (isPending)
     return (
@@ -99,7 +105,7 @@ const TaskModal = ({ isOpen, handleClose, setIsOpen, taskId }: TaskModalProps) =
         <div className={styles.taskHeaderWrapper}>
           <h3 className={styles.taskTitle}>{taskData?.title}</h3>
           <div className={styles.buttonsWrapper}>
-            <TaskMenu />
+            <TaskMenu setIsNestedModalOpen={setIsNestedModalOpen} />
             <button className={styles.closeButton} onClick={() => setIsOpen(false)}>
               <IoMdClose />
             </button>
@@ -124,6 +130,14 @@ const TaskModal = ({ isOpen, handleClose, setIsOpen, taskId }: TaskModalProps) =
             ''
           )}
         </div>
+
+        <DeleteTaskModal
+          isOpen={isNestedModalOpen}
+          handleClose={handleCloseNested}
+          taskId={taskData.id}
+          taskTitle={taskData.title}
+          boardId={taskData.boardId}
+        />
       </Dialog>
     );
 };

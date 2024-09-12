@@ -6,14 +6,24 @@ import { HiDotsVertical } from 'react-icons/hi';
 import styles from './TaskMenu.module.css';
 import { Divider } from '@mui/material';
 
-const TaskMenu = () => {
+interface TaskMenuProps {
+  setIsNestedModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const TaskMenu = ({ setIsNestedModalOpen }: TaskMenuProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleDeleteClick = () => {
+    setIsNestedModalOpen(true);
+    handleClose();
   };
 
   return (
@@ -47,7 +57,7 @@ const TaskMenu = () => {
           Edit
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={handleClose} sx={{ color: 'var(--red)', fontWeight: '700' }}>
+        <MenuItem onClick={handleDeleteClick} sx={{ color: 'var(--red)', fontWeight: '700' }}>
           Delete
         </MenuItem>
       </Menu>
