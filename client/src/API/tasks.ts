@@ -84,7 +84,11 @@ const useDeleteTask = (taskId: string, boardId: string) => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+      setTimeout(() => {
+        // timeout to 1.5 second to allow the user to read success message
+        queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+        queryClient.removeQueries({ queryKey: ['task', taskId] }); // remove deleted task from cache
+      }, 1500);
     },
   });
 
