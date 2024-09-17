@@ -37,6 +37,19 @@ interface TaskTypePartial {
   }[];
 }
 
+interface EditTaskData {
+  taskData?: {
+    title?: string | undefined;
+    desc?: string | undefined;
+    status?: 'IN_PROGRESS' | 'DONE' | 'TO_DO' | undefined;
+  };
+  subtaskData?: {
+    id?: string | undefined;
+    desc?: string | undefined;
+    finished?: boolean | undefined;
+  }[];
+}
+
 interface User {
   id: string;
   name: string;
@@ -82,17 +95,21 @@ interface BoardType {
   users: User[];
   tasks: TaskType[];
 }
-
-type BoardPreview = {
+interface BoardPreview {
   board: {
     title: string;
     id: string;
   };
-};
+}
 
-type AuthoredBoardPreview = BoardPreview & { createdAt: Date; authorId: string };
+interface AuthoredBoardPreview extends BoardPreview {
+  createdAt: Date;
+  authorId: string;
+}
 
-type BoardPreviewWithCreatedAt = BoardPreview & { createdAt: Date };
+interface BoardPreviewWithCreatedAt extends BoardPreview {
+  createdAt: Date;
+}
 
 interface UserDataPreview {
   id: string;
@@ -133,4 +150,5 @@ export type {
   UserData,
   UserBoardData,
   UserDataPreview,
+  EditTaskData,
 }; // + TaskStatus exported as a value
