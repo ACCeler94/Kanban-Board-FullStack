@@ -224,7 +224,7 @@ const TasksController = {
         }
       }
 
-      const updatedTask = prisma.task.findUnique({
+      const updatedTask = await prisma.task.findUnique({
         where: {
           id: taskId,
         },
