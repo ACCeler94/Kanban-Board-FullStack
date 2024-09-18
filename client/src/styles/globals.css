@@ -7,7 +7,7 @@
 }
 
 body {
-  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 a {
