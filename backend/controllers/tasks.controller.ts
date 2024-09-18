@@ -224,7 +224,16 @@ const TasksController = {
         }
       }
 
-      res.status(200).json({ message: 'Task updated!' });
+      const updatedTask = prisma.task.findUnique({
+        where: {
+          id: taskId,
+        },
+        include: {
+          subtasks: true,
+        },
+      });
+
+      res.status(200).json(updatedTask);
     } catch (error) {
       next(error);
     }
