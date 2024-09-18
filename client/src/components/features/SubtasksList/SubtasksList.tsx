@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Subtask } from '../../../types/types';
 import styles from './Subtasks.module.css';
 import isEqual from 'lodash/isEqual';
@@ -6,35 +6,36 @@ import isEqual from 'lodash/isEqual';
 interface SubtasksListProps {
   subtasks: Subtask[];
   setIsModified: React.Dispatch<React.SetStateAction<boolean>>;
+  setSubtaskData: React.Dispatch<React.SetStateAction<undefined | Subtask[]>>;
 }
 
-const SubtasksList = ({ subtasks, setIsModified }: SubtasksListProps) => {
+const SubtasksList = ({ subtasks, setIsModified, setSubtaskData }: SubtasksListProps) => {
   const [updatedSubtasks, setUpdatedSubtasks] = useState<Subtask[]>(subtasks);
 
   // check if any of the subtasks was modified so the parent can render save changes button
+  const isChanged = useMemo(() => isEqual(updatedSubtasks, subtasks), [subtasks, updatedSubtasks]);
   useEffect(() => {
-    const isChanged = isEqual(updatedSubtasks, subtasks);
     setIsModified(!isChanged);
-  }, [setIsModified, subtasks, updatedSubtasks]);
+  }, [isChanged, setIsModified]);
 
-  const handleCheckboxChange = (index: number) => {
-    setUpdatedSubtasks((prevSubtasks) =>
-      prevSubtasks.map((subtask, i) =>
-        i === index ? { ...subtask, finished: !subtask.finished } : subtask
-      )
+  const handleCheckboxChange = (id: string) => {
+    const newSubtasks = updatedSubtasks.map((subtask) =>
+      subtask.id === id ? { ...subtask, finished: !subtask.finished } : subtask
     );
+    setUpdatedSubtasks(newSubtasks);
+    setSubtaskData(newSubtasks);
   };
 
   return (
     <>
       <h4>Subtasks:</h4>
       <ul className={styles.subtasksList}>
-        {updatedSubtasks.map((subtask, index) => {
+        {updatedSubtasks.map((subtask) => {
           return (
             <li
               key={subtask.id}
               className={`${styles.subtask} ${subtask.finished ? styles.finished : ''}`}
-              onClick={() => handleCheckboxChange(index)}
+              onClick={() => handleCheckboxChange(subtask.id)}
             >
               <input
                 type='checkbox'
