@@ -1,51 +1,11 @@
-.taskHeaderWrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 25px;
-}
-
-.taskTitle {
-  font-size: 1.25rem;
-  margin: 0;
-  margin-right: 10px;
-}
-
-.buttonsWrapper {
-  display: flex;
-  align-items: center;
-}
-
-.buttonsWrapper button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1.85rem;
-  color: var(--grey);
-  padding: 0;
-}
-
-
-.dialogContent {
-  padding: 0 25px;
-  padding-bottom: 10px;
-}
-
-.taskDescription {
-  margin-top: 0;
-  margin-bottom: 25px;
-}
 
 .dialogContent h4 {
   color: var(--grey);
   font-size: 1.1rem;
 }
 
-.spinnerWrapper {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
 .taskDescription {
+  margin-top: 0;
+  margin-bottom: 25px;
   color: var(--dark-grey);
 }

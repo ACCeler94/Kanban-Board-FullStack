@@ -8,7 +8,8 @@ import { Subtask } from '../../../types/types';
 import DeleteTaskModal from '../DeleteTaskModal/DeleteTaskModal';
 import SubtasksList from '../SubtasksList/SubtasksList';
 import TaskMenu from '../TaskMenu/TaskMenu';
-import styles from './TaskModal.module.css';
+import taskModalStyles from './TaskModal.module.css';
+import modalStyles from '../../../styles/modal.module.css';
 
 const TaskModal = () => {
   const { id, taskId } = useParams();
@@ -50,16 +51,16 @@ const TaskModal = () => {
           },
         }}
       >
-        <div className={styles.taskHeaderWrapper}>
-          <h3 className={styles.taskTitle}>Loading</h3>
-          <div className={styles.buttonsWrapper}>
-            <button className={styles.closeButton} onClick={handleClose}>
+        <div className={modalStyles.modalHeaderWrapper}>
+          <h3 className={modalStyles.modalTitle}>Loading</h3>
+          <div className={modalStyles.buttonsWrapper}>
+            <button className={modalStyles.closeButton} onClick={handleClose}>
               <IoMdClose />
             </button>
           </div>
         </div>
-        <div className={styles.dialogContent}>
-          <div className={styles.spinnerWrapper}>
+        <div className={modalStyles.dialogContent}>
+          <div className={modalStyles.spinnerWrapper}>
             <CircularProgress />
           </div>
         </div>
@@ -80,15 +81,15 @@ const TaskModal = () => {
           },
         }}
       >
-        <div className={styles.taskHeaderWrapper}>
-          <h3 className={styles.taskTitle}>Error</h3>
-          <div className={styles.buttonsWrapper}>
-            <button className={styles.closeButton} onClick={handleClose}>
+        <div className={modalStyles.modalHeaderWrapper}>
+          <h3 className={modalStyles.modalTitle}>Error</h3>
+          <div className={modalStyles.buttonsWrapper}>
+            <button className={modalStyles.closeButton} onClick={handleClose}>
               <IoMdClose />
             </button>
           </div>
         </div>
-        <div className={styles.dialogContent}>
+        <div className={modalStyles.dialogContent}>
           <h3>{errorMessage}</h3>
           {taskFetchingError ? (
             <Button
@@ -119,17 +120,17 @@ const TaskModal = () => {
           },
         }}
       >
-        <div className={styles.taskHeaderWrapper}>
-          <h3 className={styles.taskTitle}>{taskData?.title}</h3>
-          <div className={styles.buttonsWrapper}>
+        <div className={modalStyles.modalHeaderWrapper}>
+          <h3 className={modalStyles.modalTitle}>{taskData?.title}</h3>
+          <div className={modalStyles.buttonsWrapper}>
             <TaskMenu setIsNestedModalOpen={setIsNestedModalOpen} />
-            <button className={styles.closeButton} onClick={handleClose}>
+            <button className={modalStyles.closeButton} onClick={handleClose}>
               <IoMdClose />
             </button>
           </div>
         </div>
-        <div className={styles.dialogContent}>
-          <p className={styles.taskDescription}>{taskData.desc}</p>
+        <div className={modalStyles.modalContent}>
+          <p className={taskModalStyles.taskDescription}>{taskData.desc}</p>
           {taskData.subtasks.length !== 0 ? (
             <SubtasksList
               subtasks={taskData.subtasks}
