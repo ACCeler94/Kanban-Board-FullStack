@@ -3,14 +3,18 @@ import { Route, Routes } from 'react-router-dom';
 import BoardsPage from './pages/BoardsPage/BoardsPage';
 import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
 import Board from './components/features/Board/Board';
+import AddTaskModal from './components/features/AddTaskModal/AddTaskModal';
+import TaskModal from './components/features/TaskModal/TaskModal';
 
 const App = () => {
   return (
     <>
       <Routes>
         <Route path='/boards' element={<BoardsPage />}>
-          <Route path=':id' element={<Board />} />
-          {/* <Route path='edit' element={<EditBoardPage />} /> */}
+          <Route path=':id' element={<Board />}>
+            <Route path='tasks/add-task' element={<AddTaskModal />} />
+            <Route path='tasks/:taskId' element={<TaskModal />} />
+          </Route>
         </Route>
         <Route path='/post-login' element={<PostLoginPage />} />
       </Routes>

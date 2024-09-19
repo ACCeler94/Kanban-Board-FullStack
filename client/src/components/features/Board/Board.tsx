@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import styles from './Board.module.css';
 import { useBoardById } from '../../../API/boards';
 import { validate as uuidValidate } from 'uuid';
@@ -98,6 +98,7 @@ const Board = () => {
             })}
           </ul>
         </div>
+        <Outlet />
       </div>
     );
   }
