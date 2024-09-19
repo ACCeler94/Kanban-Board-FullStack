@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TaskTypePartial } from '../../../types/types';
-import TaskModal from '../TaskModal/TaskModal';
 import styles from './TaskCard.module.css';
+import { Link } from 'react-router-dom';
 
 interface TaskCardProps {
   taskData: TaskTypePartial;
@@ -9,13 +9,6 @@ interface TaskCardProps {
 
 const TaskCard = ({ taskData }: TaskCardProps) => {
   const [finishedSubtasksCount, setFinishedSubtasksCount] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleClose = (event: object, reason: string) => {
-    if (reason === 'escapeKeyDown' || reason === 'backdropClick') return;
-
-    setIsOpen(false);
-  };
 
   useEffect(() => {
     if (taskData.subtasks.length !== 0) {
@@ -28,8 +21,8 @@ const TaskCard = ({ taskData }: TaskCardProps) => {
   }, [taskData.subtasks]);
 
   return (
-    <>
-      <div className={styles.taskCard} onClick={() => setIsOpen(true)}>
+    <Link to={`tasks/${taskData.id}`}>
+      <div className={styles.taskCard}>
         <h3>{taskData.title}</h3>
         <p>
           {taskData.subtasks.length !== 0
@@ -37,18 +30,7 @@ const TaskCard = ({ taskData }: TaskCardProps) => {
             : 'No subtasks'}
         </p>
       </div>
-      {
-        // conditionally render modal to avoid unnecessary task data fetching - it fetches task data on mount
-        isOpen ? (
-          <TaskModal
-            isOpen={isOpen}
-            handleClose={handleClose}
-            setIsOpen={setIsOpen}
-            taskId={taskData.id}
-          />
-        ) : null
-      }
-    </>
+    </Link>
   );
 };
 

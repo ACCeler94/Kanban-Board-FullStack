@@ -1,38 +1,40 @@
-import Dialog from '@mui/material/Dialog';
-import { useEditTask, useTaskData } from '../../../API/tasks';
-import styles from './TaskModal.module.css';
-import { IoMdClose } from 'react-icons/io';
-import SubtasksList from '../SubtasksList/SubtasksList';
-import { useState } from 'react';
-import TaskMenu from '../TaskMenu/TaskMenu';
 import { Button, CircularProgress } from '@mui/material';
-import DeleteTaskModal from '../DeleteTaskModal/DeleteTaskModal';
+import Dialog from '@mui/material/Dialog';
+import { useState } from 'react';
+import { IoMdClose } from 'react-icons/io';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEditTask, useTaskData } from '../../../API/tasks';
 import { Subtask } from '../../../types/types';
+import DeleteTaskModal from '../DeleteTaskModal/DeleteTaskModal';
+import SubtasksList from '../SubtasksList/SubtasksList';
+import TaskMenu from '../TaskMenu/TaskMenu';
+import styles from './TaskModal.module.css';
 
-interface TaskModalProps {
-  isOpen: boolean;
-  handleClose: (event: object, reason: string) => void;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  taskId: string;
-}
-
-const TaskModal = ({ isOpen, handleClose, setIsOpen, taskId }: TaskModalProps) => {
-  const { data: taskData, error: taskFetchingError, isPending, refetch } = useTaskData(taskId);
+const TaskModal = () => {
+  const { id, taskId } = useParams();
+  const [isOpen, setIsOpen] = useState(true);
   const [isModified, setIsModified] = useState(false);
   const [isNestedModalOpen, setIsNestedModalOpen] = useState(false);
   const [subtaskData, setSubtaskData] = useState<Subtask[] | undefined>(undefined);
+  const { data: taskData, error: taskFetchingError, isPending, refetch } = useTaskData(taskId!);
   const {
     error: editError,
     isPending: isEditPending,
     mutate: saveEditedTask,
-  } = useEditTask(taskId, { subtaskData });
+  } = useEditTask(taskId!, { subtaskData });
+  const navigate = useNavigate();
 
-  const handleSaveChanges = () => {
-    if (isModified && subtaskData) saveEditedTask();
+  const handleClose = () => {
+    setIsOpen(false);
+    navigate(`/boards/${id}`);
   };
 
   const handleCloseNested = () => {
     setIsNestedModalOpen(false);
+  };
+
+  const handleSaveChanges = () => {
+    if (isModified && subtaskData) saveEditedTask();
   };
 
   if (isPending || isEditPending)
@@ -51,7 +53,7 @@ const TaskModal = ({ isOpen, handleClose, setIsOpen, taskId }: TaskModalProps) =
         <div className={styles.taskHeaderWrapper}>
           <h3 className={styles.taskTitle}>Loading</h3>
           <div className={styles.buttonsWrapper}>
-            <button className={styles.closeButton} onClick={() => setIsOpen(false)}>
+            <button className={styles.closeButton} onClick={handleClose}>
               <IoMdClose />
             </button>
           </div>
@@ -81,7 +83,7 @@ const TaskModal = ({ isOpen, handleClose, setIsOpen, taskId }: TaskModalProps) =
         <div className={styles.taskHeaderWrapper}>
           <h3 className={styles.taskTitle}>Error</h3>
           <div className={styles.buttonsWrapper}>
-            <button className={styles.closeButton} onClick={() => setIsOpen(false)}>
+            <button className={styles.closeButton} onClick={handleClose}>
               <IoMdClose />
             </button>
           </div>
@@ -121,7 +123,7 @@ const TaskModal = ({ isOpen, handleClose, setIsOpen, taskId }: TaskModalProps) =
           <h3 className={styles.taskTitle}>{taskData?.title}</h3>
           <div className={styles.buttonsWrapper}>
             <TaskMenu setIsNestedModalOpen={setIsNestedModalOpen} />
-            <button className={styles.closeButton} onClick={() => setIsOpen(false)}>
+            <button className={styles.closeButton} onClick={handleClose}>
               <IoMdClose />
             </button>
           </div>
