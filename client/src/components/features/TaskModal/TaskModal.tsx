@@ -54,7 +54,12 @@ const TaskModal = () => {
         <div className={modalStyles.modalHeaderWrapper}>
           <h3 className={modalStyles.modalTitle}>Loading</h3>
           <div className={modalStyles.buttonsWrapper}>
-            <button className={modalStyles.closeButton} onClick={handleClose}>
+            <button
+              type='button'
+              aria-label='Close Modal'
+              className={modalStyles.closeButton}
+              onClick={handleClose}
+            >
               <IoMdClose />
             </button>
           </div>
@@ -84,7 +89,12 @@ const TaskModal = () => {
         <div className={modalStyles.modalHeaderWrapper}>
           <h3 className={modalStyles.modalTitle}>Error</h3>
           <div className={modalStyles.buttonsWrapper}>
-            <button className={modalStyles.closeButton} onClick={handleClose}>
+            <button
+              className={modalStyles.closeButton}
+              type='button'
+              aria-label='Close Modal'
+              onClick={handleClose}
+            >
               <IoMdClose />
             </button>
           </div>
@@ -124,7 +134,12 @@ const TaskModal = () => {
           <h3 className={modalStyles.modalTitle}>{taskData?.title}</h3>
           <div className={modalStyles.buttonsWrapper}>
             <TaskMenu setIsNestedModalOpen={setIsNestedModalOpen} />
-            <button className={modalStyles.closeButton} onClick={handleClose}>
+            <button
+              className={modalStyles.closeButton}
+              type='button'
+              aria-label='Close Modal'
+              onClick={handleClose}
+            >
               <IoMdClose />
             </button>
           </div>

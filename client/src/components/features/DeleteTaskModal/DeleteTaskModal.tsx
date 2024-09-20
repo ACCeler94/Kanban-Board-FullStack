@@ -38,7 +38,12 @@ const DeleteTaskModal = ({
           <div className={modalStyles.modalHeaderWrapper}>
             <h3 className={modalStyles.modalHeader}>Error</h3>
             <div className={modalStyles.buttonsWrapper}>
-              <button className={modalStyles.closeButton} onClick={handleClose}>
+              <button
+                className={modalStyles.closeButton}
+                type='button'
+                aria-label='Close Modal'
+                onClick={handleClose}
+              >
                 <IoMdClose />
               </button>
             </div>
@@ -64,7 +69,12 @@ const DeleteTaskModal = ({
         <div className={modalStyles.modalHeaderWrapper}>
           <h3 className={modalStyles.modalHeader}>Error</h3>
           <div className={modalStyles.buttonsWrapper}>
-            <button className={modalStyles.closeButton} onClick={handleClose}>
+            <button
+              className={modalStyles.closeButton}
+              type='button'
+              aria-label='Close Modal'
+              onClick={handleClose}
+            >
               <IoMdClose />
             </button>
           </div>
@@ -93,7 +103,12 @@ const DeleteTaskModal = ({
         <div className={modalStyles.modalHeaderWrapper}>
           <h3 className={modalStyles.modalHeader}>Success</h3>
           <div className={modalStyles.buttonsWrapper}>
-            <button className={modalStyles.closeButton} onClick={handleClose}>
+            <button
+              className={modalStyles.closeButton}
+              type='button'
+              aria-label='Close Modal'
+              onClick={handleClose}
+            >
               <IoMdClose />
             </button>
           </div>
@@ -119,7 +134,12 @@ const DeleteTaskModal = ({
       <div className={modalStyles.modalHeaderWrapper}>
         <h3 className={modalStyles.modalHeader}>Delete this task?</h3>
         <div className={modalStyles.buttonsWrapper}>
-          <button className={modalStyles.closeButton} onClick={handleClose}>
+          <button
+            className={modalStyles.closeButton}
+            type='button'
+            aria-label='Close Modal'
+            onClick={handleClose}
+          >
             <IoMdClose />
           </button>
         </div>

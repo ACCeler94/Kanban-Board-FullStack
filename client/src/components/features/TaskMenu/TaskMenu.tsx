@@ -29,6 +29,7 @@ const TaskMenu = ({ setIsNestedModalOpen }: TaskMenuProps) => {
   return (
     <div>
       <button
+        type='button'
         id='task-menu-button'
         aria-controls={open ? 'task-menu-button' : undefined}
         aria-haspopup='true'
