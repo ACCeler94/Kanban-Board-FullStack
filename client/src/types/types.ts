@@ -37,6 +37,11 @@ interface TaskTypePartial {
   }[];
 }
 
+interface NewSubtaskData {
+  desc: string;
+  finished: boolean;
+}
+
 interface EditTaskData {
   taskData?: {
     title?: string | undefined;
@@ -151,4 +156,5 @@ export type {
   UserBoardData,
   UserDataPreview,
   EditTaskData,
+  NewSubtaskData,
 }; // + TaskStatus exported as a value
