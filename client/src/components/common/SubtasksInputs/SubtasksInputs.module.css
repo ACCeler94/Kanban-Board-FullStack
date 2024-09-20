@@ -1,0 +1,25 @@
+.subtasksWrapper {
+  margin-bottom: 25px;
+}
+
+.inputsLabel {
+  font-weight: 600;
+  color: var(--grey);
+  margin-bottom: 10px;
+}
+
+.inputWrapper {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.addButton {
+  color: var(--main-purple);
+  height: 100%;
+}
+
+.deleteButton {
+  color: var(--red);
+  height: 100%;
+}
