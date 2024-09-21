@@ -27,6 +27,11 @@ const SubtasksInputs = ({ subtasks, setSubtasks }: SubtasksInputsProps) => {
     setNewSubtask({ desc: '', finished: false });
   };
 
+  const handleSubtaskDelete = (index: number) => {
+    const updatedSubtasks = subtasks.filter((_, i) => i !== index);
+    setSubtasks(updatedSubtasks);
+  };
+
   return (
     <div className={styles.subtasksWrapper}>
       <span className={styles.inputsLabel}>Subtasks</span>
@@ -45,7 +50,12 @@ const SubtasksInputs = ({ subtasks, setSubtasks }: SubtasksInputsProps) => {
               fullWidth
               required
             />
-            <button className={styles.deleteButton} type='button' aria-label='Delete Subtask'>
+            <button
+              className={styles.deleteButton}
+              type='button'
+              aria-label='Delete Subtask'
+              onClick={() => handleSubtaskDelete(index)}
+            >
               <MdOutlineDeleteForever />
             </button>
           </ListItem>
