@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+const TaskStatus = z.enum(['TO_DO', 'IN_PROGRESS', 'DONE']);
+
 const createTaskDTO = z.object({
   taskData: z.object({
     title: z
@@ -11,6 +13,7 @@ const createTaskDTO = z.object({
       .max(500, { message: 'Description cannot be longer than 500 characters' })
       .optional(),
     boardId: z.string().uuid({ message: 'Board ID must be a non-negative integer' }),
+    status: TaskStatus,
   }),
   subtaskData: z
     .object({
