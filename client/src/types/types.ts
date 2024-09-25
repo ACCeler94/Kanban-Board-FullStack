@@ -44,14 +44,26 @@ interface NewSubtaskData {
 
 interface EditTaskData {
   taskData?: {
-    title?: string | undefined;
-    desc?: string | undefined;
-    status?: 'IN_PROGRESS' | 'DONE' | 'TO_DO' | undefined;
+    title?: string;
+    desc?: string;
+    status?: 'IN_PROGRESS' | 'DONE' | 'TO_DO';
   };
   subtaskData?: {
-    id?: string | undefined;
-    desc?: string | undefined;
-    finished?: boolean | undefined;
+    id?: string;
+    desc?: string;
+    finished?: boolean;
+  }[];
+}
+
+interface NewTaskData {
+  taskData: {
+    title: string;
+    desc?: string;
+    status: 'IN_PROGRESS' | 'DONE' | 'TO_DO';
+  };
+  subtaskData?: {
+    desc: string;
+    finished: boolean;
   }[];
 }
 
@@ -100,6 +112,7 @@ interface BoardType {
   users: User[];
   tasks: TaskType[];
 }
+
 interface BoardPreview {
   board: {
     title: string;
@@ -157,4 +170,5 @@ export type {
   UserDataPreview,
   EditTaskData,
   NewSubtaskData,
+  NewTaskData,
 }; // + TaskStatus exported as a value
