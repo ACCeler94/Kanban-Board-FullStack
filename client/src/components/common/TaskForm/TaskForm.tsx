@@ -1,7 +1,7 @@
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 import { NewSubtaskData, Subtask, TaskStatus } from '../../../types/types';
-import { MenuItem } from '@mui/material';
+import { Button, MenuItem } from '@mui/material';
 import styles from './TaskForm.module.css';
 import SubtasksInputs from '../SubtasksInputs/SubtasksInputs';
 
@@ -14,7 +14,14 @@ interface TaskFormProps {
   submitHandler: () => void;
 }
 
-const TaskForm = ({ taskTitle, taskDesc, taskStatus, taskSubtasks }: TaskFormProps) => {
+const TaskForm = ({
+  taskTitle,
+  taskDesc,
+  taskStatus,
+  taskSubtasks,
+  submitHandler,
+  buttonText,
+}: TaskFormProps) => {
   const [title, setTitle] = useState(taskTitle || '');
   const [desc, setDesc] = useState(taskDesc || '');
   const [status, setStatus] = useState(taskStatus || TaskStatus.TO_DO);
@@ -32,7 +39,7 @@ const TaskForm = ({ taskTitle, taskDesc, taskStatus, taskSubtasks }: TaskFormPro
   ];
 
   return (
-    <form autoComplete='off'>
+    <form autoComplete='off' onSubmit={() => submitHandler({ title, desc, status, subtasks })}>
       <div className={styles.inputWrapper}>
         <label htmlFor='title'>Title</label>
         <TextField
@@ -82,6 +89,10 @@ const TaskForm = ({ taskTitle, taskDesc, taskStatus, taskSubtasks }: TaskFormPro
           })}
         </TextField>
       </div>
+
+      <Button type='submit' color='primary' variant='contained' className='button-small'>
+        {buttonText}
+      </Button>
     </form>
   );
 };
