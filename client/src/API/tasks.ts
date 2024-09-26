@@ -93,6 +93,7 @@ const addNewTask = async ({ taskData, subtaskData }: NewTaskData, token: string)
         withCredentials: true,
       }
     );
+
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -164,13 +165,14 @@ const useDeleteTask = (taskId: string, boardId: string) => {
   return { mutate, data, error, isPending };
 };
 
-const useEditTask = (taskId: string, editData: EditTaskData) => {
+const useEditTask = (taskId: string) => {
   const { getAccessTokenSilently } = useAuth0();
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (editData: EditTaskData) => {
       if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
+
       const validationResult = editTaskValidator.safeParse(editData); // data validation with zod
       if (!validationResult.success)
         throw new Error('Invalid data: ' + validationResult.error.message);
@@ -197,13 +199,14 @@ const useEditTask = (taskId: string, editData: EditTaskData) => {
   return { mutate, data, error, isPending };
 };
 
-const useCreateTask = (taskData: NewTaskData) => {
+const useCreateTask = () => {
   const { getAccessTokenSilently } = useAuth0();
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (taskData: NewTaskData) => {
       const validationResult = addTaskValidator.safeParse(taskData);
+
       if (!validationResult.success)
         throw new Error('Invalid task data: ' + validationResult.error.message);
 
