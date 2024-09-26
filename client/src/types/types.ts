@@ -60,11 +60,16 @@ interface NewTaskData {
     title: string;
     desc?: string;
     status: 'IN_PROGRESS' | 'DONE' | 'TO_DO';
+    boardId: string;
   };
   subtaskData?: {
     desc: string;
     finished: boolean;
   }[];
+}
+
+interface NewTaskFormData extends Omit<NewTaskData, 'taskData'> {
+  taskData: Omit<NewTaskData['taskData'], 'boardId'>;
 }
 
 interface User {
@@ -171,4 +176,5 @@ export type {
   EditTaskData,
   NewSubtaskData,
   NewTaskData,
+  NewTaskFormData,
 }; // + TaskStatus exported as a value
