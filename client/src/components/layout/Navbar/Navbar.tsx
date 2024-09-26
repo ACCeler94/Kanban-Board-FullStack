@@ -4,7 +4,7 @@ import Container from '../../common/Container/Container';
 import styles from './Navbar.module.css';
 import { FaPlus } from 'react-icons/fa';
 import useStore from '../../../store/useStore';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useBoardById } from '../../../API/boards';
 import { useUserBoardData } from '../../../API/users';
 import { useEffect, useState } from 'react';
@@ -53,6 +53,8 @@ const Navbar = () => {
               variant='contained'
               className='button-small'
               disabled={!isAuthor}
+              component={Link}
+              to={`${id}/tasks/add-task`}
             >
               <FaPlus />
               <span>Add New Task</span>
