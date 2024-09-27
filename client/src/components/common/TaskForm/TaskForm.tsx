@@ -89,7 +89,7 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
         <TextField
           id='status'
           select
-          defaultValue={status}
+          value={status}
           onChange={(e) => setStatus(e.target.value as TaskStatus)}
           fullWidth
           sx={{ marginTop: '5px' }}
