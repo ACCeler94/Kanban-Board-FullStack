@@ -11,7 +11,7 @@ const AddTaskModal = () => {
   const { id } = useParams();
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
-  const { data, error, isPending, mutate } = useCreateTask();
+  const { data, error, isPending, mutate, isSuccess } = useCreateTask();
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -100,7 +100,7 @@ const AddTaskModal = () => {
     );
   }
 
-  if (!isPending && !error && data) {
+  if (isSuccess) {
     return (
       <Dialog
         open={isOpen}
