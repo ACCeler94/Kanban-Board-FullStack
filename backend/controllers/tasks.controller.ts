@@ -89,7 +89,6 @@ const TasksController = {
               data: subtaskData.map((subtask) => ({
                 ...subtask,
                 taskId: task.id,
-                finished: false,
               })),
             });
           });
@@ -200,14 +199,10 @@ const TasksController = {
       // update/create subtasks if subtaskData is provided
       if (subtaskData && subtaskData.length !== 0) {
         for (const subtask of subtaskData) {
-          if (subtask.id) {
-            // Update existing subtask
-            const existingSubtask = await prisma.subtask.findUnique({
-              where: { id: subtask.id },
-            });
-            if (!existingSubtask) {
-              return res.status(404).json({ error: 'Subtask not found...' });
-            }
+          const existingSubtask = await prisma.subtask.findUnique({
+            where: { id: subtask.id },
+          });
+          if (existingSubtask) {
             await prisma.subtask.update({
               where: { id: subtask.id },
               data: { desc: subtask.desc, finished: subtask.finished },
@@ -218,7 +213,7 @@ const TasksController = {
               return res.status(400).json({ error: 'New subtask requires description.' });
 
             await prisma.subtask.create({
-              data: { taskId, desc: subtask.desc, finished: false },
+              data: { id: subtask.id, taskId, desc: subtask.desc, finished: false },
             });
           }
         }

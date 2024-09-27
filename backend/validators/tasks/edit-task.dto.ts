@@ -21,7 +21,7 @@ export const editTaskDTO = z
       .optional(),
     subtaskData: z
       .object({
-        id: z.string().uuid().optional(),
+        id: z.string({ message: 'Subtask ID is required' }).uuid('Subtask ID must be a valid UUID'),
         desc: z
           .string()
           .min(1, { message: 'Description must be at least 1 character' })
