@@ -166,7 +166,7 @@ const useEditTask = (taskId: string) => {
   const { getAccessTokenSilently } = useAuth0();
   const queryClient = useQueryClient();
 
-  const { mutate, data, error, isPending } = useMutation({
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
     mutationFn: async (editData: EditTaskData) => {
       if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
 
@@ -193,14 +193,14 @@ const useEditTask = (taskId: string) => {
     },
   });
 
-  return { mutate, data, error, isPending };
+  return { mutate, data, error, isPending, isSuccess };
 };
 
 const useCreateTask = () => {
   const { getAccessTokenSilently } = useAuth0();
   const queryClient = useQueryClient();
 
-  const { mutate, data, error, isPending } = useMutation({
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
     mutationFn: async (taskData: NewTaskData) => {
       const validationResult = addTaskValidator.safeParse(taskData);
 
@@ -228,7 +228,7 @@ const useCreateTask = () => {
       });
     },
   });
-  return { mutate, data, isPending, error };
+  return { mutate, data, isPending, error, isSuccess };
 };
 
 export { useTaskData, useDeleteTask, useEditTask, useCreateTask };
