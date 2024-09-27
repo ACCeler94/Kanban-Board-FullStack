@@ -49,6 +49,7 @@ const SubtasksInputs = ({ subtasks, setSubtasks }: SubtasksInputsProps) => {
               sx={{ marginRight: '10px' }}
               fullWidth
               required
+              inputProps={{ maxLength: 200 }}
             />
             <button
               className={styles.deleteButton}

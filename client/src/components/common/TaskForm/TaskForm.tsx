@@ -1,27 +1,33 @@
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
-import { NewSubtaskData, Subtask, TaskStatus } from '../../../types/types';
+import {
+  EditTaskData,
+  NewSubtaskData,
+  NewTaskFormData,
+  Subtask,
+  TaskStatus,
+} from '../../../types/types';
 import { Button, MenuItem } from '@mui/material';
 import styles from './TaskForm.module.css';
 import SubtasksInputs from '../SubtasksInputs/SubtasksInputs';
 
-interface TaskFormProps {
+interface TaskFormProps<T extends NewTaskFormData | EditTaskData> {
+  submitHandler: (formData: T) => void;
   taskTitle?: string;
   taskDesc?: string;
   taskStatus?: TaskStatus;
   taskSubtasks?: Subtask[];
   buttonText: string;
-  submitHandler: () => void;
 }
 
-const TaskForm = ({
+const TaskForm = <T extends NewTaskFormData | EditTaskData>({
+  submitHandler,
   taskTitle,
   taskDesc,
   taskStatus,
   taskSubtasks,
-  submitHandler,
   buttonText,
-}: TaskFormProps) => {
+}: TaskFormProps<T>) => {
   const [title, setTitle] = useState(taskTitle || '');
   const [desc, setDesc] = useState(taskDesc || '');
   const [status, setStatus] = useState(taskStatus || TaskStatus.TO_DO);
@@ -38,8 +44,13 @@ const TaskForm = ({
     { value: TaskStatus.DONE, label: 'Done' },
   ];
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    submitHandler({ taskData: { title, desc, status }, subtaskData: subtasks } as T);
+  };
+
   return (
-    <form autoComplete='off' onSubmit={() => submitHandler({ title, desc, status, subtasks })}>
+    <form autoComplete='off' onSubmit={handleSubmit}>
       <div className={styles.inputWrapper}>
         <label htmlFor='title'>Title</label>
         <TextField
@@ -50,6 +61,8 @@ const TaskForm = ({
           fullWidth
           sx={{ marginTop: '5px' }}
           placeholder='Title should be short and allow to easily identify the task.'
+          required
+          inputProps={{ maxLength: 100 }}
         />
       </div>
 
@@ -65,6 +78,7 @@ const TaskForm = ({
           multiline
           minRows={4}
           sx={{ marginTop: '5px' }}
+          inputProps={{ maxLength: 500 }}
         />
       </div>
 

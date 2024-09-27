@@ -22,7 +22,7 @@ const TaskModal = () => {
     error: editError,
     isPending: isEditPending,
     mutate: saveEditedTask,
-  } = useEditTask(taskId!, { subtaskData });
+  } = useEditTask(taskId!); // taskId is always present, if not this component will not render
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -35,7 +35,7 @@ const TaskModal = () => {
   };
 
   const handleSaveChanges = () => {
-    if (isModified && subtaskData) saveEditedTask();
+    if (isModified && subtaskData) saveEditedTask({ subtaskData });
   };
 
   if (isPending || isEditPending)
