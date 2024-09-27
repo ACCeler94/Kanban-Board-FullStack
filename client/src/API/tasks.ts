@@ -136,7 +136,7 @@ const useDeleteTask = (taskId: string, boardId: string) => {
   const { getAccessTokenSilently } = useAuth0();
   const queryClient = useQueryClient();
 
-  const { mutate, data, error, isPending } = useMutation({
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
     mutationFn: async () => {
       if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
 
@@ -154,15 +154,12 @@ const useDeleteTask = (taskId: string, boardId: string) => {
       }
     },
     onSuccess: () => {
-      setTimeout(() => {
-        // timeout to 1.5 second to allow the user to read success message
-        queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-        queryClient.removeQueries({ queryKey: ['task', taskId] }); // remove deleted task from cache
-      }, 1500);
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+      queryClient.removeQueries({ queryKey: ['task', taskId] }); // remove deleted task from cache
     },
   });
 
-  return { mutate, data, error, isPending };
+  return { mutate, data, error, isPending, isSuccess };
 };
 
 const useEditTask = (taskId: string) => {

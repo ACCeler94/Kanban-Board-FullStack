@@ -172,6 +172,7 @@ const TaskModal = () => {
         <DeleteTaskModal
           isOpen={isNestedModalOpen}
           handleClose={handleCloseNested}
+          handleCloseParent={handleClose}
           taskId={taskData.id}
           taskTitle={taskData.title}
           boardId={taskData.boardId}

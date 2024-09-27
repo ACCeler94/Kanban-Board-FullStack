@@ -3,23 +3,40 @@ import { useDeleteTask } from '../../../API/tasks';
 import { IoMdClose } from 'react-icons/io';
 import modalStyles from '../../../styles/modal.module.css';
 import deleteTaskModalStyles from './DeleteTaskModal.module.css';
+import { useEffect } from 'react';
 
 interface ConfirmationModalProps {
   taskId: string;
   boardId: string;
   taskTitle: string;
   handleClose: () => void;
+  handleCloseParent: () => void;
   isOpen: boolean;
 }
 
 const DeleteTaskModal = ({
   handleClose,
+  handleCloseParent,
   isOpen,
   taskId,
   taskTitle,
   boardId,
 }: ConfirmationModalProps) => {
-  const { mutate: deleteTask, isPending, error, data } = useDeleteTask(taskId, boardId);
+  const { mutate: deleteTask, isPending, error, data, isSuccess } = useDeleteTask(taskId, boardId);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isSuccess) {
+      timeout = setTimeout(() => {
+        handleClose();
+        handleCloseParent();
+      }, 1500);
+    }
+
+    return () => {
+      clearTimeout(timeout); // clear timeout if the component unmounts before the time passes
+    };
+  }, [handleClose, handleCloseParent, isSuccess]);
 
   if (error)
     return (
@@ -87,11 +104,14 @@ const DeleteTaskModal = ({
       </Dialog>
     );
 
-  if (!error && !isPending && data)
+  if (isSuccess)
     return (
       <Dialog
         open={isOpen}
-        onClose={handleClose}
+        onClose={() => {
+          handleClose();
+          handleCloseParent();
+        }}
         maxWidth='sm'
         fullWidth={true}
         PaperProps={{
