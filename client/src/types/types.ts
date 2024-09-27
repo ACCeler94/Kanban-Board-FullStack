@@ -38,6 +38,7 @@ interface TaskTypePartial {
 }
 
 interface NewSubtaskData {
+  id: string;
   desc: string;
   finished: boolean;
 }
