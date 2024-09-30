@@ -28,6 +28,7 @@ export const editTaskDTO = z
           .max(100, { message: 'Description cannot be longer than 280 characters' })
           .optional(),
         finished: z.boolean().optional(),
+        order: z.number().optional(),
       })
       .array()
       .optional(),

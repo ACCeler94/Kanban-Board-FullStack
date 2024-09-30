@@ -209,8 +209,9 @@ const TasksController = {
 
       // update/create subtasks if subtaskData is provided
       if (subtaskData && subtaskData.length !== 0) {
-        for (let index = 0; index < 0; index++) {
+        for (let index = 0; index < subtaskData.length; index++) {
           const subtask = subtaskData[index];
+
           const existingSubtask = await prisma.subtask.findUnique({
             where: { id: subtask.id },
           });
