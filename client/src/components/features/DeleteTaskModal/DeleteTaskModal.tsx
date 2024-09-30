@@ -84,7 +84,7 @@ const DeleteTaskModal = ({
         }}
       >
         <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalHeader}>Error</h3>
+          <h3 className={modalStyles.modalHeader}>Loading...</h3>
           <div className={modalStyles.buttonsWrapper}>
             <button
               className={modalStyles.closeButton}
