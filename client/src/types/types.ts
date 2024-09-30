@@ -53,6 +53,7 @@ interface EditTaskData {
     id?: string;
     desc?: string;
     finished?: boolean;
+    order?: number;
   }[];
 }
 
