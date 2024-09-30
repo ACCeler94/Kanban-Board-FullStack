@@ -11,7 +11,7 @@ const AddTaskModal = () => {
   const { id } = useParams();
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
-  const { data, error, isPending, mutate, isSuccess } = useCreateTask();
+  const { error, isPending, mutate, isSuccess } = useCreateTask();
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -20,12 +20,12 @@ const AddTaskModal = () => {
 
   // close the modal on success after 1.5 second
   useEffect(() => {
-    if (!isPending && !error && data) {
+    if (isSuccess) {
       setTimeout(() => {
         handleClose();
       }, 1500);
     }
-  }, [data, error, handleClose, isPending]);
+  }, [handleClose, isSuccess]);
 
   const submitHandler = (formData: NewTaskFormData) => {
     const { taskData, subtaskData } = formData;
