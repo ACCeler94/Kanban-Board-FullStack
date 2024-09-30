@@ -53,6 +53,7 @@ async function main() {
     data: {
       desc: 'This is subtask one',
       finished: false,
+      order: 0,
       task: {
         connect: {
           id: task1.id,

@@ -33,6 +33,7 @@ model Subtask {
   taskId    String
   desc      String   @db.VarChar(280)
   finished  Boolean
+  order     Int // order of subtasks within the task - if subtasks were created by transaction they have the same createdAt value and cannot be sorted this way
 
   @@index([createdAt])
 }

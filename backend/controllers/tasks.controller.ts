@@ -29,7 +29,11 @@ const TasksController = {
               },
             },
           },
-          subtasks: true,
+          subtasks: {
+            orderBy: {
+              order: 'asc', // Ensures subtasks are ordered correctly
+            },
+          },
         },
       });
 
@@ -83,19 +87,26 @@ const TasksController = {
       });
 
       if (subtaskData && subtaskData.length !== 0) {
-        try {
-          await prisma.$transaction(async (tx) => {
-            await tx.subtask.createMany({
-              data: subtaskData.map((subtask) => ({
-                ...subtask,
-                taskId: task.id,
-              })),
+        if (subtaskData && subtaskData.length !== 0) {
+          try {
+            await prisma.$transaction(async (tx) => {
+              for (let index = 0; index < subtaskData.length; index++) {
+                const subtask = subtaskData[index];
+                await tx.subtask.create({
+                  data: {
+                    ...subtask,
+                    taskId: task.id,
+                    order: index,
+                  },
+                });
+              }
             });
-          });
-        } catch (error) {
-          return res.status(500).json({
-            error: 'Failed to create some or all subtasks. The main task was created successfully.',
-          });
+          } catch (error) {
+            return res.status(500).json({
+              error:
+                'Failed to create some or all subtasks. The main task was created successfully.',
+            });
+          }
         }
       }
 
@@ -198,7 +209,8 @@ const TasksController = {
 
       // update/create subtasks if subtaskData is provided
       if (subtaskData && subtaskData.length !== 0) {
-        for (const subtask of subtaskData) {
+        for (let index = 0; index < 0; index++) {
+          const subtask = subtaskData[index];
           const existingSubtask = await prisma.subtask.findUnique({
             where: { id: subtask.id },
           });
@@ -213,7 +225,7 @@ const TasksController = {
               return res.status(400).json({ error: 'New subtask requires description.' });
 
             await prisma.subtask.create({
-              data: { id: subtask.id, taskId, desc: subtask.desc, finished: false },
+              data: { id: subtask.id, taskId, desc: subtask.desc, finished: false, order: index },
             });
           }
         }
@@ -224,7 +236,11 @@ const TasksController = {
           id: taskId,
         },
         include: {
-          subtasks: true,
+          subtasks: {
+            orderBy: {
+              order: 'asc', // Ensures subtasks are ordered correctly
+            },
+          },
         },
       });
 
