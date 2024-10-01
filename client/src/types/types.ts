@@ -45,15 +45,14 @@ interface NewSubtaskData {
 
 interface EditTaskData {
   taskData?: {
-    title?: string;
-    desc?: string;
-    status?: 'IN_PROGRESS' | 'DONE' | 'TO_DO';
+    title: string;
+    desc: string;
+    status: TaskStatus;
   };
   subtaskData?: {
-    id?: string;
-    desc?: string;
-    finished?: boolean;
-    order?: number;
+    id: string;
+    desc: string;
+    finished: boolean;
   }[];
 }
 
@@ -61,10 +60,11 @@ interface NewTaskData {
   taskData: {
     title: string;
     desc?: string;
-    status: 'IN_PROGRESS' | 'DONE' | 'TO_DO';
+    status: TaskStatus;
     boardId: string;
   };
   subtaskData?: {
+    id: string;
     desc: string;
     finished: boolean;
   }[];
@@ -72,6 +72,19 @@ interface NewTaskData {
 
 interface NewTaskFormData extends Omit<NewTaskData, 'taskData'> {
   taskData: Omit<NewTaskData['taskData'], 'boardId'>;
+}
+
+interface DiffTaskData {
+  taskData: {
+    title?: string;
+    desc?: string;
+    status?: TaskStatus;
+  };
+  subtaskData: {
+    id: string;
+    desc: string;
+    finished: boolean;
+  }[];
 }
 
 interface User {
@@ -179,4 +192,5 @@ export type {
   NewSubtaskData,
   NewTaskData,
   NewTaskFormData,
+  DiffTaskData,
 }; // + TaskStatus exported as a value

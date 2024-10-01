@@ -3,7 +3,7 @@ import { apiUrl } from './config';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { validate as uuidValidate } from 'uuid';
-import { BoardType, EditTaskData, NewTaskData, TaskType } from '../types/types';
+import { BoardType, DiffTaskData, NewTaskData, TaskType } from '../types/types';
 import editTaskValidator from '../validators/tasks/editTaskValidator';
 import addTaskValidator from '../validators/tasks/addTaskValidator';
 
@@ -53,7 +53,7 @@ const deleteTaskById = async (taskId: string, token: string) => {
 };
 
 const editTaskById = async (
-  { taskData, subtaskData }: EditTaskData,
+  { taskData, subtaskData }: DiffTaskData,
   taskId: string,
   token: string
 ) => {
@@ -167,12 +167,14 @@ const useEditTask = (taskId: string) => {
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending, isSuccess } = useMutation({
-    mutationFn: async (editData: EditTaskData) => {
+    mutationFn: async (editData: DiffTaskData) => {
       if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
 
       const validationResult = editTaskValidator.safeParse(editData); // data validation with zod
-      if (!validationResult.success)
-        throw new Error('Invalid data: ' + validationResult.error.message);
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues.map((issue) => issue.message);
+        throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
+      }
 
       let token;
       try {
@@ -204,8 +206,10 @@ const useCreateTask = () => {
     mutationFn: async (taskData: NewTaskData) => {
       const validationResult = addTaskValidator.safeParse(taskData);
 
-      if (!validationResult.success)
-        throw new Error('Invalid task data: ' + validationResult.error.message);
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues.map((issue) => issue.message);
+        throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
+      }
 
       let token;
       try {
