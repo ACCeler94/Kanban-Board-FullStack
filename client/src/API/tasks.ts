@@ -3,7 +3,7 @@ import { apiUrl } from './config';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { validate as uuidValidate } from 'uuid';
-import { BoardType, DiffTaskData, NewTaskData, TaskType } from '../types/types';
+import { BoardType, DiffTaskData, EditTaskData, NewTaskData, TaskType } from '../types/types';
 import editTaskValidator from '../validators/tasks/editTaskValidator';
 import addTaskValidator from '../validators/tasks/addTaskValidator';
 
@@ -53,14 +53,15 @@ const deleteTaskById = async (taskId: string, token: string) => {
 };
 
 const editTaskById = async (
-  { taskData, subtaskData }: DiffTaskData,
+  { taskData, subtaskData }: DiffTaskData | EditTaskData,
+  subtasksToRemove: string[] | [],
   taskId: string,
   token: string
 ) => {
   try {
     const { data } = await axios.patch(
       `${apiUrl}/tasks/${taskId}`,
-      { taskData, subtaskData }, // body obj containing optional task and subtask data
+      { taskData, subtaskData, subtasksToRemove }, // body obj containing optional task and subtask data plus subtasksToRemove array
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -167,10 +168,16 @@ const useEditTask = (taskId: string) => {
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending, isSuccess } = useMutation({
-    mutationFn: async (editData: DiffTaskData) => {
+    mutationFn: async ({
+      editData,
+      subtasksToRemove,
+    }: {
+      editData: DiffTaskData | EditTaskData;
+      subtasksToRemove: string[] | [];
+    }) => {
       if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
 
-      const validationResult = editTaskValidator.safeParse(editData); // data validation with zod
+      const validationResult = editTaskValidator.safeParse({ ...editData, subtasksToRemove }); // data validation with zod
       if (!validationResult.success) {
         const errorMessages = validationResult.error.issues.map((issue) => issue.message);
         throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
@@ -184,7 +191,7 @@ const useEditTask = (taskId: string) => {
       }
 
       try {
-        return editTaskById(editData, taskId, token);
+        return editTaskById(editData, subtasksToRemove, taskId, token);
       } catch (error) {
         throw new Error('Failed to edit the task. Please try again.');
       }
