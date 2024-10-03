@@ -32,12 +32,14 @@ export const editTaskDTO = z
       })
       .array()
       .optional(),
+    subtasksToRemove: z.string().array(),
   })
   .refine(
     (data) =>
       (data.taskData && Object.keys(data.taskData).length !== 0) ||
-      (data.subtaskData && data.subtaskData.length > 0),
+      (data.subtaskData && data.subtaskData.length > 0) ||
+      (data.subtasksToRemove && data.subtasksToRemove.length > 0),
     {
-      message: 'Either Task Data or Subtask Data must be provided.',
+      message: 'No changes detected. You must modify the task to save changes!',
     }
   );
