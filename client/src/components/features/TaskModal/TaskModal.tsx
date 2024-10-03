@@ -35,7 +35,8 @@ const TaskModal = () => {
   };
 
   const handleSaveChanges = () => {
-    if (isModified && subtaskData) saveEditedTask({ subtaskData });
+    if (isModified && subtaskData)
+      saveEditedTask({ editData: { subtaskData }, subtasksToRemove: [] }); // TaskModal allows only changes to subtaskData status so subtasksToRemove will always be empty
   };
 
   if (isPending || isEditPending)
