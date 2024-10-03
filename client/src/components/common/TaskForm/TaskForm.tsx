@@ -46,7 +46,7 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
   ];
   const setSubtasksToRemove = useStore((state) => state.setSubtasksToRemove);
 
-  // reset subtasksToRemove global state when the task form unmounts (either on close or when submitted)
+  // Reset subtasksToRemove global state when the task form unmounts (either on close or when submitted)
   useEffect(() => {
     return () => {
       setSubtasksToRemove([]);

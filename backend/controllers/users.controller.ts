@@ -201,7 +201,7 @@ const UsersController = {
     }
     const sub: string = authUser.sub;
 
-    // if the email is provided by auth0 then save it, otherwise save the email provided by the user in the registration form (userData) - the form will prompt for email only if it is not provided by auth0
+    // If the email is provided by auth0 then save it, otherwise save the email provided by the user in the registration form (userData) - the form will prompt for email only if it is not provided by auth0
     if (authUser.email) {
       email = authUser.email;
     } else if (!authUser.email && userData.email) {
@@ -211,7 +211,7 @@ const UsersController = {
     }
 
     try {
-      // check if the user with this email exists in the database - check is done with email not sub as user might use different social login method which will provide different sub but the same email
+      // Check if the user with this email exists in the database - check is done with email not sub as user might use different social login method which will provide different sub but the same email
       const existingUser = await prisma.user.findUnique({ where: { email } });
       if (existingUser) {
         return res

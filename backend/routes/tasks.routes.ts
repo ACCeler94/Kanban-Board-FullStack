@@ -9,15 +9,15 @@ import validateSubtaskIdParam from '../middleware/validateSubtaskIdParam';
 
 const router = Router();
 
-router.use(verifyJwt); // add to all tasks routes
+router.use(verifyJwt); // Add to all tasks routes
 
-// checkBoardAssignment used to prevent random users (not assigned to the board) from interacting with board's tasks
-// GET requests
+// CheckBoardAssignment used to prevent random users (not assigned to the board) from interacting with board's tasks
+// GET
 router
   .route('/tasks/:taskId')
   .get(validateTaskIdParam, checkBoardAssignment, TasksController.getById);
 
-// POST requests
+// POST
 router.route('/tasks').post(TasksController.createTask);
 
 router
@@ -29,12 +29,12 @@ router
     TasksController.addUserToTask
   );
 
-// PATCH requests
+// PATCH
 router
   .route('/tasks/:taskId')
   .patch(validateTaskIdParam, checkBoardAssignment, TasksController.editTask);
 
-// DELETE requests
+// DELETE
 router
   .route('/tasks/:taskId/users/:userId')
   .delete(
@@ -48,7 +48,6 @@ router
   .route('/tasks/:taskId')
   .delete(validateTaskIdParam, checkBoardAssignment, TasksController.deleteTask);
 
-// taskId needed only for checkBoardAssignment middleware
 router
   .route('tasks/:taskId/subtasks/:subtaskId')
   .delete(

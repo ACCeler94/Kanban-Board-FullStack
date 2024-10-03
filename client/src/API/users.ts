@@ -4,10 +4,10 @@ import axios from 'axios';
 import { apiUrl } from './config';
 import { UserBoardData, UserData, UserDataPreview } from '../types/types';
 
-// actions
+// Actions
 const fetchUserById = async (userId: string): Promise<UserDataPreview> => {
   if (typeof userId !== 'string' || !userId) {
-    // check if id is not a string or is an empty string
+    // Check if id is not a string or is an empty string
     throw new Error('Invalid User ID.');
   }
 
@@ -66,7 +66,7 @@ const fetchUserBoardData = async (token: string): Promise<UserBoardData | undefi
   }
 };
 
-// hooks
+// Hooks
 const useUserById = (userId: string) => {
   const {
     data: user,

@@ -31,8 +31,8 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
     };
 
   const addSubtask = () => {
-    if (newSubtask.desc.length === 0) return; // prevent adding empty subtasks
-    const subtaskToAdd = { ...newSubtask, id: uuid() }; // add unique id
+    if (newSubtask.desc.length === 0) return; // Prevent adding empty subtasks
+    const subtaskToAdd = { ...newSubtask, id: uuid() }; // Add unique id
 
     setSubtasks([...subtasks, subtaskToAdd]);
     setNewSubtask({ id: '', desc: '', finished: false });
@@ -41,7 +41,7 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
   const handleSubtaskDelete = (id: string) => {
     const updatedSubtasks = subtasks.filter((subtask) => id !== subtask.id);
 
-    // check if deleted subtask was in the original subtask data, if not it is new and doesn't need to be removed from the db
+    // Check if deleted subtask was in the original subtask data, if not it is new and doesn't need to be removed from the db
     if (originalSubtasks.length !== 0 && subtasks.some((subtask) => subtask.id === id)) {
       setSubtasksToRemove([...subtasksToRemove, id]);
     }

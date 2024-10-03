@@ -15,7 +15,7 @@ const BoardsController = {
     }
   },
 
-  // getting board by ID is allowed only for  assigned users
+  // Getting board by ID is allowed only for  assigned users
   getById: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
     const requestAuthorId = req.session.userId;
@@ -23,7 +23,7 @@ const BoardsController = {
     if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
-      // check if user who made the request is assigned to the board
+      // Check if user who made the request is assigned to the board
       const assignedUser = await prisma.userOnBoard.findUnique({
         where: {
           userId_boardId: {
@@ -99,7 +99,7 @@ const BoardsController = {
     if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
     try {
-      // if either creating the board or assigning the author fails - the creation of both should throw an error
+      // If either creating the board or assigning the author fails - the creation of both should throw an error
       const result = await prisma.$transaction(async (prisma) => {
         // Create the board
         const board = await prisma.board.create({
@@ -126,7 +126,7 @@ const BoardsController = {
     }
   },
 
-  // editing board title available only for the board's author
+  // Editing board title available only for the board's author
   editBoardTitle: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
     let title;
@@ -172,7 +172,7 @@ const BoardsController = {
     }
   },
 
-  // adding users to the board allowed only for the author of the board
+  // Adding users to the board allowed only for the author of the board
   addUserToBoard: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId, userId } = req.params;
     const requestAuthorId = req.session.userId;

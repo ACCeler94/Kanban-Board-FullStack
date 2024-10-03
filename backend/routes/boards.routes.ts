@@ -7,26 +7,26 @@ import verifyJwt from '../middleware/verifyJwt';
 
 const router = Router();
 
-router.use(verifyJwt); // add to all board routes
+router.use(verifyJwt); // Add to all board routes
 
-// GET requests
+// GET
 
 // [TODO - delete this endpoint for production]
 router.get('/boards', BoardsController.getAll);
 
 router.route('/boards/:boardId').get(validateBoardIdParams, BoardsController.getById);
 
-// POST requests
+// POST
 router.route('/boards').post(BoardsController.createBoard);
 
 router
   .route('/boards/:boardId/users/:userId')
   .post(validateBoardIdParams, validateUserIdParam, BoardsController.addUserToBoard); // post used as it is creating a relation on UserOnBoard table
 
-// PATCH requests
+// PATCH
 router.route('/boards/:boardId').put(validateBoardIdParams, BoardsController.editBoardTitle);
 
-// DELETE requests
+// DELETE
 router
   .route('/boards/:boardId/users/:userId')
   .delete(validateBoardIdParams, validateUserIdParam, BoardsController.deleteUserFromBoard); // delete used as it is deleting a relation on UserOnBoard table

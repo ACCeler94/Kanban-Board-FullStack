@@ -18,7 +18,7 @@ declare module 'express-session' {
 const app: Express = express();
 const port = 8000;
 
-// middleware to enable CORS requests
+// Middleware to enable CORS requests
 app.use(
   cors({
     origin: 'http://localhost:3000',
@@ -41,16 +41,16 @@ app.use(
   })
 );
 
-app.use(express.urlencoded({ extended: false })); // required to handle urlencoded requests
-app.use(express.json()); // required to handle form-data request
+app.use(express.urlencoded({ extended: false })); // Required to handle urlencoded requests
+app.use(express.json()); // Required to handle form-data request
 
-// middleware to log request to the console
+// Middleware to log request to the console
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.url}`);
   next();
 });
 
-// endpoints
+// Endpoints
 app.use('/auth', authRoutes);
 app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);

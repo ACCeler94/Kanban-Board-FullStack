@@ -17,7 +17,7 @@ const EditTaskModal = () => {
   const setSubtasksToRemove = useStore((state) => state.setSubtasksToRemove);
 
   const {
-    // fetch task data to populate edit form
+    // Fetch task data to populate edit form
     data: taskData,
     error: taskDataError,
     isPending: isTaskDataPending,
@@ -28,7 +28,7 @@ const EditTaskModal = () => {
     isPending: isEditPending,
     mutate,
     isSuccess: isEditSuccess,
-  } = useEditTask(taskId!); // taskId required for the component to mount
+  } = useEditTask(taskId!); // TaskId required for the component to mount
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -36,7 +36,7 @@ const EditTaskModal = () => {
     navigate(`/boards/${id}/tasks/${taskId}`);
   }, [id, navigate, taskId]);
 
-  // close the modal on success after 1.5 second
+  // Close the modal on success after 1.5 second
   useEffect(() => {
     if (isEditSuccess) {
       setTimeout(() => {
@@ -46,7 +46,7 @@ const EditTaskModal = () => {
   }, [handleClose, isEditSuccess, setSubtasksToRemove]);
 
   const submitHandler = (formData: EditTaskData) => {
-    const optimizedData = removeUnchangedData(formData, taskData!); // taskData is present or the error/pending will be rendered
+    const optimizedData = removeUnchangedData(formData, taskData!); // TaskData is present or the error/pending will be rendered
     mutate({ editData: optimizedData, subtasksToRemove });
   };
 

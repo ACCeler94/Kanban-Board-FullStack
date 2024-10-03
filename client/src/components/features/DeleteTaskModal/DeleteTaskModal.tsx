@@ -34,7 +34,7 @@ const DeleteTaskModal = ({
     }
 
     return () => {
-      clearTimeout(timeout); // clear timeout if the component unmounts before the time passes
+      clearTimeout(timeout); // Clear timeout if the component unmounts before the time passes
     };
   }, [handleClose, handleCloseParent, isSuccess]);
 

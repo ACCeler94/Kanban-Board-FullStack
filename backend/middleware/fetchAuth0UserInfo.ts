@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import axios from 'axios';
 import Auth0User from '../types/Auth0User';
 
-// fetch auth0 user object and save it in session
+// Fetch auth0 user object and save it in session
 const fetchAuth0UserInfo = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const accessToken = req.headers.authorization?.split(' ')[1];
@@ -17,7 +17,7 @@ const fetchAuth0UserInfo = async (req: Request, res: Response, next: NextFunctio
     });
 
     const userData = response.data as Auth0User;
-    // basic check to make sure sub is provided
+    // Basic check to make sure sub is provided
     if (userData && typeof userData.sub === 'string') req.session.auth0User = userData; // Save user info to session
 
     next();

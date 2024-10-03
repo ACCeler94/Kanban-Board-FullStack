@@ -20,7 +20,7 @@ const Navbar = () => {
     error: userDataError,
   } = useUserBoardData();
 
-  // check if the user is the author of the chosen board to show related buttons as active
+  // Check if the user is the author of the chosen board to show related buttons as active
   useEffect(() => {
     if (!isPendingBoardData && !isPendingUserData && !userDataError && !boardError) {
       if (userBoardData?.id === boardData?.authorId) {

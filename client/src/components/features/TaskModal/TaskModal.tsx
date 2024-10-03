@@ -22,7 +22,7 @@ const TaskModal = () => {
     error: editError,
     isPending: isEditPending,
     mutate: saveEditedTask,
-  } = useEditTask(taskId!); // taskId is always present, if not this component will not render
+  } = useEditTask(taskId!); // TaskId is always present, if not this component will not render
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -74,7 +74,7 @@ const TaskModal = () => {
     );
 
   if (taskFetchingError || editError) {
-    const errorMessage = taskFetchingError ? taskFetchingError.message : editError?.message; // display one error message or the other
+    const errorMessage = taskFetchingError ? taskFetchingError.message : editError?.message; // Display one error message or the other
     return (
       <Dialog
         open={isOpen}

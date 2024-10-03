@@ -5,13 +5,13 @@ import { validate as uuidValidate } from 'uuid';
 import { useAuth0 } from '@auth0/auth0-react';
 import { BoardQuery } from '../types/types';
 
-// actions
+// Actions
 const fetchBoardById = async (
   id: string | undefined,
   token: string
 ): Promise<BoardQuery | undefined> => {
   if (!id) {
-    // check if id exists and is valid uuid
+    // Check if id exists and is valid uuid
     throw new Error('Invalid Board ID.');
   }
 
@@ -34,7 +34,7 @@ const fetchBoardById = async (
   }
 };
 
-// hooks
+// Hooks
 const useBoardById = (id: string | undefined) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
@@ -48,7 +48,7 @@ const useBoardById = (id: string | undefined) => {
         throw new Error('Failed to authenticate. Please try logging in again.');
       }
     },
-    enabled: !!id && uuidValidate(id) && isAuthenticated, // check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchBoardById
+    enabled: !!id && uuidValidate(id) && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchBoardById
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 

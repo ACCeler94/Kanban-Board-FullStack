@@ -14,7 +14,7 @@ const BoardsList = ({ boards }: BoardsListProps) => {
   const setActiveBoard = useStore((state) => state.setActiveBoard);
   const { id } = useParams();
 
-  // set active board if the component re-mounted with proper id or set to null
+  // Set active board if the component re-mounted with proper id or set to null
   useEffect(() => {
     if (id) {
       const boardToSet = boards.find((elem) => elem.board.id === id);

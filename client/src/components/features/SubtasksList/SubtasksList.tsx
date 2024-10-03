@@ -12,7 +12,7 @@ interface SubtasksListProps {
 const SubtasksList = ({ subtasks, setIsModified, setSubtaskData }: SubtasksListProps) => {
   const [updatedSubtasks, setUpdatedSubtasks] = useState<Subtask[]>(subtasks);
 
-  // check if any of the subtasks was modified so the parent can render save changes button
+  // Check if any of the subtasks was modified so the parent can render save changes button
   const isChanged = useMemo(() => isEqual(updatedSubtasks, subtasks), [subtasks, updatedSubtasks]);
   useEffect(() => {
     setIsModified(!isChanged);
@@ -41,7 +41,7 @@ const SubtasksList = ({ subtasks, setIsModified, setSubtaskData }: SubtasksListP
                 type='checkbox'
                 checked={subtask.finished}
                 aria-label={subtask.finished ? 'Finished subtask' : 'Unfinished subtask'}
-                onChange={() => {}} // empty handler to silence the warning - actual change is handled by the parent component -> li element
+                onChange={() => {}} // Empty handler to silence the warning - actual change is handled by the parent component -> li element
               />
               <span>{subtask.desc}</span>
             </li>

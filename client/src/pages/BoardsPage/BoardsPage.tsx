@@ -1,12 +1,12 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom'; // Needed for rendering nested routes
+import { Outlet } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout/MainLayout';
 
 const BoardsPage = () => {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
 
-  // login when the component mounts
+  // Login when the component mounts
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       loginWithRedirect({

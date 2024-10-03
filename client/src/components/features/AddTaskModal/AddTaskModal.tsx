@@ -18,7 +18,7 @@ const AddTaskModal = () => {
     navigate(`/boards/${id}`);
   }, [id, navigate]);
 
-  // close the modal on success after 1.5 second
+  // Close the modal on success after 1.5 second
   useEffect(() => {
     if (isSuccess) {
       setTimeout(() => {
@@ -30,7 +30,7 @@ const AddTaskModal = () => {
   const submitHandler = (formData: NewTaskFormData) => {
     const { taskData, subtaskData } = formData;
 
-    const fullTaskData: NewTaskData = { taskData: { ...taskData, boardId: id! }, subtaskData }; // id is always present, if not this component will not render
+    const fullTaskData: NewTaskData = { taskData: { ...taskData, boardId: id! }, subtaskData }; // Id is always present, if not this component will not render
     mutate(fullTaskData);
   };
 

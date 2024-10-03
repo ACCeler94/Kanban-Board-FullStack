@@ -61,7 +61,7 @@ const editTaskById = async (
   try {
     const { data } = await axios.patch(
       `${apiUrl}/tasks/${taskId}`,
-      { taskData, subtaskData, subtasksToRemove }, // body obj containing optional task and subtask data plus subtasksToRemove array
+      { taskData, subtaskData, subtasksToRemove }, // Body obj containing optional task and subtask data plus subtasksToRemove array
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -126,7 +126,7 @@ const useTaskData = (taskId: string) => {
         throw new Error('Failed to fetch the task data. Please try again.');
       }
     },
-    enabled: !!taskId && uuidValidate(taskId) && isAuthenticated, // check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchTaskById
+    enabled: !!taskId && uuidValidate(taskId) && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchTaskById
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 
@@ -156,7 +156,7 @@ const useDeleteTask = (taskId: string, boardId: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['board', boardId] });
-      queryClient.removeQueries({ queryKey: ['task', taskId] }); // remove deleted task from cache
+      queryClient.removeQueries({ queryKey: ['task', taskId] }); // Remove deleted task from cache
     },
   });
 
@@ -177,7 +177,7 @@ const useEditTask = (taskId: string) => {
     }) => {
       if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
 
-      const validationResult = editTaskValidator.safeParse({ ...editData, subtasksToRemove }); // data validation with zod
+      const validationResult = editTaskValidator.safeParse({ ...editData, subtasksToRemove }); // Data validation with zod
       if (!validationResult.success) {
         const errorMessages = validationResult.error.issues.map((issue) => issue.message);
         throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
@@ -198,7 +198,7 @@ const useEditTask = (taskId: string) => {
     },
     onSuccess: (updatedTask: TaskType) => {
       queryClient.setQueryData(['task', taskId], updatedTask);
-      queryClient.invalidateQueries({ queryKey: ['board', updatedTask.boardId] }); // board invalidation done to properly update subtask counter in the TaskCard
+      queryClient.invalidateQueries({ queryKey: ['board', updatedTask.boardId] }); // Board invalidation done to properly update subtask counter in the TaskCard
     },
   });
 
@@ -233,7 +233,7 @@ const useCreateTask = () => {
     },
     onSuccess: (createdTask: TaskType) => {
       queryClient.setQueryData(['board', createdTask.boardId], (oldData: BoardType) => {
-        if (!oldData) return; // if there is no old board data return
+        if (!oldData) return; // If there is no old board data return
 
         return { ...oldData, tasks: [...oldData.tasks, createdTask] };
       });
