@@ -1,5 +1,5 @@
 import TextField from '@mui/material/TextField';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   EditTaskData,
   NewSubtaskData,
@@ -10,6 +10,7 @@ import {
 import { Button, MenuItem } from '@mui/material';
 import styles from './TaskForm.module.css';
 import SubtasksInputs from '../SubtasksInputs/SubtasksInputs';
+import useStore from '../../../store/useStore';
 
 interface TaskFormProps<T extends NewTaskFormData | EditTaskData> {
   submitHandler: (formData: T) => void;
@@ -43,6 +44,14 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
     },
     { value: TaskStatus.DONE, label: 'Done' },
   ];
+  const setSubtasksToRemove = useStore((state) => state.setSubtasksToRemove);
+
+  // reset subtasksToRemove global state when the task form unmounts (either on close or when submitted)
+  useEffect(() => {
+    return () => {
+      setSubtasksToRemove([]);
+    };
+  }, [setSubtasksToRemove]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -82,7 +91,11 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
         />
       </div>
 
-      <SubtasksInputs subtasks={subtasks} setSubtasks={setSubtasks} />
+      <SubtasksInputs
+        subtasks={subtasks}
+        setSubtasks={setSubtasks}
+        originalSubtasks={taskSubtasks || []}
+      />
 
       <div className={styles.inputWrapper}>
         <label htmlFor='status'>Status</label>

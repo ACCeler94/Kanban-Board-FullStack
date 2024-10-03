@@ -5,18 +5,22 @@ import { MdOutlineDeleteForever } from 'react-icons/md';
 import { v4 as uuid } from 'uuid';
 import { NewSubtaskData, Subtask } from '../../../types/types';
 import styles from './SubtasksInputs.module.css';
+import useStore from '../../../store/useStore';
 
 interface SubtasksInputsProps {
   subtasks: (Subtask | NewSubtaskData)[];
+  originalSubtasks: Subtask[] | [];
   setSubtasks: React.Dispatch<React.SetStateAction<(Subtask | NewSubtaskData)[]>>;
 }
 
-const SubtasksInputs = ({ subtasks, setSubtasks }: SubtasksInputsProps) => {
+const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInputsProps) => {
   const [newSubtask, setNewSubtask] = useState<NewSubtaskData>({
     id: '',
     desc: '',
     finished: false,
   });
+  const subtasksToRemove = useStore((state) => state.subtasksToRemove);
+  const setSubtasksToRemove = useStore((state) => state.setSubtasksToRemove);
 
   const handleSubtaskChange =
     (id: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -36,6 +40,11 @@ const SubtasksInputs = ({ subtasks, setSubtasks }: SubtasksInputsProps) => {
 
   const handleSubtaskDelete = (id: string) => {
     const updatedSubtasks = subtasks.filter((subtask) => id !== subtask.id);
+
+    // check if deleted subtask was in the original subtask data, if not it is new and doesn't need to be removed from the db
+    if (originalSubtasks.length !== 0 && subtasks.some((subtask) => subtask.id === id)) {
+      setSubtasksToRemove([...subtasksToRemove, id]);
+    }
     setSubtasks(updatedSubtasks);
   };
 
