@@ -3,7 +3,7 @@ import prisma from '../prisma/prisma';
 import createTaskDTO from '../validators/tasks/create-task.dto';
 import { editTaskDTO } from '../validators/tasks/edit-task.dto';
 
-// task operations can be performed by any user assigned to the board - this condition is checked by checkBoardAssignment middleware
+// Task operations can be performed by any user assigned to the board - this condition is checked by checkBoardAssignment middleware
 const TasksController = {
   // GET
   getById: async (req: Request, res: Response, next: NextFunction) => {
@@ -172,6 +172,7 @@ const TasksController = {
       next(error);
     }
   },
+
   // PATCH
   editTask: async (req: Request, res: Response, next: NextFunction) => {
     const { taskId } = req.params;
@@ -180,23 +181,16 @@ const TasksController = {
     try {
       validatedData = editTaskDTO.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid data' });
+      return res.status(400).json({ error: 'Invalid data.' });
     }
 
-    const { taskData, subtaskData } = validatedData;
-
-    if (
-      (!taskData || Object.keys(taskData).length === 0) &&
-      (!subtaskData || subtaskData.length === 0)
-    ) {
-      return res.status(400).json({ error: 'Updated task data cannot be empty!' });
-    }
+    const { taskData, subtaskData, subtasksToRemove } = validatedData;
 
     try {
       const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
-      // update task if taskData is provided
+      // Update task if taskData is provided
       if (taskData && Object.keys(taskData).length !== 0) {
         await prisma.task.update({
           where: { id: taskId },
@@ -207,26 +201,62 @@ const TasksController = {
         });
       }
 
-      // update/create subtasks if subtaskData is provided
-      if (subtaskData && subtaskData.length !== 0) {
-        for (let index = 0; index < subtaskData.length; index++) {
-          const subtask = subtaskData[index];
+      // Delete subtasks based on subtasksToRemove array
+      // There is no point checking if every subtask exists in the db, if not found then the id will be omitted
+      if (subtasksToRemove.length !== 0) {
+        await prisma.subtask.deleteMany({
+          where: {
+            id: {
+              in: subtasksToRemove,
+            },
+          },
+        });
+      }
 
-          const existingSubtask = await prisma.subtask.findUnique({
-            where: { id: subtask.id },
-          });
+      // Update or create subtasks only if subtaskData exists and is not an empty array
+      if (subtaskData && subtaskData.length !== 0) {
+        const existingSubtasks = await prisma.subtask.findMany({
+          where: { taskId },
+          orderBy: { order: 'asc' },
+        });
+
+        for (let i = 0; i < subtaskData.length; i++) {
+          const subtask = subtaskData[i];
+
+          const existingSubtask = existingSubtasks.find((s) => s.id === subtask.id);
+
           if (existingSubtask) {
             await prisma.subtask.update({
               where: { id: subtask.id },
               data: { desc: subtask.desc, finished: subtask.finished },
             });
           } else {
-            // create new subtask
+            // Create new subtask
             if (!subtask.desc)
               return res.status(400).json({ error: 'New subtask requires description.' });
-
             await prisma.subtask.create({
-              data: { id: subtask.id, taskId, desc: subtask.desc, finished: false, order: index },
+              data: {
+                id: subtask.id,
+                taskId,
+                desc: subtask.desc,
+                finished: false,
+                order: existingSubtasks.length + i, // New subtasks get appended to the end
+              },
+            });
+          }
+        }
+
+        // Reorder subtasks if new subtasks were added (it accounts for past deletions as well)
+        if (subtaskData.length > existingSubtasks.length) {
+          const updatedSubtasks = await prisma.subtask.findMany({
+            where: { taskId },
+            orderBy: { order: 'asc' },
+          });
+
+          for (let i = 0; i < updatedSubtasks.length; i++) {
+            await prisma.subtask.update({
+              where: { id: updatedSubtasks[i].id },
+              data: { order: i }, // Reorder subtasks to ensure correct order
             });
           }
         }
