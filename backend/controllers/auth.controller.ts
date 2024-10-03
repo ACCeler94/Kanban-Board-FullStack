@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 
 const AuthController = {
-  // fetch user by auth0 sub and attach userId from the db to the session to authorize certain operations based on userId
+  // Fetch user by auth0 sub and attach userId from the db to the session to authorize certain operations based on userId
   PostLogin: async (req: Request, res: Response, next: NextFunction) => {
     console.log('Callback route reached');
 
@@ -26,12 +26,22 @@ const AuthController = {
         });
       }
 
-      if (!user)
-        return res.redirect(
-          process.env.NODE_ENV === 'production'
-            ? '/post-login/user-form'
-            : 'http://localhost:3000/post-login/user-form'
-        );
+      // if (!user)
+      //   return res.redirect(
+      //     process.env.NODE_ENV === 'production'
+      //       ? '/post-login/user-form'
+      //       : 'http://localhost:3000/post-login/user-form'
+      //   );
+
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email: authUser.email!,
+            name: authUser.name!,
+            auth0Sub: authUser.sub,
+          },
+        });
+      }
 
       req.session.userId = user.id;
 
@@ -54,7 +64,7 @@ const AuthController = {
       } else {
         res.clearCookie('connect.sid');
       }
-      // redirect to auth0 logout endpoint
+      // Redirect to auth0 logout endpoint
       res.redirect(process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:3000/');
     });
   },
