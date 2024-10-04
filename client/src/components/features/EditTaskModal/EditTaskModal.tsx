@@ -14,7 +14,6 @@ const EditTaskModal = () => {
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
   const subtasksToRemove = useStore((state) => state.subtasksToRemove);
-  const setSubtasksToRemove = useStore((state) => state.setSubtasksToRemove);
 
   const {
     // Fetch task data to populate edit form
@@ -43,7 +42,7 @@ const EditTaskModal = () => {
         handleClose();
       }, 1500);
     }
-  }, [handleClose, isEditSuccess, setSubtasksToRemove]);
+  }, [handleClose, isEditSuccess]);
 
   const submitHandler = (formData: EditTaskData) => {
     const optimizedData = removeUnchangedData(formData, taskData!); // TaskData is present or the error/pending will be rendered
