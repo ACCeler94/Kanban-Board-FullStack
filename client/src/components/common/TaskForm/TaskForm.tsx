@@ -72,6 +72,9 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
           placeholder='Title should be short and allow to easily identify the task.'
           required
           inputProps={{ maxLength: 100 }}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+            e.key === 'Enter' && e.preventDefault();
+          }}
         />
       </div>
 
@@ -117,7 +120,15 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
         </TextField>
       </div>
 
-      <Button type='submit' color='primary' variant='contained' className='button-small'>
+      <Button
+        type='submit'
+        color='primary'
+        variant='contained'
+        className='button-small'
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.preventDefault();
+        }}
+      >
         {buttonText}
       </Button>
     </form>

@@ -62,6 +62,9 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
               fullWidth
               required
               inputProps={{ maxLength: 200 }}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                e.key === 'Enter' && e.preventDefault();
+              }}
             />
             <button
               className={styles.deleteButton}
@@ -81,6 +84,12 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
             sx={{ marginRight: '10px' }}
             value={newSubtask.desc}
             onChange={(event) => setNewSubtask({ ...newSubtask, desc: event.target.value })}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addSubtask();
+              }
+            }}
           />
           <button
             className={styles.addButton}
