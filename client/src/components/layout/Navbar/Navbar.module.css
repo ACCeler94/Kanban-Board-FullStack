@@ -34,11 +34,11 @@
   align-items: center;
 }
 
-.utilityBar button {
+.utilityBar a {
   display: flex;
   align-items: center;
 }
 
-.utilityBar button svg {
+.utilityBar a svg {
   margin-right: 5px;
 }
