@@ -1,13 +1,13 @@
 import { Button } from '@mui/material';
-import Icon from '../../../assets/icon.svg?react';
-import Container from '../../common/Container/Container';
-import styles from './Navbar.module.css';
+import { useEffect, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import useStore from '../../../store/useStore';
 import { Link, useParams } from 'react-router-dom';
 import { useBoardById } from '../../../API/boards';
 import { useUserBoardData } from '../../../API/users';
-import { useEffect, useState } from 'react';
+import Icon from '../../../assets/icon.svg?react';
+import useStore from '../../../store/useStore';
+import Container from '../../common/Container/Container';
+import styles from './Navbar.module.css';
 
 const Navbar = () => {
   const activeBoard = useStore((state) => state.activeBoard);

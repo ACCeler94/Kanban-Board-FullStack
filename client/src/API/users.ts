@@ -1,8 +1,8 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { apiUrl } from './config';
 import { UserBoardData, UserData, UserDataPreview } from '../types/types';
+import { apiUrl } from './config';
 
 // Actions
 const fetchUserById = async (userId: string): Promise<UserDataPreview> => {
@@ -124,4 +124,4 @@ const useUserBoardData = () => {
   return { data, error, isPending, refetch };
 };
 
-export { useUserById, useUserData, useUserBoardData };
+export { useUserBoardData, useUserById, useUserData };

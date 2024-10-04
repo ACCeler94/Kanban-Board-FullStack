@@ -2,10 +2,10 @@ import { CircularProgress, Dialog } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate, useParams } from 'react-router-dom';
-import modalStyles from '../../../styles/modal.module.css';
-import TaskForm from '../../common/TaskForm/TaskForm';
 import { useCreateTask } from '../../../API/tasks';
+import modalStyles from '../../../styles/modal.module.css';
 import { NewTaskData, NewTaskFormData } from '../../../types/types';
+import TaskForm from '../../common/TaskForm/TaskForm';
 
 const AddTaskModal = () => {
   const { id } = useParams();

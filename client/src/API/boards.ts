@@ -1,9 +1,9 @@
+import { useAuth0 } from '@auth0/auth0-react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { apiUrl } from './config';
 import { validate as uuidValidate } from 'uuid';
-import { useAuth0 } from '@auth0/auth0-react';
 import { BoardQuery } from '../types/types';
+import { apiUrl } from './config';
 
 // Actions
 const fetchBoardById = async (

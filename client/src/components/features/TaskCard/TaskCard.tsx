@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { TaskTypePartial } from '../../../types/types';
 import styles from './TaskCard.module.css';
-import { Link } from 'react-router-dom';
 
 interface TaskCardProps {
   taskData: TaskTypePartial;

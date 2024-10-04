@@ -1,17 +1,17 @@
+import { Auth0Provider } from '@auth0/auth0-react';
+import '@fontsource-variable/plus-jakarta-sans'; // Supports weights 200-800
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import '@fontsource-variable/plus-jakarta-sans'; // Supports weights 200-800
-import './index.css';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
 import { BrowserRouter } from 'react-router-dom';
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import App from './App.tsx';
+import './index.css';
 import { lightTheme } from './theme/theme.ts';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Auth0Provider } from '@auth0/auth0-react';
 
 const queryClient = new QueryClient();
 

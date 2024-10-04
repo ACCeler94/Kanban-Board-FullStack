@@ -1,13 +1,13 @@
+import { useEffect, useState } from 'react';
+import { FaCircle } from 'react-icons/fa';
 import { Outlet, useParams } from 'react-router-dom';
-import styles from './Board.module.css';
-import { useBoardById } from '../../../API/boards';
 import { validate as uuidValidate } from 'uuid';
+import { useBoardById } from '../../../API/boards';
+import { TaskStatus, TaskTypePartial } from '../../../types/types';
 import Loader from '../../common/BoardLoader/BoardLoader';
 import Error from '../../common/Error/Error';
-import { useEffect, useState } from 'react';
-import { TaskStatus, TaskTypePartial } from '../../../types/types';
-import { FaCircle } from 'react-icons/fa';
 import TaskCard from '../TaskCard/TaskCard';
+import styles from './Board.module.css';
 
 const Board = () => {
   const { id } = useParams();

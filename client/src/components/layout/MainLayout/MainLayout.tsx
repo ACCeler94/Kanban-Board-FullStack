@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import { FaEye } from 'react-icons/fa';
 import Navbar from '../Navbar/Navbar';
 import SideBar from '../SideBar/SideBar';
 import styles from './MainLayout.module.css';
-import { FaEye } from 'react-icons/fa';
 
 interface MainLayoutProps {
   children?: React.ReactNode;

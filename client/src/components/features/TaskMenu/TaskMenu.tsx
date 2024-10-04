@@ -1,10 +1,10 @@
-import * as React from 'react';
+import { Divider } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { Link } from 'react-router-dom';
+import * as React from 'react';
 import { HiDotsVertical } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 import styles from './TaskMenu.module.css';
-import { Divider } from '@mui/material';
 
 interface TaskMenuProps {
   setIsNestedModalOpen: React.Dispatch<React.SetStateAction<boolean>>;

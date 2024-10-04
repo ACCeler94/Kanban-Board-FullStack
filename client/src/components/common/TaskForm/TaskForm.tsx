@@ -1,5 +1,7 @@
+import { Button, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { useEffect, useState } from 'react';
+import useStore from '../../../store/useStore';
 import {
   EditTaskData,
   NewSubtaskData,
@@ -7,10 +9,8 @@ import {
   Subtask,
   TaskStatus,
 } from '../../../types/types';
-import { Button, MenuItem } from '@mui/material';
-import styles from './TaskForm.module.css';
 import SubtasksInputs from '../SubtasksInputs/SubtasksInputs';
-import useStore from '../../../store/useStore';
+import styles from './TaskForm.module.css';
 
 interface TaskFormProps<T extends NewTaskFormData | EditTaskData> {
   submitHandler: (formData: T) => void;

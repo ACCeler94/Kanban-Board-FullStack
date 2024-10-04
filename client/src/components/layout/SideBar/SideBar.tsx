@@ -1,13 +1,13 @@
 import { useAuth0 } from '@auth0/auth0-react';
+import Button from '@mui/material/Button';
 import axios from 'axios';
+import { useState } from 'react';
+import { FaEyeSlash } from 'react-icons/fa';
 import { authUrl } from '../../../API/config';
 import { useUserBoardData } from '../../../API/users';
+import Error from '../../common/Error/Error';
 import BoardsList from '../../features/BoardsList/BoardsList';
 import styles from './SideBar.module.css';
-import Button from '@mui/material/Button';
-import { FaEyeSlash } from 'react-icons/fa';
-import { useState } from 'react';
-import Error from '../../common/Error/Error';
 
 interface SideBarProps {
   isHidden: boolean;

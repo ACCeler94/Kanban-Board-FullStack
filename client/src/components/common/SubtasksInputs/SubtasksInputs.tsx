@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { IoAddCircle } from 'react-icons/io5';
 import { MdOutlineDeleteForever } from 'react-icons/md';
 import { v4 as uuid } from 'uuid';
+import useStore from '../../../store/useStore';
 import { NewSubtaskData, Subtask } from '../../../types/types';
 import styles from './SubtasksInputs.module.css';
-import useStore from '../../../store/useStore';
 
 interface SubtasksInputsProps {
   subtasks: (Subtask | NewSubtaskData)[];

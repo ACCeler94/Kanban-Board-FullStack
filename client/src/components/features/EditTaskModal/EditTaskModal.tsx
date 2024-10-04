@@ -2,12 +2,12 @@ import { CircularProgress, Dialog } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate, useParams } from 'react-router-dom';
-import modalStyles from '../../../styles/modal.module.css';
-import TaskForm from '../../common/TaskForm/TaskForm';
 import { useEditTask, useTaskData } from '../../../API/tasks';
-import { EditTaskData } from '../../../types/types';
 import useStore from '../../../store/useStore';
+import modalStyles from '../../../styles/modal.module.css';
+import { EditTaskData } from '../../../types/types';
 import { removeUnchangedData } from '../../../utils/removeUnchangedData';
+import TaskForm from '../../common/TaskForm/TaskForm';
 
 const EditTaskModal = () => {
   const { id, taskId } = useParams();

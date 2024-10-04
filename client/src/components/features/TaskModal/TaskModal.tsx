@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEditTask, useTaskData } from '../../../API/tasks';
+import modalStyles from '../../../styles/modal.module.css';
 import { Subtask } from '../../../types/types';
 import DeleteTaskModal from '../DeleteTaskModal/DeleteTaskModal';
 import SubtasksList from '../SubtasksList/SubtasksList';
 import TaskMenu from '../TaskMenu/TaskMenu';
 import taskModalStyles from './TaskModal.module.css';
-import modalStyles from '../../../styles/modal.module.css';
 
 const TaskModal = () => {
   const { id, taskId } = useParams();

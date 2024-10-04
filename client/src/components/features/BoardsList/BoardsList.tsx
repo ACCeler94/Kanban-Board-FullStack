@@ -1,9 +1,9 @@
-import styles from './BoardsList.module.css';
-import { FaPlus } from 'react-icons/fa';
-import useStore from '../../../store/useStore';
-import { Link, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
+import { FaPlus } from 'react-icons/fa';
+import { Link, useParams } from 'react-router-dom';
+import useStore from '../../../store/useStore';
 import { BoardPreview } from '../../../types/types';
+import styles from './BoardsList.module.css';
 
 interface BoardsListProps {
   boards: BoardPreview[];
