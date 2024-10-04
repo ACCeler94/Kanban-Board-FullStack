@@ -88,10 +88,10 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
           <BoardsList boards={userBoardData.boards} />
           <div className={styles.actionButtons}>
-            <div className={styles.hideButton} onClick={toggleIsHidden}>
+            <button id={styles.hideButton} onClick={toggleIsHidden}>
               <FaEyeSlash />
               Hide Sidebar
-            </div>
+            </button>
             <Button
               color='error'
               variant='contained'
