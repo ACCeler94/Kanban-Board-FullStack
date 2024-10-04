@@ -20,9 +20,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           toggleIsHidden={() => setIsSidebarHidden(!isSidebarHidden)}
         />
         {isSidebarHidden ? (
-          <div className={styles.showButton} onClick={() => setIsSidebarHidden(false)}>
+          <button className={styles.showButton} onClick={() => setIsSidebarHidden(false)}>
             <FaEye />
-          </div>
+          </button>
         ) : (
           ''
         )}

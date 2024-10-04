@@ -63,10 +63,10 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
           <Error message={error ? error.message : logoutError} />
           <div className={styles.actionButtons}>
-            <div className={styles.hideButton} onClick={toggleIsHidden}>
+            <button id={styles.hideButton} onClick={toggleIsHidden}>
               <FaEyeSlash />
               Hide Sidebar
-            </div>
+            </button>
             <Button
               color='error'
               variant='contained'

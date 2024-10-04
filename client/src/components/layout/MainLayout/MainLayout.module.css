@@ -27,10 +27,14 @@
   border-top-right-radius: 50px;
   border-bottom-right-radius: 50px;
   font-size: 1.25em;
-  cursor: pointer;
 }
 
 .showButton:hover {
+  background-color: var(--light-purple);
+  transition-duration: var(--duration);
+}
+
+.showButton:focus {
   background-color: var(--light-purple);
   transition-duration: var(--duration);
 }
