@@ -16,10 +16,10 @@
 
 .addButton {
   color: var(--main-purple);
-  height: 100%;
+  font-size: 2em;
 }
 
 .deleteButton {
   color: var(--red);
-  height: 100%;
+  font-size: 2em;
 }

@@ -166,8 +166,9 @@ const DeleteTaskModal = ({
       </div>
       <div className={modalStyles.modalContent}>
         <p className={deleteTaskModalStyles.deleteMessage}>
-          Are you sure you want to delete {taskTitle} task and all related subtasks? This action
-          cannot be reversed.
+          Are you sure you want to <span className={deleteTaskModalStyles.bold}>delete </span>
+          {taskTitle} task and all related subtasks?{' '}
+          <span className={deleteTaskModalStyles.underline}>This action cannot be reversed.</span>
         </p>
         <div className={deleteTaskModalStyles.confirmationButtonsWrapper}>
           <Button

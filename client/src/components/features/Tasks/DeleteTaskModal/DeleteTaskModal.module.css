@@ -9,3 +9,12 @@
   display: flex;
   justify-content: space-around;
 }
+
+.bold {
+  font-weight: 600;
+}
+
+.underline {
+  text-decoration:underline;
+  text-decoration-thickness: 1px;
+}
