@@ -1,7 +1,7 @@
 model Board {
   id        String        @id @default(uuid())
   createdAt DateTime      @default(now())
-  title     String        @default("Untitled") @db.VarChar(255)
+  title     String        @default("Untitled") @db.VarChar(100)
   author    User          @relation("BoardAuthor", fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
   tasks     Task[]
