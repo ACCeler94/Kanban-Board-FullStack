@@ -1,9 +1,9 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Route, Routes } from 'react-router-dom';
-import AddTaskModal from './components/features/AddTaskModal/AddTaskModal';
-import Board from './components/features/Board/Board';
-import EditTaskModal from './components/features/EditTaskModal/EditTaskModal';
-import TaskModal from './components/features/TaskModal/TaskModal';
+import Board from './components/features/Boards/Board/Board';
+import AddTaskModal from './components/features/Tasks/AddTaskModal/AddTaskModal';
+import EditTaskModal from './components/features/Tasks/EditTaskModal/EditTaskModal';
+import TaskModal from './components/features/Tasks/TaskModal/TaskModal';
 import BoardsPage from './pages/BoardsPage/BoardsPage';
 import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
 

@@ -9,7 +9,7 @@ import {
   Subtask,
   TaskStatus,
 } from '../../../types/types';
-import SubtasksInputs from '../SubtasksInputs/SubtasksInputs';
+import SubtasksInputs from './SubtasksInputs/SubtasksInputs';
 import styles from './TaskForm.module.css';
 
 interface TaskFormProps<T extends NewTaskFormData | EditTaskData> {

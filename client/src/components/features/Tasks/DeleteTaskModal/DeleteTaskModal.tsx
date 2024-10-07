@@ -1,8 +1,8 @@
 import { Button, CircularProgress, Dialog } from '@mui/material';
 import { useEffect } from 'react';
 import { IoMdClose } from 'react-icons/io';
-import { useDeleteTask } from '../../../API/tasks';
-import modalStyles from '../../../styles/modal.module.css';
+import { useDeleteTask } from '../../../../API/tasks';
+import modalStyles from '../../../../styles/modal.module.css';
 import deleteTaskModalStyles from './DeleteTaskModal.module.css';
 
 interface ConfirmationModalProps {

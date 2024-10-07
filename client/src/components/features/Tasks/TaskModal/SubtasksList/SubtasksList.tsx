@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual';
 import { useEffect, useMemo, useState } from 'react';
-import { Subtask } from '../../../types/types';
+import { Subtask } from '../../../../../types/types';
 import styles from './Subtasks.module.css';
 
 interface SubtasksListProps {

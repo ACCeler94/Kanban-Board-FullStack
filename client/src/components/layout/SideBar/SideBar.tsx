@@ -6,7 +6,7 @@ import { FaEyeSlash } from 'react-icons/fa';
 import { authUrl } from '../../../API/config';
 import { useUserBoardData } from '../../../API/users';
 import Error from '../../common/Error/Error';
-import BoardsList from '../../features/BoardsList/BoardsList';
+import BoardsList from '../../features/Boards/BoardsList/BoardsList';
 import styles from './SideBar.module.css';
 
 interface SideBarProps {

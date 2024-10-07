@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { IoAddCircle } from 'react-icons/io5';
 import { MdOutlineDeleteForever } from 'react-icons/md';
 import { v4 as uuid } from 'uuid';
-import useStore from '../../../store/useStore';
-import { NewSubtaskData, Subtask } from '../../../types/types';
+import useStore from '../../../../store/useStore';
+import { NewSubtaskData, Subtask } from '../../../../types/types';
 import styles from './SubtasksInputs.module.css';
 
 interface SubtasksInputsProps {
