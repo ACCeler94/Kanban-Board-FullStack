@@ -51,7 +51,7 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
   return (
     <div className={styles.subtasksWrapper}>
       <span className={styles.inputsLabel}>Subtasks</span>
-      <List>
+      <List sx={{ padding: 0 }}>
         {subtasks.map((subtask) => (
           <ListItem className={styles.inputWrapper} sx={{ padding: 0 }} key={subtask.id}>
             <TextField
