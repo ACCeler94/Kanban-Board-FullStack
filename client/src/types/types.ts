@@ -140,13 +140,21 @@ interface BoardPreview {
   };
 }
 
-interface AuthoredBoardPreview extends BoardPreview {
-  createdAt: Date;
+interface BoardPreviewWithCreatedAt extends BoardPreview {
+  board: BoardPreview['board'] & {
+    createdAt: Date;
+  };
+}
+
+interface AuthoredBoardPreview extends BoardPreviewWithCreatedAt {
   authorId: string;
 }
 
-interface BoardPreviewWithCreatedAt extends BoardPreview {
+interface NewBoardData {
+  id: string;
   createdAt: Date;
+  title: string;
+  authorId: string;
 }
 
 interface UserDataPreview {
@@ -185,6 +193,8 @@ export type {
   BoardType,
   BoardQuery,
   BoardPreview,
+  BoardPreviewWithCreatedAt,
+  NewBoardData,
   UserData,
   UserBoardData,
   UserDataPreview,
