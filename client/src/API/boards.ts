@@ -88,8 +88,8 @@ const useCreateBoard = () => {
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending, isSuccess } = useMutation({
-    mutationFn: async (title: string) => {
-      const validationResult = boardTitleValidator.safeParse(title);
+    mutationFn: async (NewBoardData: { title: string }) => {
+      const validationResult = boardTitleValidator.safeParse(NewBoardData);
 
       if (!validationResult.success) {
         const errorMessages = validationResult.error.issues.map((issue) => issue.message);
@@ -104,7 +104,7 @@ const useCreateBoard = () => {
       }
 
       try {
-        return createBoard(title, token);
+        return createBoard(validationResult.data.title, token);
       } catch (error) {
         throw new Error('Failed to create a task. Please try again.');
       }
