@@ -43,7 +43,7 @@ const BoardsList = ({ boards }: BoardsListProps) => {
           );
         })}
         <li>
-          <Link to='add' className={styles.addBoardButton}>
+          <Link to='add-board' className={styles.addBoardButton}>
             <FaPlus />
             <span>Create new board</span>
           </Link>

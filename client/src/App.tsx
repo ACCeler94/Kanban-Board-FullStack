@@ -1,5 +1,6 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Route, Routes } from 'react-router-dom';
+import AddBoardModal from './components/features/Boards/AddBoardModal/AddBoardModal';
 import Board from './components/features/Boards/Board/Board';
 import AddTaskModal from './components/features/Tasks/AddTaskModal/AddTaskModal';
 import EditTaskModal from './components/features/Tasks/EditTaskModal/EditTaskModal';
@@ -12,6 +13,7 @@ const App = () => {
     <>
       <Routes>
         <Route path='/boards' element={<BoardsPage />}>
+          <Route path='add-board' element={<AddBoardModal />} />
           <Route path=':id' element={<Board />}>
             <Route path='tasks/add-task' element={<AddTaskModal />} />
             <Route path='tasks/:taskId' element={<TaskModal />} />
