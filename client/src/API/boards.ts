@@ -1,8 +1,9 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { validate as uuidValidate } from 'uuid';
-import { BoardQuery } from '../types/types';
+import { BoardQuery, NewBoardData, UserBoardData } from '../types/types';
+import boardTitleValidator from '../validators/boards/boardTitleValidator';
 import { apiUrl } from './config';
 
 // Actions
@@ -34,6 +35,33 @@ const fetchBoardById = async (
   }
 };
 
+const createBoard = async (title: string, token: string) => {
+  try {
+    const { data } = await axios.post(
+      `${apiUrl}/boards`,
+      {
+        title,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `Failed to create board: ${error.response?.status} ${error.response?.statusText}`
+      );
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+};
+
 // Hooks
 const useBoardById = (id: string | undefined) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
@@ -55,4 +83,41 @@ const useBoardById = (id: string | undefined) => {
   return { data, error, isPending, refetch };
 };
 
-export { useBoardById };
+const useCreateBoard = () => {
+  const { getAccessTokenSilently } = useAuth0();
+  const queryClient = useQueryClient();
+
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
+    mutationFn: async (title: string) => {
+      const validationResult = boardTitleValidator.safeParse(title);
+
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues.map((issue) => issue.message);
+        throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
+      }
+
+      let token;
+      try {
+        token = await getAccessTokenSilently();
+      } catch (error) {
+        throw new Error('Failed to authenticate. Please try logging in again.');
+      }
+
+      try {
+        return createBoard(title, token);
+      } catch (error) {
+        throw new Error('Failed to create a task. Please try again.');
+      }
+    },
+    onSuccess: (createdBoard: NewBoardData) => {
+      queryClient.setQueryData(['userBoardData'], (userData: UserBoardData) => {
+        if (!userData) return;
+
+        return { ...userData, boards: [...userData.boards, { board: createdBoard }] }; // Optimistic update
+      });
+    },
+  });
+  return { mutate, data, error, isPending, isSuccess };
+};
+
+export { useBoardById, useCreateBoard };
