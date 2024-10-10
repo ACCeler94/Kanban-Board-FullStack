@@ -1,0 +1,9 @@
+.inputWrapper {
+  margin-bottom: 25px;
+}
+
+.inputWrapper label {
+  font-weight: 600;
+  color: var(--grey);
+  margin-bottom: 10px;
+}
