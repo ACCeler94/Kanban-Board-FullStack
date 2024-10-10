@@ -30,7 +30,7 @@ const BoardForm = ({ boardTitle, submitHandler, buttonText }: BoardFormProps) =>
           sx={{ marginTop: '5px' }}
           placeholder='Title should be short and allow to easily identify the board.'
           required
-          inputProps={{ maxLength: 255 }}
+          inputProps={{ maxLength: 100 }}
           onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
             e.key === 'Enter' && e.preventDefault();
           }}
