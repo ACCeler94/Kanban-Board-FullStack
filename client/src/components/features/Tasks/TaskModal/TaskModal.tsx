@@ -1,4 +1,4 @@
-import { Button, CircularProgress } from '@mui/material';
+import { Button } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import { useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
@@ -6,6 +6,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEditTask, useTaskData } from '../../../../API/tasks';
 import modalStyles from '../../../../styles/modal.module.css';
 import { Subtask } from '../../../../types/types';
+import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
+import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
 import DeleteTaskModal from '../DeleteTaskModal/DeleteTaskModal';
 import SubtasksList from './SubtasksList/SubtasksList';
 import TaskMenu from './TaskMenu/TaskMenu';
@@ -52,29 +54,12 @@ const TaskModal = () => {
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalTitle}>Loading</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              type='button'
-              aria-label='Close Modal'
-              className={modalStyles.closeButton}
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.dialogContent}>
-          <div className={modalStyles.spinnerWrapper}>
-            <CircularProgress />
-          </div>
-        </div>
+        <LoadingModalContent handleClose={handleClose} />
       </Dialog>
     );
 
   if (taskFetchingError || editError) {
-    const errorMessage = taskFetchingError ? taskFetchingError.message : editError?.message; // Display one error message or the other
+    const error = taskFetchingError ? taskFetchingError : editError!;
     return (
       <Dialog
         open={isOpen}
@@ -87,33 +72,18 @@ const TaskModal = () => {
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalTitle}>Error</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.dialogContent}>
-          <h3>{errorMessage}</h3>
-          {taskFetchingError ? (
-            <Button
-              color='primary'
-              variant='contained'
-              className='button-small'
-              sx={{ margin: '25px 0' }}
-              onClick={async () => await refetch()}
-            >
-              Retry
-            </Button>
-          ) : null}
-        </div>
+        <ErrorModalContent error={error} handleClose={handleClose} />
+        {taskFetchingError ? (
+          <Button
+            color='primary'
+            variant='contained'
+            className='button-small'
+            sx={{ margin: '25px' }}
+            onClick={async () => await refetch()}
+          >
+            Retry
+          </Button>
+        ) : null}
       </Dialog>
     );
   }
