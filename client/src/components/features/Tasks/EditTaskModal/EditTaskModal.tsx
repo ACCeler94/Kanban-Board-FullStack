@@ -9,6 +9,7 @@ import { EditTaskData } from '../../../../types/types';
 import { removeUnchangedData } from '../../../../utils/removeUnchangedData';
 import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
 import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
+import SuccessModalContent from '../../../common/SuccessModalContent/SuccessModalContent';
 import TaskForm from '../../../common/TaskForm/TaskForm';
 
 const EditTaskModal = () => {
@@ -103,20 +104,10 @@ const EditTaskModal = () => {
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalTitle}>Success</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.modalContent}>Changes saved successfully!</div>
+        <SuccessModalContent
+          handleClose={handleClose}
+          successMessage='Changes saved successfully!'
+        />
       </Dialog>
     );
   }

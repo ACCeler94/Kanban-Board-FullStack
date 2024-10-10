@@ -7,6 +7,7 @@ import modalStyles from '../../../../styles/modal.module.css';
 import { NewTaskData, NewTaskFormData } from '../../../../types/types';
 import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
 import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
+import SuccessModalContent from '../../../common/SuccessModalContent/SuccessModalContent';
 import TaskForm from '../../../common/TaskForm/TaskForm';
 
 const AddTaskModal = () => {
@@ -85,20 +86,10 @@ const AddTaskModal = () => {
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalTitle}>Success</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.modalContent}>Task successfully created!</div>
+        <SuccessModalContent
+          handleClose={handleClose}
+          successMessage='Task successfully created!'
+        />
       </Dialog>
     );
   }

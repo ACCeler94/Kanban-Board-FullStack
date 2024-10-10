@@ -5,6 +5,7 @@ import { useDeleteTask } from '../../../../API/tasks';
 import modalStyles from '../../../../styles/modal.module.css';
 import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
 import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
+import SuccessModalContent from '../../../common/SuccessModalContent/SuccessModalContent';
 import deleteTaskModalStyles from './DeleteTaskModal.module.css';
 
 interface ConfirmationModalProps {
@@ -24,7 +25,7 @@ const DeleteTaskModal = ({
   taskTitle,
   boardId,
 }: ConfirmationModalProps) => {
-  const { mutate: deleteTask, isPending, error, data, isSuccess } = useDeleteTask(taskId, boardId);
+  const { mutate: deleteTask, isPending, error, isSuccess } = useDeleteTask(taskId, boardId);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -90,22 +91,10 @@ const DeleteTaskModal = ({
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalHeader}>Success</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.modalContent}>
-          <p>{data.message}</p>
-        </div>
+        <SuccessModalContent
+          handleClose={handleClose}
+          successMessage='Task removed successfully!'
+        />
       </Dialog>
     );
 
