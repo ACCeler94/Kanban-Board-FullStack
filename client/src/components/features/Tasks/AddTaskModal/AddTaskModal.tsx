@@ -1,10 +1,12 @@
-import { CircularProgress, Dialog } from '@mui/material';
+import { Dialog } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCreateTask } from '../../../../API/tasks';
 import modalStyles from '../../../../styles/modal.module.css';
 import { NewTaskData, NewTaskFormData } from '../../../../types/types';
+import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
+import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
 import TaskForm from '../../../common/TaskForm/TaskForm';
 
 const AddTaskModal = () => {
@@ -47,20 +49,7 @@ const AddTaskModal = () => {
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalTitle}>Error</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.modalContent}>Error: {error.message}</div>
+        <ErrorModalContent error={error} handleClose={handleClose} />
       </Dialog>
     );
   }
@@ -78,24 +67,7 @@ const AddTaskModal = () => {
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalTitle}>Loading...</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.modalContent}>
-          <div className={modalStyles.spinnerWrapper}>
-            <CircularProgress />
-          </div>
-        </div>
+        <LoadingModalContent handleClose={handleClose} />
       </Dialog>
     );
   }

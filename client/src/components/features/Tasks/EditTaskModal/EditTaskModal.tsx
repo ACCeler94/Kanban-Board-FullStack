@@ -1,4 +1,4 @@
-import { CircularProgress, Dialog } from '@mui/material';
+import { Dialog } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -7,6 +7,8 @@ import useStore from '../../../../store/useStore';
 import modalStyles from '../../../../styles/modal.module.css';
 import { EditTaskData } from '../../../../types/types';
 import { removeUnchangedData } from '../../../../utils/removeUnchangedData';
+import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
+import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
 import TaskForm from '../../../common/TaskForm/TaskForm';
 
 const EditTaskModal = () => {
@@ -62,22 +64,10 @@ const EditTaskModal = () => {
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalTitle}>Error</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.modalContent}>
-          Error: {editError ? editError.message : taskDataError?.message}
-        </div>
+        <ErrorModalContent
+          handleClose={handleClose}
+          error={editError ? editError : taskDataError!}
+        />
       </Dialog>
     );
   }
@@ -95,24 +85,7 @@ const EditTaskModal = () => {
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalTitle}>Loading...</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.modalContent}>
-          <div className={modalStyles.spinnerWrapper}>
-            <CircularProgress />
-          </div>
-        </div>
+        <LoadingModalContent handleClose={handleClose} />
       </Dialog>
     );
   }

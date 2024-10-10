@@ -1,8 +1,10 @@
-import { Button, CircularProgress, Dialog } from '@mui/material';
+import { Button, Dialog } from '@mui/material';
 import { useEffect } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { useDeleteTask } from '../../../../API/tasks';
 import modalStyles from '../../../../styles/modal.module.css';
+import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
+import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
 import deleteTaskModalStyles from './DeleteTaskModal.module.css';
 
 interface ConfirmationModalProps {
@@ -51,22 +53,7 @@ const DeleteTaskModal = ({
           },
         }}
       >
-        <div>
-          <div className={modalStyles.modalHeaderWrapper}>
-            <h3 className={modalStyles.modalHeader}>Error</h3>
-            <div className={modalStyles.buttonsWrapper}>
-              <button
-                className={modalStyles.closeButton}
-                type='button'
-                aria-label='Close Modal'
-                onClick={handleClose}
-              >
-                <IoMdClose />
-              </button>
-            </div>
-          </div>
-          <p>Error: {error.message}</p>
-        </div>
+        <ErrorModalContent handleClose={handleClose} error={error} />
       </Dialog>
     );
 
@@ -83,24 +70,7 @@ const DeleteTaskModal = ({
           },
         }}
       >
-        <div className={modalStyles.modalHeaderWrapper}>
-          <h3 className={modalStyles.modalHeader}>Loading...</h3>
-          <div className={modalStyles.buttonsWrapper}>
-            <button
-              className={modalStyles.closeButton}
-              type='button'
-              aria-label='Close Modal'
-              onClick={handleClose}
-            >
-              <IoMdClose />
-            </button>
-          </div>
-        </div>
-        <div className={modalStyles.modalContent}>
-          <div className={modalStyles.spinnerWrapper}>
-            <CircularProgress />
-          </div>
-        </div>
+        <LoadingModalContent handleClose={handleClose} />
       </Dialog>
     );
 
