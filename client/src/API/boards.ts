@@ -182,6 +182,7 @@ const useEditBoard = (id: string) => {
           title: variables.title,
         }; // Optimistic update
       });
+      queryClient.invalidateQueries({ queryKey: ['userBoardData'] });
     },
   });
   return { mutate, data, error, isPending, isSuccess };
