@@ -118,7 +118,8 @@ const useUserBoardData = () => {
     },
     retry: false,
     enabled: isAuthenticated,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchInterval: 2 * 60 * 1000, // Since the BoardsList component is very rarely re-mounted it needs to refetch in intervals (2 minutes) to ensure the data is updated
   });
 
   return { data, error, isPending, refetch };
