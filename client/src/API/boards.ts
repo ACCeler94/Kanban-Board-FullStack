@@ -104,7 +104,8 @@ const useBoardById = (id: string | undefined) => {
       }
     },
     enabled: !!id && uuidValidate(id) && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchBoardById
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 60 * 1000, // 1 minute
+    refetchInterval: 2 * 60 * 1000, // 2 minutes
   });
 
   return { data, error, isPending, refetch };
