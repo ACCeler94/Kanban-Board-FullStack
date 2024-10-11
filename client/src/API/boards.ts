@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { validate as uuidValidate } from 'uuid';
-import { BoardQuery, NewBoardData, UserBoardData } from '../types/types';
+import { BoardQuery, BoardType, NewBoardData, UserBoardData } from '../types/types';
 import boardTitleValidator from '../validators/boards/boardTitleValidator';
 import { apiUrl } from './config';
 
@@ -62,6 +62,33 @@ const createBoard = async (title: string, token: string) => {
   }
 };
 
+const editBoard = async (title: string, boardId: string, token: string) => {
+  try {
+    const { data } = await axios.put(
+      `${apiUrl}/boards/${boardId}`,
+      {
+        title,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `Failed to edit board: ${error.response?.status} ${error.response?.statusText}`
+      );
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+};
+
 // Hooks
 const useBoardById = (id: string | undefined) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
@@ -88,8 +115,8 @@ const useCreateBoard = () => {
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending, isSuccess } = useMutation({
-    mutationFn: async (NewBoardData: { title: string }) => {
-      const validationResult = boardTitleValidator.safeParse(NewBoardData);
+    mutationFn: async (newBoardData: { title: string }) => {
+      const validationResult = boardTitleValidator.safeParse(newBoardData);
 
       if (!validationResult.success) {
         const errorMessages = validationResult.error.issues.map((issue) => issue.message);
@@ -106,7 +133,7 @@ const useCreateBoard = () => {
       try {
         return createBoard(validationResult.data.title, token);
       } catch (error) {
-        throw new Error('Failed to create a task. Please try again.');
+        throw new Error('Failed to create a board. Please try again.');
       }
     },
     onSuccess: (createdBoard: NewBoardData) => {
@@ -120,4 +147,44 @@ const useCreateBoard = () => {
   return { mutate, data, error, isPending, isSuccess };
 };
 
-export { useBoardById, useCreateBoard };
+const useEditBoard = (id: string) => {
+  const { getAccessTokenSilently } = useAuth0();
+  const queryClient = useQueryClient();
+
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
+    mutationFn: async (editedBoardData: { title: string }) => {
+      const validationResult = boardTitleValidator.safeParse(editedBoardData);
+
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues.map((issue) => issue.message);
+        throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
+      }
+
+      let token;
+      try {
+        token = await getAccessTokenSilently();
+      } catch (error) {
+        throw new Error('Failed to authenticate. Please try logging in again.');
+      }
+
+      try {
+        return editBoard(validationResult.data.title, id, token);
+      } catch (error) {
+        throw new Error('Failed to save changes. Please try again.');
+      }
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData(['board', id], (oldData: BoardType) => {
+        if (!oldData) return;
+
+        return {
+          ...oldData,
+          title: variables.title,
+        }; // Optimistic update
+      });
+    },
+  });
+  return { mutate, data, error, isPending, isSuccess };
+};
+
+export { useBoardById, useCreateBoard, useEditBoard };
