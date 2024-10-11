@@ -52,9 +52,9 @@ const Navbar = () => {
               color='primary'
               variant='contained'
               className='button-small'
-              disabled={!isAuthor}
+              disabled={!isAuthor || !id}
               component={Link}
-              to={`${id}/tasks/add-task`}
+              to={`${id}/tasks/add`}
             >
               <FaPlus />
               <span>Add New Task</span>
