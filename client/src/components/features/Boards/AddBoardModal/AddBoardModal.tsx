@@ -26,11 +26,13 @@ const AddBoardModal = () => {
 
   // Redirect to the new board on success after 1.5 second
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (isSuccess && boardData) {
       setTimeout(() => {
         navigate(`/boards/${boardData.id}`);
       }, 1500);
     }
+    return () => clearTimeout(timeout);
   }, [boardData, isSuccess, navigate]);
 
   if (error) {

@@ -23,11 +23,13 @@ const AddTaskModal = () => {
 
   // Close the modal on success after 1.5 second
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (isSuccess) {
       setTimeout(() => {
         handleClose();
       }, 1500);
     }
+    return () => clearTimeout(timeout);
   }, [handleClose, isSuccess]);
 
   const submitHandler = (formData: NewTaskFormData) => {

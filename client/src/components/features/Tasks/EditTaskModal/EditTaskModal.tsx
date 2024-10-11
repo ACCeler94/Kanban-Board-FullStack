@@ -40,11 +40,13 @@ const EditTaskModal = () => {
 
   // Close the modal on success after 1.5 second
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (isEditSuccess) {
       setTimeout(() => {
         handleClose();
       }, 1500);
     }
+    return () => clearTimeout(timeout);
   }, [handleClose, isEditSuccess]);
 
   const submitHandler = (formData: EditTaskData) => {
