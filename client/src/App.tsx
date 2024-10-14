@@ -8,6 +8,7 @@ import TaskModal from './components/features/Tasks/TaskModal/TaskModal';
 import BoardsPage from './pages/BoardsPage/BoardsPage';
 import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
 import EditBoardModal from './components/features/Boards/EditBoardModal/EditBoardModal';
+import DeleteTaskModal from './components/features/Tasks/DeleteTaskModal/DeleteTaskModal';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
             <Route path='tasks/add' element={<AddTaskModal />} />
             <Route path='tasks/:taskId' element={<TaskModal />} />
             <Route path='tasks/:taskId/edit' element={<EditTaskModal />} />
+            <Route path='tasks/:taskId/delete' element={<DeleteTaskModal />} />
           </Route>
         </Route>
         <Route path='/post-login' element={<PostLoginPage />} />

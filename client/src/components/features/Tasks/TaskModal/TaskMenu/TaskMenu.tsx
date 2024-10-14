@@ -6,11 +6,7 @@ import { HiDotsVertical } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import styles from './TaskMenu.module.css';
 
-interface TaskMenuProps {
-  setIsNestedModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const TaskMenu = ({ setIsNestedModalOpen }: TaskMenuProps) => {
+const TaskMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -19,11 +15,6 @@ const TaskMenu = ({ setIsNestedModalOpen }: TaskMenuProps) => {
   };
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleDeleteClick = () => {
-    setIsNestedModalOpen(true);
-    handleClose();
   };
 
   return (
@@ -58,7 +49,7 @@ const TaskMenu = ({ setIsNestedModalOpen }: TaskMenuProps) => {
           Edit
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={handleDeleteClick} sx={{ color: 'var(--red)', fontWeight: '700' }}>
+        <MenuItem component={Link} to='delete' sx={{ color: 'var(--red)', fontWeight: '700' }}>
           Delete
         </MenuItem>
       </Menu>

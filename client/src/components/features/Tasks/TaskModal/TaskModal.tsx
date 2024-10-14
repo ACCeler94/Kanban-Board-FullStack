@@ -8,7 +8,6 @@ import modalStyles from '../../../../styles/modal.module.css';
 import { Subtask } from '../../../../types/types';
 import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
 import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
-import DeleteTaskModal from '../DeleteTaskModal/DeleteTaskModal';
 import SubtasksList from './SubtasksList/SubtasksList';
 import TaskMenu from './TaskMenu/TaskMenu';
 import taskModalStyles from './TaskModal.module.css';
@@ -17,7 +16,6 @@ const TaskModal = () => {
   const { id, taskId } = useParams();
   const [isOpen, setIsOpen] = useState(true);
   const [isModified, setIsModified] = useState(false);
-  const [isNestedModalOpen, setIsNestedModalOpen] = useState(false);
   const [subtaskData, setSubtaskData] = useState<Subtask[] | undefined>(undefined);
   const { data: taskData, error: taskFetchingError, isPending, refetch } = useTaskData(taskId!);
   const {
@@ -30,10 +28,6 @@ const TaskModal = () => {
   const handleClose = () => {
     setIsOpen(false);
     navigate(`/boards/${id}`);
-  };
-
-  const handleCloseNested = () => {
-    setIsNestedModalOpen(false);
   };
 
   const handleSaveChanges = () => {
@@ -104,7 +98,7 @@ const TaskModal = () => {
         <div className={modalStyles.modalHeaderWrapper}>
           <h3 className={modalStyles.modalTitle}>{taskData?.title}</h3>
           <div className={modalStyles.buttonsWrapper}>
-            <TaskMenu setIsNestedModalOpen={setIsNestedModalOpen} />
+            <TaskMenu />
             <button
               className={modalStyles.closeButton}
               type='button'
@@ -139,15 +133,6 @@ const TaskModal = () => {
             ''
           )}
         </div>
-
-        <DeleteTaskModal
-          isOpen={isNestedModalOpen}
-          handleClose={handleCloseNested}
-          handleCloseParent={handleClose}
-          taskId={taskData.id}
-          taskTitle={taskData.title}
-          boardId={taskData.boardId}
-        />
       </Dialog>
     );
 };
