@@ -21,7 +21,7 @@ const EditBoardModal = () => {
   const navigate = useNavigate();
 
   const handleClose = () => {
-    navigate('/boards');
+    navigate(`/boards/${id}`);
     setIsOpen(false);
   };
 
