@@ -34,11 +34,7 @@
   align-items: center;
 }
 
-.utilityBar a {
+.buttonsWrapper {
   display: flex;
   align-items: center;
-}
-
-.utilityBar a svg {
-  margin-right: 5px;
 }

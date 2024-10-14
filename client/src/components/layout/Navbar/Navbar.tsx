@@ -8,6 +8,7 @@ import Icon from '../../../assets/icon.svg?react';
 import useStore from '../../../store/useStore';
 import Container from '../../common/Container/Container';
 import styles from './Navbar.module.css';
+import BoardMenu from '../../features/Boards/BoardMenu/BoardMenu';
 
 const Navbar = () => {
   const activeBoard = useStore((state) => state.activeBoard);
@@ -48,17 +49,20 @@ const Navbar = () => {
           </div>
           <div className={styles.utilityBar}>
             <h2>{activeBoard?.title || 'Select a board...'}</h2>
-            <Button
-              color='primary'
-              variant='contained'
-              className='button-small'
-              disabled={!isAuthor || !id}
-              component={Link}
-              to={`${id}/tasks/add`}
-            >
-              <FaPlus />
-              <span>Add New Task</span>
-            </Button>
+            <div className={styles.buttonsWrapper}>
+              {!isAuthor || !id ? null : <BoardMenu />}
+              <Button
+                color='primary'
+                variant='contained'
+                className='button-small'
+                disabled={!isAuthor || !id}
+                component={Link}
+                to={`${id}/tasks/add`}
+              >
+                <FaPlus />
+                <span>Add New Task</span>
+              </Button>
+            </div>
           </div>
         </div>
       </Container>
