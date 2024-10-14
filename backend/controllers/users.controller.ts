@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createUserDTO from '../validators/users/create-user.dto';
-import EmailSearchSchema from '../validators/EmailSearchSchema';
+import EmailSchema from '../validators/EmailSchema';
 
 const UsersController = {
   // GET
@@ -153,7 +153,7 @@ const UsersController = {
       return res.status(400).json({ error: 'Invalid search query.' });
 
     try {
-      searchQuery = EmailSearchSchema.parse(req.query);
+      searchQuery = EmailSchema.parse(req.query);
     } catch (error) {
       return res.status(400).json({ error: 'Invalid search query.' });
     }
