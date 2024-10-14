@@ -9,6 +9,7 @@ import BoardsPage from './pages/BoardsPage/BoardsPage';
 import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
 import EditBoardModal from './components/features/Boards/EditBoardModal/EditBoardModal';
 import DeleteTaskModal from './components/features/Tasks/DeleteTaskModal/DeleteTaskModal';
+import DeleteBoardModal from './components/features/Boards/DeleteBoardModal/DeleteBoardModal';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
           <Route path='add' element={<AddBoardModal />} />
           <Route path=':id' element={<Board />}>
             <Route path='edit' element={<EditBoardModal />} />
+            <Route path='delete' element={<DeleteBoardModal />} />
             <Route path='tasks/add' element={<AddTaskModal />} />
             <Route path='tasks/:taskId' element={<TaskModal />} />
             <Route path='tasks/:taskId/edit' element={<EditTaskModal />} />
