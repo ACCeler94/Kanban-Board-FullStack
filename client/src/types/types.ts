@@ -186,6 +186,11 @@ interface UserData {
   authoredTasks: TaskType[];
 }
 
+interface JsonResponseType {
+  message?: string; // Success message
+  error?: string; // Error message if something goes wrong
+}
+
 export type {
   TaskType,
   TaskTypePartial,
@@ -203,4 +208,5 @@ export type {
   NewTaskData,
   NewTaskFormData,
   DiffTaskData,
+  JsonResponseType,
 }; // + TaskStatus exported as a value

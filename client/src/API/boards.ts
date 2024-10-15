@@ -2,7 +2,13 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { validate as uuidValidate } from 'uuid';
-import { BoardQuery, BoardType, NewBoardData, UserBoardData } from '../types/types';
+import {
+  BoardQuery,
+  BoardType,
+  JsonResponseType,
+  NewBoardData,
+  UserBoardData,
+} from '../types/types';
 import boardTitleValidator from '../validators/boards/boardTitleValidator';
 import userEmailValidator from '../validators/users/userEmailValidator';
 import { apiUrl } from './config';
@@ -12,11 +18,6 @@ const fetchBoardById = async (
   id: string | undefined,
   token: string
 ): Promise<BoardQuery | undefined> => {
-  if (!id) {
-    // Check if id exists and is valid uuid
-    throw new Error('Invalid Board ID.');
-  }
-
   try {
     const { data } = await axios.get(`${apiUrl}/boards/${id}`, {
       headers: {
@@ -36,7 +37,7 @@ const fetchBoardById = async (
   }
 };
 
-const createBoard = async (title: string, token: string) => {
+const createBoard = async (title: string, token: string): Promise<NewBoardData> => {
   try {
     const { data } = await axios.post(
       `${apiUrl}/boards`,
@@ -63,7 +64,11 @@ const createBoard = async (title: string, token: string) => {
   }
 };
 
-const editBoard = async (title: string, boardId: string, token: string) => {
+const editBoard = async (
+  title: string,
+  boardId: string,
+  token: string
+): Promise<JsonResponseType> => {
   try {
     const { data } = await axios.put(
       `${apiUrl}/boards/${boardId}`,
@@ -90,8 +95,7 @@ const editBoard = async (title: string, boardId: string, token: string) => {
   }
 };
 
-const deleteBoardById = async (boardId: string, token: string) => {
-  if (!boardId) throw new Error('Invalid Task ID.');
+const deleteBoardById = async (boardId: string, token: string): Promise<JsonResponseType> => {
   try {
     const { data } = await axios.delete(`${apiUrl}/boards/${boardId}`, {
       headers: {
@@ -104,7 +108,7 @@ const deleteBoardById = async (boardId: string, token: string) => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(
-        `Failed to fetch task data: ${error.response?.status} ${error.response?.statusText}`
+        `Failed to fetch board data: ${error.response?.status} ${error.response?.statusText}`
       );
     } else {
       throw new Error('An unexpected error occurred.');
@@ -112,8 +116,12 @@ const deleteBoardById = async (boardId: string, token: string) => {
   }
 };
 
-const addUserToBoard = async (boardId: string, email: string, token: string) => {
-  if (!boardId) throw new Error('Invalid Task ID.');
+const addUserToBoard = async (
+  boardId: string,
+  email: string,
+  token: string
+): Promise<JsonResponseType> => {
+  if (!boardId) throw new Error('Invalid Board ID.');
 
   try {
     const { data } = await axios.post(
@@ -148,6 +156,8 @@ const useBoardById = (id: string | undefined) => {
   const { data, error, isPending, refetch } = useQuery({
     queryKey: ['board', id],
     queryFn: async () => {
+      if (!id || !uuidValidate(id)) throw new Error('Invalid board ID.');
+
       try {
         const token = await getAccessTokenSilently();
         return fetchBoardById(id, token);
@@ -206,6 +216,8 @@ const useEditBoard = (id: string) => {
 
   const { mutate, data, error, isPending, isSuccess } = useMutation({
     mutationFn: async (editedBoardData: { title: string }) => {
+      if (!id || !uuidValidate(id)) throw new Error('Invalid board ID.');
+
       const validationResult = boardTitleValidator.safeParse(editedBoardData);
 
       if (!validationResult.success) {
