@@ -20,8 +20,8 @@ router.route('/boards/:boardId').get(validateBoardIdParams, BoardsController.get
 router.route('/boards').post(BoardsController.createBoard);
 
 router
-  .route('/boards/:boardId/users/:userId')
-  .post(validateBoardIdParams, validateUserIdParam, BoardsController.addUserToBoard); // post used as it is creating a relation on UserOnBoard table
+  .route('/boards/:boardId/users/add')
+  .post(validateBoardIdParams, BoardsController.addUserToBoard); // post used as it is creating a relation on UserOnBoard table
 
 // PATCH
 router.route('/boards/:boardId').put(validateBoardIdParams, BoardsController.editBoardTitle);

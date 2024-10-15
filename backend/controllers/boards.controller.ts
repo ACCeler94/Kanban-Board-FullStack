@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createBoardDTO from '../validators/boards/create-board.dto';
 import UpdateBoardTitleDTO from '../validators/boards/update-board-title.dto';
+import EmailSchema from '../validators/EmailSchema';
 
 const BoardsController = {
   // [TODO - delete this endpoint for production]
@@ -174,10 +175,18 @@ const BoardsController = {
 
   // Adding users to the board allowed only for the author of the board
   addUserToBoard: async (req: Request, res: Response, next: NextFunction) => {
-    const { boardId, userId } = req.params;
+    const { boardId } = req.params;
     const requestAuthorId = req.session.userId;
+    let email;
+    let userToAdd;
 
     if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
+
+    try {
+      ({ email } = EmailSchema.parse(req.body));
+    } catch (error) {
+      return res.status(400).json({ error: 'Invalid email data.' });
+    }
 
     try {
       const board = await prisma.board.findUnique({
@@ -194,10 +203,10 @@ const BoardsController = {
           .status(403)
           .json({ error: 'Adding users only allowed by the creator of the board.' });
 
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
+      userToAdd = await prisma.user.findUnique({
+        where: { email },
       });
-      if (!user) return res.status(404).json({ error: 'User not found...' });
+      if (!userToAdd) return res.status(404).json({ error: 'User not found...' });
     } catch (error) {
       return next(error);
     }
@@ -206,7 +215,7 @@ const BoardsController = {
       const existingUserOnBoard = await prisma.userOnBoard.findUnique({
         where: {
           userId_boardId: {
-            userId,
+            userId: userToAdd.id,
             boardId,
           },
         },
@@ -218,7 +227,7 @@ const BoardsController = {
 
       await prisma.userOnBoard.create({
         data: {
-          userId,
+          userId: userToAdd.id,
           boardId,
         },
       });
