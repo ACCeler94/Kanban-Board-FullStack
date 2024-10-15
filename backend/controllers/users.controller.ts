@@ -147,25 +147,18 @@ const UsersController = {
   },
 
   findByEmail: async (req: Request, res: Response, next: NextFunction) => {
-    let searchQuery;
-
-    if (!req.query || !req.query.email)
-      return res.status(400).json({ error: 'Invalid search query.' });
+    let email;
 
     try {
-      searchQuery = EmailSchema.parse(req.query);
+      ({ email } = EmailSchema.parse(req.body));
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid search query.' });
+      return res.status(400).json({ error: 'Invalid email data.' });
     }
 
-    const emailQuery = searchQuery.email;
-
     try {
-      const users = await prisma.user.findMany({
+      const user = await prisma.user.findUnique({
         where: {
-          email: {
-            contains: emailQuery,
-          },
+          email,
         },
         select: {
           name: true,
@@ -173,11 +166,11 @@ const UsersController = {
         },
       });
 
-      if (users.length === 0) {
-        return res.status(404).json({ error: 'No users found...' });
+      if (!user) {
+        return res.status(404).json({ error: 'User not found...' });
       }
 
-      return res.status(200).json(users);
+      return res.status(200).json(user);
     } catch (error) {
       return next(error);
     }
