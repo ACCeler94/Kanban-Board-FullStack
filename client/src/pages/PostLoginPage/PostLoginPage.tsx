@@ -12,12 +12,16 @@ const PostLoginPage = () => {
     const handlePostLogin = async () => {
       try {
         const token = await getAccessTokenSilently();
-        await axios.post(`${authUrl}/post-login`, {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        });
+        await axios.post(
+          `${authUrl}/post-login`,
+          {},
+          {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
+        );
 
         navigate('/boards');
       } catch (error) {
