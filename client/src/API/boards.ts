@@ -4,6 +4,7 @@ import axios from 'axios';
 import { validate as uuidValidate } from 'uuid';
 import { BoardQuery, BoardType, NewBoardData, UserBoardData } from '../types/types';
 import boardTitleValidator from '../validators/boards/boardTitleValidator';
+import userEmailValidator from '../validators/users/userEmailValidator';
 import { apiUrl } from './config';
 
 // Actions
@@ -104,6 +105,35 @@ const deleteBoardById = async (boardId: string, token: string) => {
     if (axios.isAxiosError(error)) {
       throw new Error(
         `Failed to fetch task data: ${error.response?.status} ${error.response?.statusText}`
+      );
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+};
+
+const addUserToBoard = async (boardId: string, email: string, token: string) => {
+  if (!boardId) throw new Error('Invalid Task ID.');
+
+  try {
+    const { data } = await axios.post(
+      `${apiUrl}/boards/${boardId}`,
+      {
+        email,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `Failed to edit board: ${error.response?.status} ${error.response?.statusText}`
       );
     } else {
       throw new Error('An unexpected error occurred.');
@@ -241,4 +271,40 @@ const useDeleteBoard = (boardId: string) => {
   return { mutate, data, error, isPending, isSuccess };
 };
 
-export { useBoardById, useCreateBoard, useEditBoard, useDeleteBoard };
+const useAddUserToBoard = (boardId: string) => {
+  const { getAccessTokenSilently } = useAuth0();
+  const queryClient = useQueryClient();
+
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
+    mutationFn: async (email) => {
+      if (!boardId || !uuidValidate(boardId)) throw new Error('Invalid board ID.');
+
+      const validationResult = userEmailValidator.safeParse({ email });
+
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues.map((issue) => issue.message);
+        throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
+      }
+
+      let token;
+      try {
+        token = await getAccessTokenSilently();
+      } catch (error) {
+        throw new Error('Failed to authenticate. Please try logging in again.');
+      }
+
+      try {
+        return addUserToBoard(boardId, validationResult.data.email, token);
+      } catch (error) {
+        throw new Error('Failed to delete the board. Please try again.');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+    },
+  });
+
+  return { mutate, data, error, isPending, isSuccess };
+};
+
+export { useAddUserToBoard, useBoardById, useCreateBoard, useDeleteBoard, useEditBoard };
