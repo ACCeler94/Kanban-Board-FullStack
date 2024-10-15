@@ -12,7 +12,7 @@ const PostLoginPage = () => {
     const handlePostLogin = async () => {
       try {
         const token = await getAccessTokenSilently();
-        await axios.get(`${authUrl}/post-login`, {
+        await axios.post(`${authUrl}/post-login`, {
           headers: {
             authorization: `Bearer ${token}`,
           },
