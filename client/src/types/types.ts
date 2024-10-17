@@ -90,6 +90,8 @@ interface DiffTaskData {
 interface User {
   id: string;
   name: string;
+  picture: string;
+  email: string;
 }
 
 interface BoardQuery {
@@ -161,6 +163,7 @@ interface UserDataPreview {
   id: string;
   email: string;
   name: string;
+  picture: string;
 }
 
 interface UserBoardData {
@@ -168,6 +171,7 @@ interface UserBoardData {
   email: string;
   name: string;
   auth0Sub: string;
+  picture: string;
   assignedTasks: {
     taskId: string;
     userId: string;
@@ -180,6 +184,7 @@ interface UserData {
   email: string;
   name: string;
   auth0Sub: string;
+  picture: string;
   assignedTasks: TaskType[];
   boards: BoardPreview[];
   authoredBoards: AuthoredBoardPreview;

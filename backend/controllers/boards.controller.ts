@@ -49,6 +49,8 @@ const BoardsController = {
                 select: {
                   id: true,
                   name: true,
+                  email: true,
+                  picture: true,
                 },
               },
             },

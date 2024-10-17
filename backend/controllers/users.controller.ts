@@ -26,6 +26,7 @@ const UsersController = {
           id: true,
           name: true,
           email: true,
+          picture: true,
         },
       });
 
@@ -163,6 +164,7 @@ const UsersController = {
         select: {
           name: true,
           email: true,
+          picture: true,
         },
       });
 
