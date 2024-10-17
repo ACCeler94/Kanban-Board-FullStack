@@ -69,6 +69,7 @@ model User {
   email          String        @unique
   name           String
   auth0Sub       String        @unique
+  picture        String?
   authoredBoards Board[]       @relation("BoardAuthor")
   boards         UserOnBoard[]
   authoredTasks  Task[]        @relation("TaskAuthor")
