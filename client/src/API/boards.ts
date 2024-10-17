@@ -153,7 +153,7 @@ const deleteUserFromBoard = async (
   boardId: string,
   userId: string,
   token: string
-): Promise<JsonResponseType> => {
+): Promise<string[]> => {
   try {
     const { data } = await axios.delete(`${apiUrl}/boards/${boardId}/users/${userId}`, {
       headers: {
@@ -366,8 +366,15 @@ const useDeleteUserFromBoard = (boardId: string) => {
         throw new Error('Failed to delete the user from the board. Please try again.');
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // Remove deleted board from cache
+    onSuccess: (taskIds) => {
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // Invalidate board the user was assigned to
+      if (taskIds.length !== 0) {
+        // Invalidate tasks the user was assigned to
+        queryClient.invalidateQueries({
+          queryKey: ['task'],
+          predicate: (query) => taskIds.includes(query.queryKey[1] as string),
+        });
+      }
     },
   });
 
