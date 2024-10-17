@@ -22,8 +22,23 @@ const AuthController = {
           where: { email: authUser.email },
           select: {
             id: true,
+            picture: true,
           },
         });
+      }
+
+      if (user) {
+        // update picture in the db if the auth0 picture differs from the db
+        if (user.picture !== authUser.picture) {
+          await prisma.user.update({
+            where: {
+              id: user.id,
+            },
+            data: {
+              picture: authUser.picture,
+            },
+          });
+        }
       }
 
       // if (!user)
@@ -39,6 +54,7 @@ const AuthController = {
             email: authUser.email!,
             name: authUser.name!,
             auth0Sub: authUser.sub,
+            picture: authUser.picture,
           },
         });
       }
