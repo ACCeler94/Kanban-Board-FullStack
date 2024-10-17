@@ -295,6 +295,9 @@ const BoardsController = {
           .status(403)
           .json({ error: "Removing users from the board is only allowed by it's author." });
 
+      if (board.authorId === userId)
+        return res.status(403).json({ error: "Board's author cannot be removed." });
+
       // Check if the user exists
       const user = await prisma.user.findUnique({
         where: { id: userId },
