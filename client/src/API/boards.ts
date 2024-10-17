@@ -141,7 +141,32 @@ const addUserToBoard = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(
-        `Failed to edit board: ${error.response?.status} ${error.response?.statusText}`
+        `Failed to add user to the board: ${error.response?.status} ${error.response?.statusText}`
+      );
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+};
+
+const deleteUserFromBoard = async (
+  boardId: string,
+  userId: string,
+  token: string
+): Promise<JsonResponseType> => {
+  try {
+    const { data } = await axios.delete(`${apiUrl}/boards/${boardId}/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `Failed to delete user from the board: ${error.response?.status} ${error.response?.statusText}`
       );
     } else {
       throw new Error('An unexpected error occurred.');
@@ -319,4 +344,41 @@ const useAddUserToBoard = (boardId: string) => {
   return { mutate, data, error, isPending, isSuccess };
 };
 
-export { useAddUserToBoard, useBoardById, useCreateBoard, useDeleteBoard, useEditBoard };
+const useDeleteUserFromBoard = (boardId: string) => {
+  const { getAccessTokenSilently } = useAuth0();
+  const queryClient = useQueryClient();
+
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
+    mutationFn: async (userId: string) => {
+      if (!boardId || !uuidValidate(boardId)) throw new Error('Invalid board ID.');
+      if (!userId || !uuidValidate(userId)) throw new Error('Invalid user ID.');
+
+      let token;
+      try {
+        token = await getAccessTokenSilently();
+      } catch (error) {
+        throw new Error('Failed to authenticate. Please try logging in again.');
+      }
+
+      try {
+        return deleteUserFromBoard(boardId, userId, token);
+      } catch (error) {
+        throw new Error('Failed to delete the user from the board. Please try again.');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // Remove deleted board from cache
+    },
+  });
+
+  return { mutate, data, error, isPending, isSuccess };
+};
+
+export {
+  useAddUserToBoard,
+  useBoardById,
+  useCreateBoard,
+  useDeleteBoard,
+  useDeleteUserFromBoard,
+  useEditBoard,
+};
