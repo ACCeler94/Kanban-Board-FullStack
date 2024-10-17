@@ -2,6 +2,7 @@
 import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 import session from 'express-session';
+import path from 'path';
 import { authRoutes } from './routes/auth.routes';
 import { boardsRoutes } from './routes/boards.routes';
 import { tasksRoutes } from './routes/tasks.routes';
@@ -50,6 +51,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, '/public')));
+
 // Endpoints
 app.use('/auth', authRoutes);
 app.use('/api', boardsRoutes);
@@ -57,10 +61,10 @@ app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
 
 // // Serve static files from the React app
-// app.use(express.static(path.join(__dirname, '/client/build')));
+// app.use(express.static(path.join(__dirname, '..', '/client/build')));
 
 // app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '/client/build/index.html'));
+//   res.sendFile(path.join(__dirname, '..', '/client/build/index.html'));
 // });
 
 app.use((req, res) => {
