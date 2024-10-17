@@ -314,17 +314,45 @@ const BoardsController = {
         return res.status(400).json({ error: 'User is not assigned to this board!' });
       }
 
-      // Delete the user from the board
-      await prisma.userOnBoard.delete({
+      const userAssignedTasks = await prisma.task.findMany({
         where: {
-          userId_boardId: {
-            userId,
-            boardId,
+          boardId: boardId,
+          assignedUsers: {
+            some: {
+              userId,
+            },
           },
+        },
+        select: {
+          id: true,
         },
       });
 
-      res.status(200).json({ message: 'User removed from the board!' });
+      let assignedTasksIds: string[] = [];
+
+      await prisma.$transaction(async (x) => {
+        // Delete UserOnTask records if there are tasks to delete
+        if (userAssignedTasks.length > 0) {
+          assignedTasksIds = userAssignedTasks.map((task) => task.id);
+          await x.userOnTask.deleteMany({
+            where: {
+              userId: userId,
+              taskId: { in: assignedTasksIds },
+            },
+          });
+        }
+
+        // Delete user from the board
+        await x.userOnBoard.delete({
+          where: {
+            userId_boardId: {
+              userId,
+              boardId,
+            },
+          },
+        });
+      });
+      res.status(200).json(assignedTasksIds);
     } catch (error) {
       next(error);
     }
