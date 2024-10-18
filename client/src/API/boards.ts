@@ -7,6 +7,7 @@ import {
   BoardType,
   JsonResponseType,
   NewBoardData,
+  User,
   UserBoardData,
 } from '../types/types';
 import boardTitleValidator from '../validators/boards/boardTitleValidator';
@@ -28,9 +29,8 @@ const fetchBoardById = async (
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to fetch board data: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to fetch board data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred');
     }
@@ -55,9 +55,8 @@ const createBoard = async (title: string, token: string): Promise<NewBoardData> 
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to create board: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to create board: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -86,9 +85,8 @@ const editBoard = async (
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to edit board: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to edit board: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -107,20 +105,15 @@ const deleteBoardById = async (boardId: string, token: string): Promise<JsonResp
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to fetch board data: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to fetch board data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
   }
 };
 
-const addUserToBoard = async (
-  boardId: string,
-  email: string,
-  token: string
-): Promise<JsonResponseType> => {
+const addUserToBoard = async (boardId: string, email: string, token: string): Promise<User> => {
   if (!boardId) throw new Error('Invalid Board ID.');
 
   try {
@@ -140,9 +133,8 @@ const addUserToBoard = async (
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to add user to the board: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to add user to the board: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -165,8 +157,9 @@ const deleteUserFromBoard = async (
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
       throw new Error(
-        `Failed to delete user from the board: ${error.response?.status} ${error.response?.statusText}`
+        `Failed to delete user from the board: ${error.response?.status} ${errorMessage}`
       );
     } else {
       throw new Error('An unexpected error occurred.');
@@ -313,7 +306,7 @@ const useAddUserToBoard = (boardId: string) => {
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending, isSuccess } = useMutation({
-    mutationFn: async (email) => {
+    mutationFn: async (email: string) => {
       if (!boardId || !uuidValidate(boardId)) throw new Error('Invalid board ID.');
 
       const validationResult = userEmailValidator.safeParse({ email });

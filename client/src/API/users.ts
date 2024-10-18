@@ -17,9 +17,8 @@ const fetchUserById = async (userId: string): Promise<UserDataPreview> => {
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to fetch user data: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to fetch user data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred');
     }
@@ -37,9 +36,8 @@ const fetchUserData = async (token: string): Promise<UserData | undefined> => {
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to fetch user data: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to fetch user data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred');
     }
@@ -57,9 +55,8 @@ const fetchUserBoardData = async (token: string): Promise<UserBoardData | undefi
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to fetch user data: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to fetch user data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred');
     }

@@ -21,9 +21,8 @@ const fetchTaskById = async (taskId: string, token: string): Promise<TaskType | 
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to fetch task data: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to fetch task data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -43,9 +42,8 @@ const deleteTaskById = async (taskId: string, token: string) => {
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to fetch task data: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to fetch task data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -73,9 +71,8 @@ const editTaskById = async (
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to update task data: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to update task data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -98,9 +95,8 @@ const addNewTask = async ({ taskData, subtaskData }: NewTaskData, token: string)
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(
-        `Failed to create task: ${error.response?.status} ${error.response?.statusText}`
-      );
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to create task: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
