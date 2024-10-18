@@ -234,7 +234,7 @@ const BoardsController = {
         },
       });
 
-      res.status(201).json({ message: 'User assigned to the board!' });
+      res.status(201).json(userToAdd);
     } catch (error) {
       next(error);
     }
