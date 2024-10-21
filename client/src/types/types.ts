@@ -104,10 +104,7 @@ interface BoardQuery {
     name: string;
   };
   users: {
-    user: {
-      id: string;
-      name: string;
-    };
+    user: User;
   }[];
   tasks: {
     id: string;
@@ -131,7 +128,9 @@ interface BoardType {
     id: string;
     name: string;
   };
-  users: User[];
+  users: {
+    user: User;
+  }[];
   tasks: TaskType[];
 }
 
@@ -205,6 +204,7 @@ export type {
   BoardPreview,
   BoardPreviewWithCreatedAt,
   NewBoardData,
+  User,
   UserData,
   UserBoardData,
   UserDataPreview,
