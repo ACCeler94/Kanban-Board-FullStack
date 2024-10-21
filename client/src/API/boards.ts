@@ -118,7 +118,7 @@ const addUserToBoard = async (boardId: string, email: string, token: string): Pr
 
   try {
     const { data } = await axios.post(
-      `${apiUrl}/boards/${boardId}`,
+      `${apiUrl}/boards/${boardId}/users/add`,
       {
         email,
       },
