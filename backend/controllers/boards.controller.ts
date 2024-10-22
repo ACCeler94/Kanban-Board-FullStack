@@ -44,6 +44,9 @@ const BoardsController = {
             },
           },
           users: {
+            orderBy: {
+              createdAt: 'asc',
+            },
             select: {
               user: {
                 select: {
