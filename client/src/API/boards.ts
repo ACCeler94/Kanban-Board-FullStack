@@ -2,7 +2,14 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { validate as uuidValidate } from 'uuid';
-import { BoardQuery, JsonResponseType, NewBoardData, User, UserBoardData } from '../types/types';
+import {
+  BoardQuery,
+  JsonResponseType,
+  NewBoardData,
+  User,
+  UserBoardData,
+  UserDataPreview,
+} from '../types/types';
 import boardTitleValidator from '../validators/boards/boardTitleValidator';
 import userEmailValidator from '../validators/users/userEmailValidator';
 import { apiUrl } from './config';
@@ -24,6 +31,28 @@ const fetchBoardById = async (
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
       throw new Error(`Failed to fetch board data: ${error.response?.status} ${errorMessage}`);
+    } else {
+      throw new Error('An unexpected error occurred');
+    }
+  }
+};
+
+const fetchBoardUsers = async (
+  id: string | undefined,
+  token: string
+): Promise<{ users: { user: UserDataPreview }[] } | undefined> => {
+  try {
+    const { data } = await axios.get(`${apiUrl}/boards/${id}/users`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to fetch users' data: ${error.response?.status} ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred');
     }
@@ -178,7 +207,28 @@ const useBoardById = (id: string | undefined) => {
     },
     enabled: !!id && uuidValidate(id) && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchBoardById
     staleTime: 60 * 1000, // 1 minute
-    refetchInterval: 2 * 60 * 1000, // 2 minutes
+  });
+
+  return { data, error, isPending, refetch };
+};
+
+const useBoardUsers = (id: string | undefined) => {
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+
+  const { data, error, isPending, refetch } = useQuery({
+    queryKey: ['board', id, 'users'],
+    queryFn: async () => {
+      if (!id || !uuidValidate(id)) throw new Error('Invalid board ID.');
+
+      try {
+        const token = await getAccessTokenSilently();
+        return fetchBoardUsers(id, token);
+      } catch (error) {
+        throw new Error('Failed to authenticate. Please try logging in again.');
+      }
+    },
+    enabled: !!id && uuidValidate(id) && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchBoardUsers
+    staleTime: 3 * 60 * 1000, // 3 minutes
   });
 
   return { data, error, isPending, refetch };
@@ -323,7 +373,7 @@ const useAddUserToBoard = (boardId: string) => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] });
+      queryClient.invalidateQueries({ queryKey: ['board', boardId, 'users'] });
     },
   });
 
@@ -353,7 +403,7 @@ const useDeleteUserFromBoard = (boardId: string) => {
       }
     },
     onSuccess: (taskIds) => {
-      queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // Invalidate board the user was assigned to
+      queryClient.invalidateQueries({ queryKey: ['board', boardId, 'users'] });
       if (taskIds.length !== 0) {
         // Invalidate tasks the user was assigned to
         queryClient.invalidateQueries({
@@ -370,6 +420,7 @@ const useDeleteUserFromBoard = (boardId: string) => {
 export {
   useAddUserToBoard,
   useBoardById,
+  useBoardUsers,
   useCreateBoard,
   useDeleteBoard,
   useDeleteUserFromBoard,
