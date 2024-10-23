@@ -15,8 +15,10 @@ const DeleteBoardModal = () => {
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
-    navigate('/boards');
-  }, [navigate]);
+
+    if (isSuccess) navigate('/boards');
+    else navigate(`/boards/${id}`);
+  }, [id, isSuccess, navigate]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;

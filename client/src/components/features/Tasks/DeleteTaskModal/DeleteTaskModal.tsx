@@ -15,8 +15,10 @@ const DeleteTaskModal = () => {
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
-    navigate(`/boards/${boardId}/`);
-  }, [boardId, navigate]);
+
+    if (isSuccess) navigate(`/boards/${boardId}/`);
+    else navigate(`/boards/${boardId}/tasks/${taskId}`);
+  }, [boardId, isSuccess, navigate, taskId]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
