@@ -10,6 +10,7 @@ import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
 import EditBoardModal from './components/features/Boards/EditBoardModal/EditBoardModal';
 import DeleteTaskModal from './components/features/Tasks/DeleteTaskModal/DeleteTaskModal';
 import DeleteBoardModal from './components/features/Boards/DeleteBoardModal/DeleteBoardModal';
+import BoardUsersModal from './components/features/Boards/BoardUsersModal/BoardUsersModal';
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
             <Route path='tasks/:taskId' element={<TaskModal />} />
             <Route path='tasks/:taskId/edit' element={<EditTaskModal />} />
             <Route path='tasks/:taskId/delete' element={<DeleteTaskModal />} />
+            <Route path='users' element={<BoardUsersModal />} />
           </Route>
         </Route>
         <Route path='/post-login' element={<PostLoginPage />} />
