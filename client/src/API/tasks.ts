@@ -3,7 +3,7 @@ import { apiUrl } from './config';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { validate as uuidValidate } from 'uuid';
-import { BoardType, DiffTaskData, EditTaskData, NewTaskData, TaskType } from '../types/types';
+import { BoardQuery, DiffTaskData, EditTaskData, NewTaskData, TaskType } from '../types/types';
 import editTaskValidator from '../validators/tasks/editTaskValidator';
 import addTaskValidator from '../validators/tasks/addTaskValidator';
 
@@ -228,11 +228,31 @@ const useCreateTask = () => {
       }
     },
     onSuccess: (createdTask: TaskType) => {
-      queryClient.setQueryData(['board', createdTask.boardId], (oldData: BoardType) => {
-        if (!oldData) return; // If there is no old board data return
+      queryClient.setQueryData(
+        ['board', createdTask.boardId],
+        (oldData: BoardQuery | undefined) => {
+          if (!oldData) return; // If there is no old board data, return
 
-        return { ...oldData, tasks: [...oldData.tasks, createdTask] };
-      });
+          // Map the createdTask subtasks to match the BoardQuery subtasks structure
+          const mappedSubtasks = createdTask.subtasks.map((subtask) => ({
+            finished: subtask.finished,
+          }));
+
+          // Prepare the new task to match the BoardQuery's task structure
+          const newTask = {
+            id: createdTask.id,
+            title: createdTask.title,
+            status: createdTask.status,
+            assignedUsers: [],
+            subtasks: mappedSubtasks,
+          };
+
+          return {
+            ...oldData,
+            tasks: [...oldData.tasks, newTask],
+          };
+        }
+      );
     },
   });
   return { mutate, data, isPending, error, isSuccess };

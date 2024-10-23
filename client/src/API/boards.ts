@@ -2,14 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { validate as uuidValidate } from 'uuid';
-import {
-  BoardQuery,
-  BoardType,
-  JsonResponseType,
-  NewBoardData,
-  User,
-  UserBoardData,
-} from '../types/types';
+import { BoardQuery, JsonResponseType, NewBoardData, User, UserBoardData } from '../types/types';
 import boardTitleValidator from '../validators/boards/boardTitleValidator';
 import userEmailValidator from '../validators/users/userEmailValidator';
 import { apiUrl } from './config';
@@ -257,7 +250,7 @@ const useEditBoard = (id: string) => {
       }
     },
     onSuccess: (_data, variables) => {
-      queryClient.setQueryData(['board', id], (oldData: BoardType) => {
+      queryClient.setQueryData(['board', id], (oldData: BoardQuery) => {
         if (!oldData) return;
 
         return {

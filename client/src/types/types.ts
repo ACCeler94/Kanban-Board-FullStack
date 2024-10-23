@@ -103,17 +103,14 @@ interface BoardQuery {
     id: string;
     name: string;
   };
-  users: {
-    user: User;
-  }[];
   tasks: {
     id: string;
     title: string;
-    boardId: string;
     status: TaskStatus;
+    assignedUsers: {
+      userId: string;
+    }[];
     subtasks: {
-      id: string;
-      desc: string;
       finished: boolean;
     }[];
   }[];
