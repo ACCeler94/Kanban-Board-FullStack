@@ -60,7 +60,7 @@ const UsersList = ({ users, isEditable, addUser, deleteUser }: UsersListProps) =
       })}
 
       {isEditable && (
-        <ListItem>
+        <ListItem className={styles.addUserInputWrapper}>
           <TextField
             id='add-input'
             aria-label='Add User to Board'

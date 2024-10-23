@@ -14,7 +14,7 @@
   border-top: 1px solid rgb(215, 215, 215);
 }
 
-.usersList li:last-child {
+.addUserInputWrapper {
   margin-top: 30px;
   margin-bottom: 10px;
   padding-left: 0;
