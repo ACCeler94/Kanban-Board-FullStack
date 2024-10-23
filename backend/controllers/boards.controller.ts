@@ -33,6 +33,7 @@ const BoardsController = {
           },
         },
       });
+      if (!assignedUser) return res.status(403).json({ error: 'Access only for assigned users!' });
 
       const board = await prisma.board.findUnique({
         where: { id: boardId },
@@ -43,6 +44,64 @@ const BoardsController = {
               name: true,
             },
           },
+          tasks: {
+            orderBy: {
+              createdAt: 'asc',
+            },
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              assignedUsers: {
+                orderBy: {
+                  createdAt: 'asc',
+                },
+                select: {
+                  userId: true,
+                },
+              },
+              subtasks: {
+                orderBy: {
+                  createdAt: 'asc',
+                },
+                select: {
+                  finished: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!board) return res.status(404).json({ error: 'Board not found...' });
+
+      res.status(200).json(board);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getBoardUsers: async (req: Request, res: Response, next: NextFunction) => {
+    const { boardId } = req.params;
+    const requestAuthorId = req.session.userId;
+
+    if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
+
+    try {
+      // Check if user who made the request is assigned to the board
+      const assignedUser = await prisma.userOnBoard.findUnique({
+        where: {
+          userId_boardId: {
+            userId: requestAuthorId,
+            boardId,
+          },
+        },
+      });
+      if (!assignedUser) return res.status(403).json({ error: 'Access only for assigned users!' });
+
+      const board = await prisma.board.findUnique({
+        where: { id: boardId },
+        include: {
           users: {
             orderBy: {
               createdAt: 'asc',
@@ -58,32 +117,10 @@ const BoardsController = {
               },
             },
           },
-          tasks: {
-            orderBy: {
-              createdAt: 'asc',
-            },
-            select: {
-              id: true,
-              title: true,
-              boardId: true,
-              status: true,
-              subtasks: {
-                orderBy: {
-                  createdAt: 'asc',
-                },
-                select: {
-                  id: true,
-                  desc: true,
-                  finished: true,
-                },
-              },
-            },
-          },
         },
       });
 
       if (!board) return res.status(404).json({ error: 'Board not found...' });
-      if (!assignedUser) return res.status(403).json({ error: 'Access only for assigned users!' });
 
       res.status(200).json(board);
     } catch (error) {
