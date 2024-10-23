@@ -37,22 +37,10 @@ const ConfirmDeletionModalContent = ({
           <span className={deletionModalStyles.underline}> This action cannot be reversed.</span>
         </p>
         <div className={deletionModalStyles.confirmationButtonsWrapper}>
-          <Button
-            color='error'
-            variant='contained'
-            className='button-small'
-            sx={{ margin: '10px 0', marginBottom: '25px' }}
-            onClick={handleDelete}
-          >
+          <Button color='error' variant='contained' className='button-small' onClick={handleDelete}>
             Delete
           </Button>
-          <Button
-            color='info'
-            variant='contained'
-            className='button-small'
-            sx={{ margin: '10px 0', marginBottom: '25px' }}
-            onClick={handleClose}
-          >
+          <Button color='info' variant='contained' className='button-small' onClick={handleClose}>
             Cancel
           </Button>
         </div>
