@@ -16,6 +16,8 @@ router.get('/boards', BoardsController.getAll);
 
 router.route('/boards/:boardId').get(validateBoardIdParams, BoardsController.getById);
 
+router.route('/boards/:boardId/users').get(validateBoardIdParams, BoardsController.getBoardUsers);
+
 // POST
 router.route('/boards').post(BoardsController.createBoard);
 
