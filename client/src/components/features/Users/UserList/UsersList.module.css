@@ -1,0 +1,53 @@
+.userCard {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.usersList .usersListItem {
+  border-bottom: 1px solid rgb(215, 215, 215);
+  padding: 16px;
+  padding-right: 0px;
+}
+
+.usersList .usersListItem:first-child {
+  border-top: 1px solid rgb(215, 215, 215);
+}
+
+.usersList li:last-child {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  padding-left: 0;
+  padding-right: 0px;
+}
+
+.avatar {
+  height: 48px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+
+.userData p {
+  margin: 0;
+  line-height: normal;
+}
+
+.userName {
+  font-weight: 600;
+}
+
+.userEmail {
+  color: var(--medium-grey);
+  font-size: 0.9em;
+}
+
+.addButton {
+  color: var(--main-purple);
+  font-size: 2em;
+}
+
+.deleteButton {
+  color: var(--red);
+  font-size: 2em;
+}
