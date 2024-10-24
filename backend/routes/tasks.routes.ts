@@ -21,7 +21,7 @@ router
 router.route('/tasks').post(TasksController.createTask);
 
 router
-  .route('/tasks/:taskId/users/:userId')
+  .route('/tasks/:taskId/users/add')
   .post(
     validateTaskIdParam,
     validateUserIdParam,

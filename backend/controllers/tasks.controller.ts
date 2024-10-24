@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
+import EmailSchema from '../validators/EmailSchema';
 import createTaskDTO from '../validators/tasks/create-task.dto';
 import { editTaskDTO } from '../validators/tasks/edit-task.dto';
 
@@ -123,7 +124,14 @@ const TasksController = {
   },
 
   addUserToTask: async (req: Request, res: Response, next: NextFunction) => {
-    const { taskId, userId } = req.params;
+    const { taskId } = req.params;
+    let email;
+
+    try {
+      ({ email } = EmailSchema.parse(req.body));
+    } catch (error) {
+      return res.status(400).json({ error: 'Invalid email data.' });
+    }
 
     try {
       const task = await prisma.task.findUnique({
@@ -138,35 +146,35 @@ const TasksController = {
       });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
-      const user = await prisma.user.findUnique({ where: { id: userId } });
-      if (!user) return res.status(404).json({ error: 'User not found...' });
+      const userToAdd = await prisma.user.findUnique({
+        where: { email },
+      });
+      if (!userToAdd) return res.status(404).json({ error: 'User not found...' });
 
       // Check if the user being added is assigned to the board
       const isUserAssignedToBoard = task.board.users.some(
-        (userOnBoard) => userOnBoard.userId === userId
+        (userOnBoard) => userOnBoard.userId === userToAdd.id
       );
       if (!isUserAssignedToBoard) {
-        return res
-          .status(403)
-          .json({ error: 'Access forbidden! User is not assigned to the board.' });
+        return res.status(403).json({ error: 'User is not assigned to the board.' });
       }
 
       // Check if the user is already assigned to the task
       const existingUserOnTask = await prisma.userOnTask.findUnique({
         where: {
           userId_taskId: {
-            userId,
+            userId: userToAdd.id,
             taskId,
           },
         },
       });
 
       if (existingUserOnTask) {
-        return res.status(409).json({ error: 'User is already added to the task!' });
+        return res.status(409).json({ error: 'User is already added to this task!' });
       }
 
       // Assign the user to the task
-      await prisma.userOnTask.create({ data: { userId, taskId } });
+      await prisma.userOnTask.create({ data: { userId: userToAdd.id, taskId } });
       res.status(201).json({ message: 'User assigned to the task!' });
     } catch (error) {
       next(error);
