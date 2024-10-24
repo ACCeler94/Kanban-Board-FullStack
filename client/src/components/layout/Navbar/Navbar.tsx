@@ -50,12 +50,12 @@ const Navbar = () => {
           <div className={styles.utilityBar}>
             <h2>{activeBoard?.title || 'Select a board...'}</h2>
             <div className={styles.buttonsWrapper}>
-              {!isAuthor || !id ? null : <BoardMenu />}
+              {!!boardError || !id ? null : <BoardMenu isAuthor={isAuthor} />}
               <Button
                 color='primary'
                 variant='contained'
                 className='button-small'
-                disabled={!isAuthor || !id}
+                disabled={!id || !!boardError}
                 component={Link}
                 to={`${id}/tasks/add`}
               >
