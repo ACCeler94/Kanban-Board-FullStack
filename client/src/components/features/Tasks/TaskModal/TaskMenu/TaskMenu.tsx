@@ -2,6 +2,7 @@ import { Divider } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import * as React from 'react';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { HiDotsVertical } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import styles from './TaskMenu.module.css';
@@ -36,6 +37,7 @@ const TaskMenu = () => {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        className={styles.menuList}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'right',
@@ -45,11 +47,17 @@ const TaskMenu = () => {
           horizontal: 'right',
         }}
       >
-        <MenuItem component={Link} to='edit' onClick={handleClose}>
+        <MenuItem component={Link} to='edit' onClick={handleClose} className={styles.menuLink}>
+          <FaEdit />
           Edit
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
-        <MenuItem component={Link} to='delete' sx={{ color: 'var(--red)', fontWeight: '700' }}>
+        <MenuItem
+          component={Link}
+          to='delete'
+          className={`${styles.menuLink} ${styles.deleteLink}`}
+        >
+          <FaTrash />
           Delete
         </MenuItem>
       </Menu>

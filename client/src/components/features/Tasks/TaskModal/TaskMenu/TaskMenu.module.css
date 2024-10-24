@@ -1,3 +1,17 @@
 .menuButton {
   margin-right: 15px;
 }
+.menuList .menuLink {
+  min-width: 150px;
+  color: var(--medium-grey);
+  font-weight: 600;
+}
+
+.menuLink svg {
+  margin-right: 10px;
+}
+
+.menuLink.deleteLink {
+  color: var(--red);
+  font-weight: 700;
+}
