@@ -2,11 +2,16 @@ import Divider from '@mui/material/Divider';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import * as React from 'react';
+import { FaEdit, FaTrash, FaUserAlt } from 'react-icons/fa';
 import { HiDotsVertical } from 'react-icons/hi';
 import { Link, useParams } from 'react-router-dom';
 import styles from './BoardMenu.module.css';
 
-const BoardMenu = () => {
+interface BoardMenuProps {
+  isAuthor: boolean;
+}
+
+const BoardMenu = ({ isAuthor }: BoardMenuProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { id } = useParams();
   const open = Boolean(anchorEl);
@@ -39,6 +44,7 @@ const BoardMenu = () => {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        className={styles.menuList}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'right',
@@ -52,28 +58,35 @@ const BoardMenu = () => {
           component={Link}
           to={`/boards/${id}/users`}
           onClick={handleClose}
-          sx={{ minWidth: '150px' }}
+          className={styles.menuLink}
         >
+          <FaUserAlt />
           Users
         </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        <MenuItem
-          component={Link}
-          to={`/boards/${id}/edit`}
-          onClick={handleClose}
-          sx={{ minWidth: '150px' }}
-        >
-          Edit
-        </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        <MenuItem
-          component={Link}
-          to={`/boards/${id}/delete`}
-          onClick={handleClose}
-          sx={{ color: 'var(--red)', fontWeight: '700', minWidth: '150px' }}
-        >
-          Delete
-        </MenuItem>
+        {isAuthor ? (
+          <div>
+            <Divider sx={{ my: 0.5 }} />
+            <MenuItem
+              component={Link}
+              to={`/boards/${id}/edit`}
+              onClick={handleClose}
+              className={styles.menuLink}
+            >
+              <FaEdit />
+              Edit
+            </MenuItem>
+            <Divider sx={{ my: 0.5 }} />
+            <MenuItem
+              component={Link}
+              to={`/boards/${id}/delete`}
+              onClick={handleClose}
+              className={`${styles.menuLink} ${styles.deleteLink}`}
+            >
+              <FaTrash />
+              Delete
+            </MenuItem>
+          </div>
+        ) : null}
       </Menu>
     </div>
   );

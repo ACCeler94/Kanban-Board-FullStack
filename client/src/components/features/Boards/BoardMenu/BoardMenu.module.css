@@ -5,3 +5,18 @@
 .menuWrapper button svg {
   font-size: 1.75em;
 }
+
+.menuList .menuLink {
+  min-width: 200px;
+  color: var(--medium-grey);
+  font-weight: 600;
+}
+
+.menuLink svg {
+  margin-right: 10px;
+}
+
+.menuLink.deleteLink {
+  color: var(--red);
+  font-weight: 700;
+}
