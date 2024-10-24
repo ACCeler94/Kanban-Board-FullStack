@@ -2,8 +2,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
-import { IoAddCircle } from 'react-icons/io5';
-import { MdOutlineDeleteForever } from 'react-icons/md';
+import { FaPlusCircle, FaTrash } from 'react-icons/fa';
 import { User } from '../../../../types/types';
 import styles from './UsersList.module.css';
 
@@ -52,7 +51,7 @@ const UsersList = ({ users, isEditable, addUser, deleteUser }: UsersListProps) =
                 aria-label='Delete User from Board'
                 onClick={() => deleteUser(user.id)}
               >
-                <MdOutlineDeleteForever />
+                <FaTrash />
               </button>
             )}
           </ListItem>
@@ -84,7 +83,7 @@ const UsersList = ({ users, isEditable, addUser, deleteUser }: UsersListProps) =
             aria-label='Add Subtask'
             onClick={handleAddUser}
           >
-            <IoAddCircle />
+            <FaPlusCircle />
           </button>
         </ListItem>
       )}

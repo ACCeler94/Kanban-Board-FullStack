@@ -1,7 +1,6 @@
 import { List, ListItem, TextField } from '@mui/material';
 import { useState } from 'react';
-import { IoAddCircle } from 'react-icons/io5';
-import { MdOutlineDeleteForever } from 'react-icons/md';
+import { FaPlusCircle, FaTrash } from 'react-icons/fa';
 import { v4 as uuid } from 'uuid';
 import useStore from '../../../../store/useStore';
 import { NewSubtaskData, Subtask } from '../../../../types/types';
@@ -52,30 +51,32 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
     <div className={styles.subtasksWrapper}>
       <span className={styles.inputsLabel}>Subtasks</span>
       <List sx={{ padding: 0 }}>
-        {subtasks.map((subtask) => (
-          <ListItem className={styles.inputWrapper} sx={{ padding: 0 }} key={subtask.id}>
-            <TextField
-              aria-label={`Edit Subtask ${subtask.id}`}
-              value={subtask.desc}
-              onChange={handleSubtaskChange(subtask.id)}
-              sx={{ marginRight: '10px' }}
-              fullWidth
-              required
-              inputProps={{ maxLength: 200 }}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                e.key === 'Enter' && e.preventDefault();
-              }}
-            />
-            <button
-              className={styles.deleteButton}
-              type='button'
-              aria-label='Delete Subtask'
-              onClick={() => handleSubtaskDelete(subtask.id)}
-            >
-              <MdOutlineDeleteForever />
-            </button>
-          </ListItem>
-        ))}
+        {subtasks.map((subtask) => {
+          return (
+            <ListItem className={styles.inputWrapper} sx={{ padding: 0 }} key={subtask.id}>
+              <TextField
+                aria-label={`Edit Subtask ${subtask.id}`}
+                value={subtask.desc}
+                onChange={handleSubtaskChange(subtask.id)}
+                sx={{ marginRight: '10px' }}
+                fullWidth
+                required
+                inputProps={{ maxLength: 200 }}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  e.key === 'Enter' && e.preventDefault();
+                }}
+              />
+              <button
+                className={styles.deleteButton}
+                type='button'
+                aria-label='Delete Subtask'
+                onClick={() => handleSubtaskDelete(subtask.id)}
+              >
+                <FaTrash />
+              </button>
+            </ListItem>
+          );
+        })}
         <ListItem className={styles.inputWrapper} sx={{ padding: 0 }} key='new-subtask'>
           <TextField
             aria-label='New Subtask'
@@ -97,7 +98,7 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
             aria-label='Add Subtask'
             onClick={addSubtask}
           >
-            <IoAddCircle />
+            <FaPlusCircle />
           </button>
         </ListItem>
       </List>
