@@ -57,7 +57,12 @@ const BoardsController = {
                   createdAt: 'asc',
                 },
                 select: {
-                  userId: true,
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
                 },
               },
               subtasks: {

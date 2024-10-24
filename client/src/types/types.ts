@@ -28,11 +28,14 @@ interface TaskType {
 interface TaskTypePartial {
   id: string;
   title: string;
-  boardId: string;
   status: TaskStatus;
+  assignedUsers: {
+    user: {
+      name: string;
+      id: string;
+    };
+  }[];
   subtasks: {
-    id: string;
-    desc: string;
     finished: boolean;
   }[];
 }
@@ -108,7 +111,10 @@ interface BoardQuery {
     title: string;
     status: TaskStatus;
     assignedUsers: {
-      userId: string;
+      user: {
+        name: string;
+        id: string;
+      };
     }[];
     subtasks: {
       finished: boolean;
