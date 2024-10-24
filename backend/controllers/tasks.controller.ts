@@ -21,11 +21,15 @@ const TasksController = {
             },
           },
           assignedUsers: {
+            orderBy: {
+              createdAt: 'asc',
+            },
             select: {
               user: {
                 select: {
                   id: true,
                   name: true,
+                  email: true,
                 },
               },
             },
