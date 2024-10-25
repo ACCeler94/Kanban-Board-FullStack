@@ -30,6 +30,7 @@ const TasksController = {
                   id: true,
                   name: true,
                   email: true,
+                  picture: true,
                 },
               },
             },
