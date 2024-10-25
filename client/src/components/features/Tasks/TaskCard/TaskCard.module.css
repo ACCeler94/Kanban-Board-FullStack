@@ -13,14 +13,28 @@
   font-size: 1.4em;
   margin: 0;
   margin-bottom: 5px;
-
 }
 
-.taskCard p {
+.cardContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardContent .subtasksText {
   font-weight: 700;
   margin: 0;
   color: var(--grey);
   font-size: 1.1em;
+}
+
+.cardContent .usersText {
+  color: var(--grey);
+  margin: 0;
+  margin-top: 15px;
+}
+
+.cardContent .usersText span {
+  font-weight: 600;
 }
 
 .taskCard:hover {
