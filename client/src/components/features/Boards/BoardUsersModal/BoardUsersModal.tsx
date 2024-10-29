@@ -12,15 +12,18 @@ import { useUserBoardData } from '../../../../API/users';
 import modalStyles from '../../../../styles/modal.module.css';
 import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
 import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
-import UserList from '../../Users/UserList/UsersList';
+import UsersList from '../../Users/UserList/UsersList';
+import DeleteBoardUserModal from '../DeleteBoardUser/DeleteBoardUser';
 
 const BoardUsersModal = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
+  const [isNestedOpen, setIsNestedOpen] = useState(false);
   const [showAddError, setShowAddError] = useState(false); // separate error states for add and delete to allow both being visible at the same time
   const [showDeleteError, setShowDeleteError] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState('');
 
   const { data: boardData, isPending, error } = useBoardById(id!);
   const {
@@ -33,11 +36,7 @@ const BoardUsersModal = () => {
     isPending: isPendingUserData,
     error: userDataError,
   } = useUserBoardData(); // get current user to check if it is authorized to edit users - show or hide related buttons
-  const {
-    mutate: addUser,
-    isPending: isPendingAdd,
-    error: addError,
-  } = useAddUserToBoard(id!);
+  const { mutate: addUser, isPending: isPendingAdd, error: addError } = useAddUserToBoard(id!);
   const {
     mutate: deleteUser,
     isPending: isPendingDelete,
@@ -60,6 +59,19 @@ const BoardUsersModal = () => {
     navigate(`/boards/${id}`);
   };
 
+  // delete user and close modal with confirmation prompt
+  const handleDelete = () => {
+    deleteUser(userIdToDelete);
+    setIsNestedOpen(false);
+  };
+
+  // close nested modal with confirmation prompt
+  const handleCloseNested = () => {
+    setIsNestedOpen(false);
+    setUserIdToDelete('');
+  };
+
+  // show add error alert for 5 seconds
   useEffect(() => {
     if (addError && !isPendingAdd) setShowAddError(true);
     const timeout = setTimeout(() => {
@@ -69,6 +81,7 @@ const BoardUsersModal = () => {
     return () => clearTimeout(timeout);
   }, [addError, isPendingAdd]);
 
+  // show delete error alert for 5 seconds
   useEffect(() => {
     if (deleteError && !isPendingDelete) setShowDeleteError(true);
     const timeout = setTimeout(() => {
@@ -78,6 +91,7 @@ const BoardUsersModal = () => {
     return () => clearTimeout(timeout);
   }, [deleteError, isPendingDelete]);
 
+  // set isEditable state to show or hide buttons in UsersList
   useEffect(() => {
     if (boardData?.authorId === userBoardData?.id) setIsEditable(true);
     else setIsEditable(false);
@@ -181,11 +195,17 @@ const BoardUsersModal = () => {
           ) : (
             ''
           )}
-          <UserList
+          <UsersList
             users={flattenedUsersArr}
             addUser={addUser}
-            deleteUser={deleteUser}
+            setUserIdToDelete={setUserIdToDelete}
             isEditable={isEditable}
+            setIsNestedOpen={setIsNestedOpen}
+          />
+          <DeleteBoardUserModal
+            handleDelete={handleDelete}
+            handleClose={handleCloseNested}
+            isOpen={isNestedOpen}
           />
         </div>
       </Dialog>
