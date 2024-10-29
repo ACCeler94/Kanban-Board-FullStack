@@ -180,7 +180,7 @@ const TasksController = {
 
       // Assign the user to the task
       await prisma.userOnTask.create({ data: { userId: userToAdd.id, taskId } });
-      res.status(201).json({ message: 'User assigned to the task!' });
+      res.status(201).json(userToAdd);
     } catch (error) {
       next(error);
     }
