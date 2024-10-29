@@ -83,7 +83,7 @@ const UsersList = ({
             onChange={(e) => setUserEmail(e.target.value)}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
               if (e.key === 'Enter') {
-                e.preventDefault();
+                handleAddUser();
               }
             }}
           />
