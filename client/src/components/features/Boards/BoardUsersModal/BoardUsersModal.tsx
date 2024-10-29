@@ -12,7 +12,7 @@ import { useUserBoardData } from '../../../../API/users';
 import modalStyles from '../../../../styles/modal.module.css';
 import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
 import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
-import UsersList from '../../Users/UserList/UsersList';
+import UsersList from '../../Users/UsersList/UsersList';
 import DeleteBoardUserModal from '../DeleteBoardUser/DeleteBoardUser';
 
 const BoardUsersModal = () => {
