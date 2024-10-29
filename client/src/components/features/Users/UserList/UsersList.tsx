@@ -10,10 +10,17 @@ interface UsersListProps {
   users: User[];
   isEditable: boolean;
   addUser: (email: string) => void;
-  deleteUser: (userId: string) => void;
+  setIsNestedOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setUserIdToDelete: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const UsersList = ({ users, isEditable, addUser, deleteUser }: UsersListProps) => {
+const UsersList = ({
+  users,
+  isEditable,
+  addUser,
+  setIsNestedOpen,
+  setUserIdToDelete,
+}: UsersListProps) => {
   const [userEmail, setUserEmail] = useState('');
 
   const handleAddUser = () => {
@@ -48,8 +55,11 @@ const UsersList = ({ users, isEditable, addUser, deleteUser }: UsersListProps) =
               <button
                 className={styles.deleteButton}
                 type='button'
-                aria-label='Delete User from Board'
-                onClick={() => deleteUser(user.id)}
+                aria-label='Delete User'
+                onClick={() => {
+                  setIsNestedOpen(true);
+                  setUserIdToDelete(user.id);
+                }}
               >
                 <FaTrash />
               </button>
@@ -62,7 +72,7 @@ const UsersList = ({ users, isEditable, addUser, deleteUser }: UsersListProps) =
         <ListItem className={styles.addUserInputWrapper}>
           <TextField
             id='add-input'
-            aria-label='Add User to Board'
+            aria-label='Add User'
             fullWidth
             placeholder='Enter e-mail address...'
             sx={{ marginRight: '10px' }}
@@ -80,7 +90,7 @@ const UsersList = ({ users, isEditable, addUser, deleteUser }: UsersListProps) =
           <button
             className={styles.addButton}
             type='button'
-            aria-label='Add Subtask'
+            aria-label='Add User'
             onClick={handleAddUser}
           >
             <FaPlusCircle />
