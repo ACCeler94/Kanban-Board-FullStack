@@ -18,14 +18,16 @@ const App = () => {
       <Routes>
         <Route path='/boards' element={<BoardsPage />}>
           <Route path='add' element={<AddBoardModal />} />
+
           <Route path=':id' element={<Board />}>
             <Route path='edit' element={<EditBoardModal />} />
             <Route path='delete' element={<DeleteBoardModal />} />
+            <Route path='users' element={<BoardUsersModal />} />
+
             <Route path='tasks/add' element={<AddTaskModal />} />
             <Route path='tasks/:taskId' element={<TaskModal />} />
             <Route path='tasks/:taskId/edit' element={<EditTaskModal />} />
             <Route path='tasks/:taskId/delete' element={<DeleteTaskModal />} />
-            <Route path='users' element={<BoardUsersModal />} />
           </Route>
         </Route>
         <Route path='/post-login' element={<PostLoginPage />} />
