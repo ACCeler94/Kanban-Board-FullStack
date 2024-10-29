@@ -369,7 +369,7 @@ const useAddUserToBoard = (boardId: string) => {
       try {
         return addUserToBoard(boardId, validationResult.data.email, token);
       } catch (error) {
-        throw new Error('Failed to delete the board. Please try again.');
+        throw new Error('Failed to add user to the board. Please try again.');
       }
     },
     onSuccess: () => {
