@@ -13,7 +13,7 @@ import modalStyles from '../../../../styles/modal.module.css';
 import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
 import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
 import UsersList from '../../Users/UsersList/UsersList';
-import DeleteBoardUserModal from '../DeleteBoardUserModal/DeleteBoardUserModal';
+import DeleteBoardUserModal from './DeleteBoardUserModal/DeleteBoardUserModal';
 
 const BoardUsersModal = () => {
   const { id } = useParams();
