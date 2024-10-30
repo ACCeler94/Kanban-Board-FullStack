@@ -26,6 +26,8 @@ interface TaskType {
     user: {
       name: string;
       id: string;
+      picture: string;
+      email: string;
     };
   }[];
   subtasks: Subtask[];
