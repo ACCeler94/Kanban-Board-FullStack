@@ -22,12 +22,7 @@ router.route('/tasks').post(TasksController.createTask);
 
 router
   .route('/tasks/:taskId/users/add')
-  .post(
-    validateTaskIdParam,
-    validateUserIdParam,
-    checkBoardAssignment,
-    TasksController.addUserToTask
-  );
+  .post(validateTaskIdParam, checkBoardAssignment, TasksController.addUserToTask);
 
 // PATCH
 router
