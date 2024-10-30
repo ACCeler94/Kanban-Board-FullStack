@@ -161,7 +161,11 @@ const TasksController = {
         (userOnBoard) => userOnBoard.userId === userToAdd.id
       );
       if (!isUserAssignedToBoard) {
-        return res.status(403).json({ error: 'User is not assigned to the board.' });
+        return res
+          .status(403)
+          .json({
+            error: 'User is not assigned to the board. Please add the user to the board first.',
+          });
       }
 
       // Check if the user is already assigned to the task
