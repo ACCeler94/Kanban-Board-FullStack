@@ -34,6 +34,7 @@ const UsersList = ({
 
   return (
     <List sx={{ padding: 0, overflow: 'auto' }} className={styles.usersList}>
+      {users.length === 0 && <div>No assigned users...</div>}
       {users.map((user) => {
         return (
           <ListItem key={user.id} className={styles.usersListItem}>
