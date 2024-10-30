@@ -1,5 +1,5 @@
 import { Dialog } from '@mui/material';
-import ConfirmDeletionModalContent from '../../../common/ConfirmDeleteModalContent/ConfirmDeleteModalContent';
+import ConfirmDeletionModalContent from '../../../../common/ConfirmDeleteModalContent/ConfirmDeleteModalContent';
 
 interface DeleteBoardUserModalProps {
   isOpen: boolean;
