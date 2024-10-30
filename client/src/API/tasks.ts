@@ -370,15 +370,9 @@ const useDeleteUserFromTask = (boardId: string, taskId: string) => {
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending, isSuccess } = useMutation({
-    mutationFn: async (email: string) => {
-      if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
-
-      const validationResult = userEmailValidator.safeParse({ email });
-
-      if (!validationResult.success) {
-        const errorMessages = validationResult.error.issues.map((issue) => issue.message);
-        throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
-      }
+    mutationFn: async (userId: string) => {
+      if (!boardId || !uuidValidate(boardId)) throw new Error('Invalid board ID.');
+      if (!userId || !uuidValidate(userId)) throw new Error('Invalid user ID.');
 
       let token;
       try {
@@ -388,7 +382,7 @@ const useDeleteUserFromTask = (boardId: string, taskId: string) => {
       }
 
       try {
-        return deleteUserFromTask(taskId, validationResult.data.email, token);
+        return deleteUserFromTask(taskId, userId, token);
       } catch (error) {
         throw new Error('Failed to add user to the task. Please try again.');
       }
