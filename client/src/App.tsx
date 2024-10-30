@@ -2,15 +2,16 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Route, Routes } from 'react-router-dom';
 import AddBoardModal from './components/features/Boards/AddBoardModal/AddBoardModal';
 import Board from './components/features/Boards/Board/Board';
+import BoardUsersModal from './components/features/Boards/BoardUsersModal/BoardUsersModal';
+import DeleteBoardModal from './components/features/Boards/DeleteBoardModal/DeleteBoardModal';
+import EditBoardModal from './components/features/Boards/EditBoardModal/EditBoardModal';
 import AddTaskModal from './components/features/Tasks/AddTaskModal/AddTaskModal';
+import DeleteTaskModal from './components/features/Tasks/DeleteTaskModal/DeleteTaskModal';
 import EditTaskModal from './components/features/Tasks/EditTaskModal/EditTaskModal';
 import TaskModal from './components/features/Tasks/TaskModal/TaskModal';
+import TaskUsersModal from './components/features/Tasks/TaskUsersModal/TaskUsersModal';
 import BoardsPage from './pages/BoardsPage/BoardsPage';
 import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
-import EditBoardModal from './components/features/Boards/EditBoardModal/EditBoardModal';
-import DeleteTaskModal from './components/features/Tasks/DeleteTaskModal/DeleteTaskModal';
-import DeleteBoardModal from './components/features/Boards/DeleteBoardModal/DeleteBoardModal';
-import BoardUsersModal from './components/features/Boards/BoardUsersModal/BoardUsersModal';
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
             <Route path='tasks/:taskId' element={<TaskModal />} />
             <Route path='tasks/:taskId/edit' element={<EditTaskModal />} />
             <Route path='tasks/:taskId/delete' element={<DeleteTaskModal />} />
+            <Route path='tasks/:taskId/users' element={<TaskUsersModal />} />
           </Route>
         </Route>
         <Route path='/post-login' element={<PostLoginPage />} />
