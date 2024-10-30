@@ -3,9 +3,18 @@ import { apiUrl } from './config';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { validate as uuidValidate } from 'uuid';
-import { BoardQuery, DiffTaskData, EditTaskData, NewTaskData, TaskType } from '../types/types';
+import {
+  BoardQuery,
+  DiffTaskData,
+  EditTaskData,
+  JsonResponseType,
+  NewTaskData,
+  TaskType,
+  User,
+} from '../types/types';
 import editTaskValidator from '../validators/tasks/editTaskValidator';
 import addTaskValidator from '../validators/tasks/addTaskValidator';
+import userEmailValidator from '../validators/users/userEmailValidator';
 
 const fetchTaskById = async (taskId: string, token: string): Promise<TaskType | undefined> => {
   if (!taskId) throw new Error('Invalid Task ID.');
@@ -103,6 +112,60 @@ const addNewTask = async ({ taskData, subtaskData }: NewTaskData, token: string)
   }
 };
 
+const addUserToTask = async (taskId: string, email: string, token: string): Promise<User> => {
+  if (!taskId) throw new Error('Invalid Board ID.');
+
+  try {
+    const { data } = await axios.post(
+      `${apiUrl}/tasks/${taskId}/users/add`,
+      {
+        email,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(`Failed to add user to the task: ${error.response?.status} ${errorMessage}`);
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+};
+
+const deleteUserFromTask = async (
+  taskId: string,
+  userId: string,
+  token: string
+): Promise<JsonResponseType> => {
+  try {
+    const { data } = await axios.delete(`${apiUrl}/tasks/${taskId}/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
+      throw new Error(
+        `Failed to delete user from the task: ${error.response?.status} ${errorMessage}`
+      );
+    } else {
+      throw new Error('An unexpected error occurred.');
+    }
+  }
+};
+
 const useTaskData = (taskId: string) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
@@ -129,7 +192,7 @@ const useTaskData = (taskId: string) => {
   return { data, error, isPending, refetch };
 };
 
-const useDeleteTask = (taskId: string, boardId: string) => {
+const useDeleteTask = (boardId: string, taskId: string) => {
   const { getAccessTokenSilently } = useAuth0();
   const queryClient = useQueryClient();
 
@@ -258,4 +321,93 @@ const useCreateTask = () => {
   return { mutate, data, isPending, error, isSuccess };
 };
 
-export { useTaskData, useDeleteTask, useEditTask, useCreateTask };
+const useAddUserToTask = (boardId: string, taskId: string) => {
+  const { getAccessTokenSilently } = useAuth0();
+  const queryClient = useQueryClient();
+
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
+    mutationFn: async (email: string) => {
+      if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
+
+      const validationResult = userEmailValidator.safeParse({ email });
+
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues.map((issue) => issue.message);
+        throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
+      }
+
+      let token;
+      try {
+        token = await getAccessTokenSilently();
+      } catch (error) {
+        throw new Error('Failed to authenticate. Please try logging in again.');
+      }
+
+      try {
+        return addUserToTask(taskId, validationResult.data.email, token);
+      } catch (error) {
+        throw new Error('Failed to add user to the task. Please try again.');
+      }
+    },
+    onSuccess: (addedUser) => {
+      queryClient.setQueryData(['task', taskId], (oldData: TaskType) => {
+        if (!oldData) return;
+        return {
+          ...oldData,
+          assignedUsers: [...oldData.assignedUsers, addedUser],
+        };
+      });
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // invalidate board data in the background so the counter on the card is updated
+      // [TODO - rethink query invalidation]
+    },
+  });
+
+  return { mutate, data, error, isPending, isSuccess };
+};
+
+const useDeleteUserFromTask = (boardId: string, taskId: string) => {
+  const { getAccessTokenSilently } = useAuth0();
+  const queryClient = useQueryClient();
+
+  const { mutate, data, error, isPending, isSuccess } = useMutation({
+    mutationFn: async (email: string) => {
+      if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
+
+      const validationResult = userEmailValidator.safeParse({ email });
+
+      if (!validationResult.success) {
+        const errorMessages = validationResult.error.issues.map((issue) => issue.message);
+        throw new Error(`Invalid data: ${errorMessages.join(', ')}`);
+      }
+
+      let token;
+      try {
+        token = await getAccessTokenSilently();
+      } catch (error) {
+        throw new Error('Failed to authenticate. Please try logging in again.');
+      }
+
+      try {
+        return deleteUserFromTask(taskId, validationResult.data.email, token);
+      } catch (error) {
+        throw new Error('Failed to add user to the task. Please try again.');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+      queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // invalidate board data in the background so the counter on the card is updated
+      // [TODO - rethink query invalidation]
+    },
+  });
+
+  return { mutate, data, error, isPending, isSuccess };
+};
+
+export {
+  useTaskData,
+  useDeleteTask,
+  useEditTask,
+  useCreateTask,
+  useAddUserToTask,
+  useDeleteUserFromTask,
+};
