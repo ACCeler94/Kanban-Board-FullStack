@@ -1,13 +1,19 @@
 import { Dialog } from '@mui/material';
-import ConfirmDeletionModalContent from '../../../../common/ConfirmDeleteModalContent/ConfirmDeleteModalContent';
+import ConfirmDeletionModalContent from '../ConfirmDeleteModalContent/ConfirmDeleteModalContent';
 
-interface DeleteBoardUserModalProps {
+interface DeleteUserModalProps {
   isOpen: boolean;
   handleClose: () => void;
   handleDelete: () => void;
+  deletionSubject: string;
 }
 
-const DeleteBoardUserModal = ({ isOpen, handleClose, handleDelete }: DeleteBoardUserModalProps) => {
+const DeleteUserModal = ({
+  isOpen,
+  handleClose,
+  handleDelete,
+  deletionSubject,
+}: DeleteUserModalProps) => {
   return (
     <Dialog
       open={isOpen}
@@ -23,10 +29,10 @@ const DeleteBoardUserModal = ({ isOpen, handleClose, handleDelete }: DeleteBoard
       <ConfirmDeletionModalContent
         handleClose={handleClose}
         handleDelete={handleDelete}
-        deletionSubject='User and remove it from assigned tasks'
+        deletionSubject={deletionSubject}
       />
     </Dialog>
   );
 };
 
-export default DeleteBoardUserModal;
+export default DeleteUserModal;

@@ -10,10 +10,10 @@ import {
 } from '../../../../API/boards';
 import { useUserBoardData } from '../../../../API/users';
 import modalStyles from '../../../../styles/modal.module.css';
+import DeleteUserModal from '../../../common/DeleteUserModal/DeleteUserModal';
 import ErrorModalContent from '../../../common/ErrorModalContent/ErrorModalContent';
 import LoadingModalContent from '../../../common/LoadingModalContent/LoadingModalContent';
 import UsersList from '../../Users/UsersList/UsersList';
-import DeleteBoardUserModal from './DeleteBoardUserModal/DeleteBoardUserModal';
 
 const BoardUsersModal = () => {
   const { id } = useParams();
@@ -202,10 +202,11 @@ const BoardUsersModal = () => {
             isEditable={isEditable}
             setIsNestedOpen={setIsNestedOpen}
           />
-          <DeleteBoardUserModal
+          <DeleteUserModal
             handleDelete={handleDelete}
             handleClose={handleCloseNested}
             isOpen={isNestedOpen}
+            deletionSubject='User and remove it from assigned tasks'
           />
         </div>
       </Dialog>
