@@ -354,7 +354,7 @@ const useAddUserToTask = (boardId: string, taskId: string) => {
         if (!oldData) return;
         return {
           ...oldData,
-          assignedUsers: [...oldData.assignedUsers, addedUser],
+          assignedUsers: [...oldData.assignedUsers, { user: addedUser }],
         };
       });
       queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // invalidate board data in the background so the counter on the card is updated
