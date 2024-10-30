@@ -2,7 +2,7 @@ import { Divider } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import * as React from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaUserAlt } from 'react-icons/fa';
 import { HiDotsVertical } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import styles from './TaskMenu.module.css';
@@ -47,6 +47,10 @@ const TaskMenu = () => {
           horizontal: 'right',
         }}
       >
+        <MenuItem component={Link} to={'users'} onClick={handleClose} className={styles.menuLink}>
+          <FaUserAlt />
+          Users
+        </MenuItem>
         <MenuItem component={Link} to='edit' onClick={handleClose} className={styles.menuLink}>
           <FaEdit />
           Edit
