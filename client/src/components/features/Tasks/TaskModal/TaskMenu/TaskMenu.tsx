@@ -51,6 +51,7 @@ const TaskMenu = () => {
           <FaUserAlt />
           Users
         </MenuItem>
+        <Divider sx={{ my: 0.5 }} />
         <MenuItem component={Link} to='edit' onClick={handleClose} className={styles.menuLink}>
           <FaEdit />
           Edit
