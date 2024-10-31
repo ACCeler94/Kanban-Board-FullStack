@@ -37,7 +37,7 @@ const TaskUsersModal = () => {
 
   const flattenedUsersArr = useMemo(() => {
     if (taskData)
-      return taskData?.assignedUsers.map((userObj) => ({
+      return taskData.assignedUsers.map((userObj) => ({
         id: userObj.user.id,
         name: userObj.user.name,
         email: userObj.user.email,

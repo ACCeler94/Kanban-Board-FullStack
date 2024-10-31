@@ -44,14 +44,15 @@ const BoardUsersModal = () => {
   } = useDeleteUserFromBoard(id!);
 
   const flattenedUsersArr = useMemo(() => {
-    return (
-      boardUsers?.users.map((userObj) => ({
+    if (boardUsers)
+      return boardUsers.users.map((userObj) => ({
         id: userObj.user.id,
         name: userObj.user.name,
         email: userObj.user.email,
         picture: userObj.user.picture,
-      })) || []
-    ); // Default to empty array if boardData is not available
+      }));
+    // Default to empty array if boardData is not available
+    else return [];
   }, [boardUsers]);
 
   const handleClose = () => {
