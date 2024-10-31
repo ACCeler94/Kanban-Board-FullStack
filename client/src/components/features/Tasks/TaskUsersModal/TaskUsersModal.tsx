@@ -36,15 +36,16 @@ const TaskUsersModal = () => {
   } = useDeleteUserFromTask(id!, taskId!);
 
   const flattenedUsersArr = useMemo(() => {
-    return (
-      taskData?.assignedUsers.map((userObj) => ({
+    if (taskData)
+      return taskData?.assignedUsers.map((userObj) => ({
         id: userObj.user.id,
         name: userObj.user.name,
         email: userObj.user.email,
         picture: userObj.user.picture,
-      })) || []
-    ); // Default to empty array if taskData is not available
-  }, [taskData?.assignedUsers]);
+      }));
+    // Default to empty array if taskData is not available
+    else return [];
+  }, [taskData]);
 
   const handleClose = () => {
     setIsOpen(false);
