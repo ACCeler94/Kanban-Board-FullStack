@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TaskTypePartial } from '../../../../types/types';
 import styles from './TaskCard.module.css';
+import { RxDragHandleDots2 } from 'react-icons/rx';
+import { useDraggable } from '@dnd-kit/core';
 
 interface TaskCardProps {
   taskData: TaskTypePartial;
@@ -9,6 +11,10 @@ interface TaskCardProps {
 
 const TaskCard = ({ taskData }: TaskCardProps) => {
   const [finishedSubtasksCount, setFinishedSubtasksCount] = useState(0);
+
+  const { listeners } = useDraggable({
+    id: taskData.id,
+  });
 
   const determineUsersText = () => {
     if (taskData.assignedUsers.length === 0) return 'No assigned users...';
@@ -32,8 +38,8 @@ const TaskCard = ({ taskData }: TaskCardProps) => {
   }, [taskData.subtasks]);
 
   return (
-    <Link to={`tasks/${taskData.id}`}>
-      <div className={styles.taskCard}>
+    <div className={styles.taskCard}>
+      <Link to={`tasks/${taskData.id}`}>
         <h3>{taskData.title}</h3>
         <div className={styles.cardContent}>
           <p className={styles.subtasksText}>
@@ -45,8 +51,11 @@ const TaskCard = ({ taskData }: TaskCardProps) => {
             Users: <span>{determineUsersText()}</span>
           </p>
         </div>
+      </Link>
+      <div className={styles.dragHandle} {...listeners} tabIndex={0}>
+        <RxDragHandleDots2 />
       </div>
-    </Link>
+    </div>
   );
 };
 
