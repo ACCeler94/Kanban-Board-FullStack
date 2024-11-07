@@ -18,11 +18,7 @@ const TaskModal = () => {
   const [isModified, setIsModified] = useState(false);
   const [subtaskData, setSubtaskData] = useState<Subtask[] | undefined>(undefined);
   const { data: taskData, error: taskFetchingError, isPending, refetch } = useTaskData(taskId!);
-  const {
-    error: editError,
-    isPending: isEditPending,
-    mutate: saveEditedTask,
-  } = useEditTask(taskId!); // TaskId is always present, if not this component will not render
+  const { error: editError, isPending: isEditPending, mutate: saveEditedTask } = useEditTask(); // TaskId is always present, if not this component will not render
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -32,7 +28,7 @@ const TaskModal = () => {
 
   const handleSaveChanges = () => {
     if (isModified && subtaskData)
-      saveEditedTask({ editData: { subtaskData }, subtasksToRemove: [] }); // TaskModal allows only changes to subtaskData status so subtasksToRemove will always be empty
+      saveEditedTask({ taskId: taskId!, editData: { subtaskData }, subtasksToRemove: [] }); // TaskModal allows only changes to subtaskData status so subtasksToRemove will always be empty
   };
 
   if (isPending || isEditPending)

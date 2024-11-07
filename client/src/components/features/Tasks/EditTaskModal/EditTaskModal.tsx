@@ -30,7 +30,7 @@ const EditTaskModal = () => {
     isPending: isEditPending,
     mutate,
     isSuccess: isEditSuccess,
-  } = useEditTask(taskId!); // TaskId required for the component to mount
+  } = useEditTask(); // TaskId required for the component to mount
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -51,7 +51,7 @@ const EditTaskModal = () => {
 
   const submitHandler = (formData: EditTaskData) => {
     const optimizedData = removeUnchangedData(formData, taskData!); // TaskData is present or the error/pending will be rendered
-    mutate({ editData: optimizedData, subtasksToRemove });
+    mutate({ taskId: taskId!, editData: optimizedData, subtasksToRemove });
   };
 
   if (editError || taskDataError) {

@@ -222,15 +222,17 @@ const useDeleteTask = (boardId: string, taskId: string) => {
   return { mutate, data, error, isPending, isSuccess };
 };
 
-const useEditTask = (taskId: string) => {
+const useEditTask = () => {
   const { getAccessTokenSilently } = useAuth0();
   const queryClient = useQueryClient();
 
   const { mutate, data, error, isPending, isSuccess } = useMutation({
     mutationFn: async ({
+      taskId,
       editData,
       subtasksToRemove,
     }: {
+      taskId: string;
       editData: DiffTaskData | EditTaskData;
       subtasksToRemove: string[] | [];
     }) => {
@@ -256,7 +258,7 @@ const useEditTask = (taskId: string) => {
       }
     },
     onSuccess: (updatedTask: TaskType) => {
-      queryClient.setQueryData(['task', taskId], updatedTask);
+      queryClient.setQueryData(['task', updatedTask.id], updatedTask);
       queryClient.invalidateQueries({ queryKey: ['board', updatedTask.boardId] }); // Board invalidation done to properly update subtask counter in the TaskCard
     },
   });
