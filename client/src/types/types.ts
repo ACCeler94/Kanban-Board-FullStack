@@ -56,9 +56,9 @@ interface NewSubtaskData {
 
 interface EditTaskData {
   taskData?: {
-    title: string;
-    desc: string;
-    status: TaskStatus;
+    title?: string;
+    desc?: string;
+    status?: TaskStatus;
   };
   subtaskData?: {
     id: string;
