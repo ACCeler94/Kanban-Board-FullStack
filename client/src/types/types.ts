@@ -120,6 +120,7 @@ interface BoardQuery {
     id: string;
     title: string;
     status: TaskStatus;
+    order: number;
     assignedUsers: {
       user: {
         name: string;
