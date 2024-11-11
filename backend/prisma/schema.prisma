@@ -46,6 +46,7 @@ model Task {
   updatedAt     DateTime     @updatedAt
   title         String       @default("Untitled") @db.VarChar(100)
   desc          String?
+  order         Int
   board         Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId       String
   author        User         @relation("TaskAuthor", fields: [authorId], references: [id])
@@ -54,7 +55,7 @@ model Task {
   status        TaskStatus   @default(TO_DO)
   subtasks      Subtask[]
 
-  @@index([createdAt])
+  @@index([order])
 }
 
 model UserOnTask {
