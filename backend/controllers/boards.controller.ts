@@ -46,7 +46,7 @@ const BoardsController = {
           },
           tasks: {
             orderBy: {
-              createdAt: 'asc',
+              order: 'asc',
             },
             select: {
               id: true,
