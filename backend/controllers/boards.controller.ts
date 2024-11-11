@@ -52,6 +52,7 @@ const BoardsController = {
               id: true,
               title: true,
               status: true,
+              order: true,
               assignedUsers: {
                 orderBy: {
                   createdAt: 'asc',
