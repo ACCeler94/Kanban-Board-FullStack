@@ -22,6 +22,7 @@ interface TaskType {
   boardId: string;
   authorId: string;
   status: TaskStatus;
+  order: number;
   assignedUsers: {
     user: {
       name: string;
@@ -37,6 +38,7 @@ interface TaskTypePartial {
   id: string;
   title: string;
   status: TaskStatus;
+  order: number;
   assignedUsers: {
     user: {
       name: string;
