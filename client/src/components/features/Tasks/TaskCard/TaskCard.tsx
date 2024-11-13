@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { TaskTypePartial } from '../../../../types/types';
 import styles from './TaskCard.module.css';
 import { RxDragHandleDots2 } from 'react-icons/rx';
-import { useDraggable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
 
 interface TaskCardProps {
   taskData: TaskTypePartial;
@@ -12,7 +12,7 @@ interface TaskCardProps {
 const TaskCard = ({ taskData }: TaskCardProps) => {
   const [finishedSubtasksCount, setFinishedSubtasksCount] = useState(0);
 
-  const { listeners } = useDraggable({
+  const { listeners } = useSortable({
     id: taskData.id,
   });
 
