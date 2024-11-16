@@ -11,7 +11,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { SortableContext } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useEffect, useState } from 'react';
 import { FaCircle } from 'react-icons/fa';
 import { Outlet, useParams } from 'react-router-dom';
@@ -19,8 +19,8 @@ import { validate as uuidValidate } from 'uuid';
 import { useBoardById } from '../../../../API/boards';
 import { useEditTask } from '../../../../API/tasks';
 import { TaskStatus, TaskTypePartial } from '../../../../types/types';
-import { getColumnByStatus } from '../../../../utils/getColumnByStatus';
-import { updateLocalColumns } from '../../../../utils/updateLocalColumns';
+import { getColumnByTaskId } from '../../../../utils/getColumnByTaskId';
+import { getListByStatus } from '../../../../utils/getListByStatus';
 import Loader from '../../../common/BoardLoader/BoardLoader';
 import Droppable from '../../../common/Droppable/Droppable';
 import Error from '../../../common/Error/Error';
@@ -72,100 +72,148 @@ const Board = () => {
   };
 
   const handleDragOver = (event: DragOverEvent) => {
-    const { over } = event;
+    const { over, active } = event;
     if (!over) return;
-    const overId = over.id;
 
-    // Only proceed if the task is not the one being hovered over
-    if (activeTask && activeTask.id !== overId) {
-      let columnState;
-      let setColumnState;
+    const activeContainer = getColumnByTaskId({
+      toDos,
+      inProgress,
+      done,
+      taskId: active.id as string,
+    });
 
-      // Choose the appropriate column and state setter based on the activeTask's status
-      switch (activeTask.status) {
-        case TaskStatus.TO_DO:
-          columnState = toDos;
-          setColumnState = setToDos;
-          break;
-        case TaskStatus.IN_PROGRESS:
-          columnState = inProgress;
-          setColumnState = setInProgress;
-          break;
-        case TaskStatus.DONE:
-          columnState = done;
-          setColumnState = setDone;
-          break;
-        default:
-          return;
-      }
+    let overContainer: TaskStatus | null = null;
 
-      // Find the index of the task being dragged over and the task being dragged
-      const overIndex = columnState.findIndex((task) => task.id === overId);
-      const activeIndex = columnState.findIndex((task) => task.id === activeTask.id);
-
-      // Only update if the task's position has changed
-      if (activeIndex !== overIndex) {
-        const updatedColumn = [...columnState];
-        const [movedTask] = updatedColumn.splice(activeIndex, 1);
-        updatedColumn.splice(overIndex, 0, movedTask);
-
-        // Update the state with the new column order
-        setColumnState(updatedColumn);
-      }
+    // Check if 'over.id' is a column or a task
+    if (
+      over.id === TaskStatus.TO_DO ||
+      over.id === TaskStatus.IN_PROGRESS ||
+      over.id === TaskStatus.DONE
+    ) {
+      overContainer = over.id as TaskStatus; // It's a column
+    } else {
+      overContainer = getColumnByTaskId({
+        toDos,
+        inProgress,
+        done,
+        taskId: over.id as string,
+      });
     }
+
+    if (!activeContainer || !overContainer || activeContainer === overContainer) {
+      return;
+    }
+
+    const { list: activeItems, setter: setActiveItems } = getListByStatus({
+      status: activeContainer,
+      toDos,
+      setToDos,
+      inProgress,
+      setInProgress,
+      done,
+      setDone,
+    });
+    const { list: overItems, setter: setOverItems } = getListByStatus({
+      status: overContainer,
+      toDos,
+      setToDos,
+      inProgress,
+      setInProgress,
+      done,
+      setDone,
+    });
+
+    const activeIndex = activeItems.findIndex((item) => item.id === active.id);
+
+    // If hovering over a column (not a task), place at the end of that column
+    const overIndex =
+      over.id === overContainer
+        ? overItems.length
+        : overItems.findIndex((item) => item.id === over.id);
+
+    setActiveItems((prevState) => prevState.filter((task) => task.id !== active.id));
+    setOverItems((prevState) => {
+      return [
+        ...prevState.slice(0, overIndex),
+        activeItems[activeIndex],
+        ...prevState.slice(overIndex, prevState.length),
+      ];
+    });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    if (event.over && activeTask) {
-      const targetStatus = event.over.id as TaskStatus;
-      const previousStatus = activeTask.status;
+    const { active, over } = event;
+    if (!over) return;
 
-      // Skip if the task is dropped in the same column and same position
-      if (targetStatus === previousStatus) {
-        const targetColumn = getColumnByStatus({ status: targetStatus, toDos, inProgress, done });
-        const overIndex = targetColumn.findIndex((task) => task.id === event.over?.id);
-        const activeIndex = targetColumn.findIndex((task) => task.id === activeTask.id);
+    const activeContainer = getColumnByTaskId({
+      toDos,
+      inProgress,
+      done,
+      taskId: active.id as string,
+    });
 
-        // Do nothing if it's the same position
-        if (overIndex === activeIndex) return;
-      }
+    let overContainer: TaskStatus | null = null;
 
-      // Optimistically update the task status in the local state
-      if (targetStatus !== previousStatus) {
-        updateLocalColumns({
-          task: activeTask,
-          newStatus: targetStatus,
-          setToDos,
-          setInProgress,
-          setDone,
-        });
-        setActiveTask({ ...activeTask, status: targetStatus });
-      }
-
-      // Proceed with the backend mutation
-      // mutate({
-      //   taskId: activeTask.id,
-      //   editData: { taskData: { status: targetStatus } },
-      //   subtasksToRemove: [],
-      // });
-
-      // Rollback if there’s an error
-      if (editError) {
-        updateLocalColumns({
-          task: activeTask,
-          newStatus: previousStatus,
-          setToDos,
-          setInProgress,
-          setDone,
-        });
-        setActiveTask(null);
-      }
-
-      // Clear active task after success
-      if (isSuccess) {
-        setActiveTask(null);
-      }
+    if (
+      over.id === TaskStatus.TO_DO ||
+      over.id === TaskStatus.IN_PROGRESS ||
+      over.id === TaskStatus.DONE
+    ) {
+      overContainer = over.id as TaskStatus;
+    } else {
+      overContainer = getColumnByTaskId({
+        toDos,
+        inProgress,
+        done,
+        taskId: over.id as string,
+      });
     }
+
+    if (!activeContainer || !overContainer) return;
+
+    const { list: activeItems, setter: setActiveItems } = getListByStatus({
+      status: activeContainer,
+      toDos,
+      setToDos,
+      inProgress,
+      setInProgress,
+      done,
+      setDone,
+    });
+
+    const { list: overItems, setter: setOverItems } = getListByStatus({
+      status: overContainer,
+      toDos,
+      setToDos,
+      inProgress,
+      setInProgress,
+      done,
+      setDone,
+    });
+
+    const activeIndex = activeItems.findIndex((item) => item.id === active.id);
+    const overIndex =
+      over.id === overContainer
+        ? overItems.length
+        : overItems.findIndex((item) => item.id === over.id);
+
+    if (activeContainer === overContainer && activeIndex !== overIndex) {
+      setOverItems((prevState) => arrayMove(prevState, activeIndex, overIndex));
+    } else if (activeContainer !== overContainer) {
+      setActiveItems((prevState) => prevState.filter((task) => task.id !== active.id));
+      setOverItems((prevState) => {
+        return [
+          ...prevState.slice(0, overIndex),
+          activeItems[activeIndex],
+          ...prevState.slice(overIndex, prevState.length),
+        ];
+      });
+
+      // Perform mutation to update task status in the backend
+      // mutate({ id: active.id, status: overContainer });
+    }
+
+    setActiveTask(null);
   };
 
   if (!id || !uuidValidate(id)) return <Error message='Error. Invalid board ID!' />;
@@ -180,7 +228,11 @@ const Board = () => {
       onDragEnd={handleDragEnd}
     >
       <div className={styles.boardGrid}>
-        <SortableContext id={TaskStatus.TO_DO} items={toDos.map((task) => task.id)}>
+        <SortableContext
+          id={TaskStatus.TO_DO}
+          items={toDos.map((task) => task.id)}
+          strategy={verticalListSortingStrategy}
+        >
           <Droppable id={TaskStatus.TO_DO}>
             <div className={styles.boardColumn}>
               <div className={`${styles.columnHeaderWrapper} ${styles.toDo}`}>
@@ -198,7 +250,11 @@ const Board = () => {
           </Droppable>
         </SortableContext>
 
-        <SortableContext id={TaskStatus.IN_PROGRESS} items={inProgress.map((task) => task.id)}>
+        <SortableContext
+          id={TaskStatus.IN_PROGRESS}
+          items={inProgress.map((task) => task.id)}
+          strategy={verticalListSortingStrategy}
+        >
           <Droppable id={TaskStatus.IN_PROGRESS}>
             <div className={styles.boardColumn}>
               <div className={`${styles.columnHeaderWrapper} ${styles.inProgress}`}>
@@ -216,7 +272,11 @@ const Board = () => {
           </Droppable>
         </SortableContext>
 
-        <SortableContext id={TaskStatus.DONE} items={done.map((task) => task.id)}>
+        <SortableContext
+          id={TaskStatus.DONE}
+          items={done.map((task) => task.id)}
+          strategy={verticalListSortingStrategy}
+        >
           <Droppable id={TaskStatus.DONE}>
             <div className={styles.boardColumn}>
               <div className={`${styles.columnHeaderWrapper} ${styles.done}`}>
