@@ -13,15 +13,15 @@
   margin-left: 10px;
 }
 
-.columnHeaderWrapper.toDo svg {
+.columnHeaderWrapper.TO_DO svg {
   color: var(--todo-dot);
 }
 
-.columnHeaderWrapper.inProgress svg {
+.columnHeaderWrapper.IN_PROGRESS svg {
   color: var(--in-progress-dot);
 }
 
-.columnHeaderWrapper.done svg {
+.columnHeaderWrapper.DONE svg {
   color: var(--done-dot);
 }
 

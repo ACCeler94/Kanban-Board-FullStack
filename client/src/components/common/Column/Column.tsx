@@ -20,7 +20,7 @@ const Column = ({ tasks, status }: ColumnProps) => {
     >
       <Droppable id={status}>
         <div className={styles.column}>
-          <div className={`${styles.columnHeaderWrapper} ${styles.toDo}`}>
+          <div className={`${styles.columnHeaderWrapper} ${styles[status]}`}>
             <FaCircle />
             <h2 className={styles.columnHeader}>
               {status} ({tasks.length})
