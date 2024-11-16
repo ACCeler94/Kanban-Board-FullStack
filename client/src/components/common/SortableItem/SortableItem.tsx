@@ -1,6 +1,6 @@
-import { CSSProperties } from 'react';
 import { TaskTypePartial } from '../../../types/types';
 import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface SortableItemProps {
   id: string;
@@ -9,13 +9,15 @@ interface SortableItemProps {
 }
 
 const SortableItem = ({ id, children, data }: SortableItemProps) => {
-  const { attributes, setNodeRef, isDragging } = useSortable({
+  const { attributes, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
     data,
   });
-  const style: CSSProperties = {
-    visibility: isDragging ? 'hidden' : 'visible', // Use visibility instead of opacity
-    pointerEvents: isDragging ? 'none' : undefined, // Prevent interaction while dragging
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0 : 1,
   };
 
   return (
