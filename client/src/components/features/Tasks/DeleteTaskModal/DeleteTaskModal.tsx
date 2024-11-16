@@ -9,7 +9,7 @@ import ConfirmDeletionModalContent from '../../../common/ConfirmDeleteModalConte
 
 const DeleteTaskModal = () => {
   const { id: boardId, taskId } = useParams();
-  const { mutate: deleteTask, isPending, error, isSuccess } = useDeleteTask(taskId!, boardId!);
+  const { mutate: deleteTask, isPending, error, isSuccess } = useDeleteTask(boardId!, taskId!);
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
 
