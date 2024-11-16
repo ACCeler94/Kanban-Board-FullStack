@@ -11,9 +11,8 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { arrayMove } from '@dnd-kit/sortable';
 import { useEffect, useState } from 'react';
-import { FaCircle } from 'react-icons/fa';
 import { Outlet, useParams } from 'react-router-dom';
 import { validate as uuidValidate } from 'uuid';
 import { useBoardById } from '../../../../API/boards';
@@ -22,9 +21,8 @@ import { TaskStatus, TaskTypePartial } from '../../../../types/types';
 import { getColumnByTaskId } from '../../../../utils/getColumnByTaskId';
 import { getListByStatus } from '../../../../utils/getListByStatus';
 import Loader from '../../../common/BoardLoader/BoardLoader';
-import Droppable from '../../../common/Droppable/Droppable';
+import Column from '../../../common/Column/Column';
 import Error from '../../../common/Error/Error';
-import SortableItem from '../../../common/SortableItem/SortableItem';
 import TaskCard from '../../Tasks/TaskCard/TaskCard';
 import styles from './Board.module.css';
 
@@ -228,71 +226,9 @@ const Board = () => {
       onDragEnd={handleDragEnd}
     >
       <div className={styles.boardGrid}>
-        <SortableContext
-          id={TaskStatus.TO_DO}
-          items={toDos.map((task) => task.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <Droppable id={TaskStatus.TO_DO}>
-            <div className={styles.boardColumn}>
-              <div className={`${styles.columnHeaderWrapper} ${styles.toDo}`}>
-                <FaCircle />
-                <h2 className={styles.columnHeader}>TO DO ({toDos.length})</h2>
-              </div>
-              <ul className={styles.tasksList}>
-                {toDos.map((task) => (
-                  <SortableItem id={task.id} key={task.id} data={task}>
-                    <TaskCard taskData={task} />
-                  </SortableItem>
-                ))}
-              </ul>
-            </div>
-          </Droppable>
-        </SortableContext>
-
-        <SortableContext
-          id={TaskStatus.IN_PROGRESS}
-          items={inProgress.map((task) => task.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <Droppable id={TaskStatus.IN_PROGRESS}>
-            <div className={styles.boardColumn}>
-              <div className={`${styles.columnHeaderWrapper} ${styles.inProgress}`}>
-                <FaCircle />
-                <h2 className={styles.columnHeader}>IN PROGRESS ({inProgress.length})</h2>
-              </div>
-              <ul className={styles.tasksList}>
-                {inProgress.map((task) => (
-                  <SortableItem id={task.id} key={task.id} data={task}>
-                    <TaskCard taskData={task} />
-                  </SortableItem>
-                ))}
-              </ul>
-            </div>
-          </Droppable>
-        </SortableContext>
-
-        <SortableContext
-          id={TaskStatus.DONE}
-          items={done.map((task) => task.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <Droppable id={TaskStatus.DONE}>
-            <div className={styles.boardColumn}>
-              <div className={`${styles.columnHeaderWrapper} ${styles.done}`}>
-                <FaCircle />
-                <h2 className={styles.columnHeader}>DONE ({done.length})</h2>
-              </div>
-              <ul className={styles.tasksList}>
-                {done.map((task) => (
-                  <SortableItem id={task.id} key={task.id} data={task}>
-                    <TaskCard taskData={task} />
-                  </SortableItem>
-                ))}
-              </ul>
-            </div>
-          </Droppable>
-        </SortableContext>
+        <Column tasks={toDos} status={TaskStatus.TO_DO} />
+        <Column tasks={inProgress} status={TaskStatus.IN_PROGRESS} />
+        <Column tasks={done} status={TaskStatus.DONE} />
 
         <DragOverlay modifiers={[restrictToWindowEdges]}>
           {activeTask ? <TaskCard taskData={activeTask} /> : null}
