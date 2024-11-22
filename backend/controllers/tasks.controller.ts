@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import EmailSchema from '../validators/EmailSchema';
-import createTaskDTO from '../validators/tasks/create-task.dto';
+import { createTaskDTO } from '../validators/tasks/create-task.dto';
 import { editTaskDTO } from '../validators/tasks/edit-task.dto';
 
 // Task operations can be performed by any user assigned to the board - this condition is checked by checkBoardAssignment middleware
@@ -54,7 +54,6 @@ const TasksController = {
   // POST
   createTask: async (req: Request, res: Response, next: NextFunction) => {
     let validatedData;
-
     const requestAuthorId = req.session.userId;
     if (!requestAuthorId) return res.status(400).json({ error: 'Invalid user data.' });
 
@@ -67,14 +66,13 @@ const TasksController = {
     const { taskData, subtaskData } = validatedData;
 
     try {
+      // Check if the board exists
       const board = await prisma.board.findUnique({
-        where: {
-          id: taskData.boardId,
-        },
+        where: { id: taskData.boardId },
       });
-
       if (!board) return res.status(404).json({ error: 'Board not found...' });
 
+      // Ensure the user is assigned to the board
       const isUserAssigned = await prisma.userOnBoard.findUnique({
         where: {
           userId_boardId: {
@@ -84,42 +82,50 @@ const TasksController = {
         },
       });
       if (!isUserAssigned)
-        return res
-          .status(403)
-          .json({ error: 'Access forbidden! User is not assigned to the board.' });
+        return res.status(403).json({ error: 'User not assigned to the board.' });
 
-      const task = await prisma.task.create({
-        data: { ...taskData, authorId: requestAuthorId },
+      // Find the highest current order for tasks in the same board and status - newly created tasks are always added as the last within the column/status
+      const maxOrder = await prisma.task.findFirst({
+        where: { boardId: taskData.boardId, status: taskData.status },
+        orderBy: { order: 'desc' },
+        select: { order: true },
       });
 
-      if (subtaskData && subtaskData.length !== 0) {
-        if (subtaskData && subtaskData.length !== 0) {
-          try {
-            await prisma.$transaction(async (tx) => {
-              for (let index = 0; index < subtaskData.length; index++) {
-                const subtask = subtaskData[index];
-                await tx.subtask.create({
-                  data: {
-                    ...subtask,
-                    taskId: task.id,
-                    order: index,
-                  },
-                });
-              }
-            });
-          } catch (error) {
-            return res.status(500).json({
-              error:
-                'Failed to create some or all subtasks. The main task was created successfully.',
-            });
-          }
-        }
+      let newOrder;
+      if (maxOrder && typeof maxOrder.order === 'number') {
+        newOrder = maxOrder.order + 1;
+      } else {
+        newOrder = 0;
       }
 
-      // Fetch the task with subtasks and send the response - if no subtasks were created it will be an empty array
+      // Create the task with the calculated order
+      const task = await prisma.task.create({
+        data: {
+          ...taskData,
+          authorId: requestAuthorId,
+          order: newOrder,
+        },
+      });
+
+      // Handle subtasks if provided
+      if (subtaskData && subtaskData.length > 0) {
+        await prisma.$transaction(async (tx) => {
+          for (let index = 0; index < subtaskData.length; index++) {
+            const subtask = subtaskData[index];
+            await tx.subtask.create({
+              data: {
+                ...subtask,
+                taskId: task.id,
+                order: index,
+              },
+            });
+          }
+        });
+      }
+      // Fetch the task with subtasks
       const taskWithSubtasks = await prisma.task.findUnique({
         where: { id: task.id },
-        include: { subtasks: true },
+        include: { subtasks: { orderBy: { order: 'asc' } } },
       });
 
       res.status(201).json(taskWithSubtasks);
@@ -161,11 +167,9 @@ const TasksController = {
         (userOnBoard) => userOnBoard.userId === userToAdd.id
       );
       if (!isUserAssignedToBoard) {
-        return res
-          .status(403)
-          .json({
-            error: 'User is not assigned to the board. Please add the user to the board first.',
-          });
+        return res.status(403).json({
+          error: 'User is not assigned to the board. Please add the user to the board first.',
+        });
       }
 
       // Check if the user is already assigned to the task
@@ -207,20 +211,94 @@ const TasksController = {
       const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
-      // Update task if taskData is provided
-      if (taskData && Object.keys(taskData).length !== 0) {
-        await prisma.task.update({
-          where: { id: taskId },
-          data: {
-            ...task,
-            ...taskData,
-          },
-        });
-      }
+      await prisma.$transaction(async (tx) => {
+        // Update the task first
+        if (taskData && Object.keys(taskData).length !== 0) {
+          await tx.task.update({
+            where: { id: taskId },
+            data: taskData,
+          });
+        }
+
+        if (taskData && (taskData.order !== undefined || taskData.status !== undefined)) {
+          // Either taskData.order or taskData.status present - (if present it means) changed
+          if (taskData.status !== task.status) {
+            // Task moved to a different column
+            // Decrement order in the old column
+            await tx.task.updateMany({
+              where: {
+                id: {
+                  not: taskId,
+                },
+                boardId: task.boardId,
+                status: task.status,
+                order: { gt: task.order },
+              },
+              data: {
+                order: { decrement: 1 },
+              },
+            });
+
+            // Increment order in the new column
+            await tx.task.updateMany({
+              where: {
+                id: {
+                  not: taskId,
+                },
+                boardId: task.boardId,
+                status: taskData.status,
+                order: { gte: taskData.order },
+              },
+              data: {
+                order: { increment: 1 },
+              },
+            });
+          } else {
+            // Task moved within the same column
+            if (taskData.order && taskData.order > task.order) {
+              // Moving downwards
+              await tx.task.updateMany({
+                where: {
+                  id: {
+                    not: taskId,
+                  },
+                  boardId: task.boardId,
+                  status: taskData.status,
+                  order: {
+                    gt: task.order, // Old order
+                    lte: taskData.order, // New order
+                  },
+                },
+                data: {
+                  order: { decrement: 1 },
+                },
+              });
+            } else if (taskData.order && taskData.order < task.order) {
+              // Moving upwards
+              await tx.task.updateMany({
+                where: {
+                  id: {
+                    not: taskId,
+                  },
+                  boardId: task.boardId,
+                  status: taskData.status,
+                  order: {
+                    gte: taskData.order,
+                    lt: task.order,
+                  },
+                },
+                data: {
+                  order: { increment: 1 },
+                },
+              });
+            }
+          }
+        }
+      });
 
       // Delete subtasks based on subtasksToRemove array
       // There is no point checking if every subtask exists in the db, if not found then the id will be omitted
-      if (subtasksToRemove.length !== 0) {
+      if (subtasksToRemove && subtasksToRemove.length !== 0) {
         await prisma.subtask.deleteMany({
           where: {
             id: {
@@ -289,6 +367,7 @@ const TasksController = {
               order: 'asc', // Ensures subtasks are ordered correctly
             },
           },
+          assignedUsers: true, // include assigned users to data structure with getById
         },
       });
 
@@ -303,6 +382,7 @@ const TasksController = {
     const { taskId } = req.params;
 
     try {
+      console.log(taskId);
       const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
