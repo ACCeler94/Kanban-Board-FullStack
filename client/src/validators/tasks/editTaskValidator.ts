@@ -16,6 +16,7 @@ const editTaskValidator = z
           .max(500, { message: 'Description cannot be longer than 500 characters' })
           .optional(),
         status: TaskStatus.optional(),
+        order: z.number().optional(),
       })
       .optional(),
     subtaskData: z
@@ -30,7 +31,7 @@ const editTaskValidator = z
       })
       .array()
       .optional(),
-    subtasksToRemove: z.string().array(),
+    subtasksToRemove: z.string().array().optional(),
   })
   .refine(
     (data) =>
