@@ -25,16 +25,17 @@ import Column from '../../../common/Column/Column';
 import Error from '../../../common/Error/Error';
 import TaskCard from '../../Tasks/TaskCard/TaskCard';
 import styles from './Board.module.css';
+import LoadingOverlay from '../../../common/LoadingOverlay/LoadingOverlay';
 
 const Board = () => {
   const { id } = useParams();
-  const { data: boardData, isPending, error } = useBoardById(id);
+  const { data: boardData, isPending, error, isFetching } = useBoardById(id);
   const [toDos, setToDos] = useState<TaskTypePartial[]>([]);
   const [inProgress, setInProgress] = useState<TaskTypePartial[]>([]);
   const [done, setDone] = useState<TaskTypePartial[]>([]);
   const [activeTask, setActiveTask] = useState<TaskTypePartial | null>(null); // Track active task for overlay
 
-  const { mutate, isSuccess, error: editError } = useEditTask();
+  const { mutate, isSuccess, error: editError, isPending: isEditPending } = useEditTask();
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor, {
@@ -218,6 +219,11 @@ const Board = () => {
         <DragOverlay modifiers={[restrictToWindowEdges]}>
           {activeTask ? <TaskCard taskData={activeTask} /> : null}
         </DragOverlay>
+
+        {
+          // Loading overlay added to prevent drag and dropping tasks while the data is refreshing to avoid inconsistencies
+        }
+        {isEditPending || isFetching ? <LoadingOverlay /> : null}
 
         <Outlet />
       </div>

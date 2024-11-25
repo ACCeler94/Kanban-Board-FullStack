@@ -193,7 +193,7 @@ const deleteUserFromBoard = async (
 const useBoardById = (id: string | undefined) => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const { data, error, isPending, refetch } = useQuery({
+  const { data, error, isPending, refetch, isFetching } = useQuery({
     queryKey: ['board', id],
     queryFn: async () => {
       if (!id || !uuidValidate(id)) throw new Error('Invalid board ID.');
@@ -206,10 +206,10 @@ const useBoardById = (id: string | undefined) => {
       }
     },
     enabled: !!id && uuidValidate(id) && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchBoardById
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  return { data, error, isPending, refetch };
+  return { data, error, isPending, refetch, isFetching };
 };
 
 const useBoardUsers = (id: string | undefined) => {
