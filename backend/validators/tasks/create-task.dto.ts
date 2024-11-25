@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const TaskStatus = z.enum(['TO_DO', 'IN_PROGRESS', 'DONE']);
 
-const createTaskDTO = z.object({
+export const createTaskDTO = z.object({
   taskData: z.object({
     title: z
       .string()
@@ -27,5 +27,3 @@ const createTaskDTO = z.object({
     .array()
     .optional(),
 });
-
-export default createTaskDTO;
