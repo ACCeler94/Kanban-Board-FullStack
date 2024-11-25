@@ -17,7 +17,7 @@ import { Outlet, useParams } from 'react-router-dom';
 import { validate as uuidValidate } from 'uuid';
 import { useBoardById } from '../../../../API/boards';
 import { useEditTask } from '../../../../API/tasks';
-import { TaskStatus, TaskTypePartial } from '../../../../types/types';
+import { EditTaskData, TaskStatus, TaskTypePartial } from '../../../../types/types';
 import { getColumnByTaskId } from '../../../../utils/getColumnByTaskId';
 import { getListByStatus } from '../../../../utils/getListByStatus';
 import Loader from '../../../common/BoardLoader/BoardLoader';
@@ -143,13 +143,6 @@ const Board = () => {
     const { active, over } = event;
     if (!over) return;
 
-    const activeContainer = getColumnByTaskId({
-      toDos,
-      inProgress,
-      done,
-      taskId: active.id as string,
-    });
-
     let overContainer: TaskStatus | null = null;
 
     if (
@@ -167,17 +160,7 @@ const Board = () => {
       });
     }
 
-    if (!activeContainer || !overContainer) return;
-
-    const { list: activeItems, setter: setActiveItems } = getListByStatus({
-      status: activeContainer,
-      toDos,
-      setToDos,
-      inProgress,
-      setInProgress,
-      done,
-      setDone,
-    });
+    if (!overContainer) return;
 
     const { list: overItems, setter: setOverItems } = getListByStatus({
       status: overContainer,
@@ -189,28 +172,30 @@ const Board = () => {
       setDone,
     });
 
-    const activeIndex = activeItems.findIndex((item) => item.id === active.id);
-    const overIndex =
-      over.id === overContainer
-        ? overItems.length
-        : overItems.findIndex((item) => item.id === over.id);
+    const activeIndex = overItems.findIndex((item) => item.id === active.id); // active item is already added to the overItems in dragOverHandler
+    let overIndex;
 
-    if (activeContainer === overContainer && activeIndex !== overIndex) {
-      setOverItems((prevState) => arrayMove(prevState, activeIndex, overIndex));
-    } else if (activeContainer !== overContainer) {
-      setActiveItems((prevState) => prevState.filter((task) => task.id !== active.id));
-      setOverItems((prevState) => {
-        return [
-          ...prevState.slice(0, overIndex),
-          activeItems[activeIndex],
-          ...prevState.slice(overIndex, prevState.length),
-        ];
-      });
-
-      // Perform mutation to update task status in the backend
-      // mutate({ id: active.id, status: overContainer });
+    if (over.id === overContainer) {
+      if (overItems.length > 0) {
+        overIndex = overItems.length - 1;
+      } else overIndex = overItems.length;
+    } else {
+      overIndex = overItems.findIndex((item) => item.id === over.id);
     }
 
+    setOverItems((prevState) => arrayMove(prevState, activeIndex, overIndex));
+
+    // when status was changed
+    if (activeTask!.status !== overContainer) {
+      const changedData: EditTaskData = { taskData: {} };
+      changedData.taskData!.status = overContainer;
+      if (activeTask!.order !== overIndex) changedData.taskData!.order = overIndex;
+
+      mutate({ taskId: activeTask!.id, editData: changedData });
+      // when only order was changed
+    } else if (activeTask!.status === overContainer && activeTask!.order !== overIndex) {
+      mutate({ taskId: activeTask!.id, editData: { taskData: { order: overIndex } } });
+    }
     setActiveTask(null);
   };
 
