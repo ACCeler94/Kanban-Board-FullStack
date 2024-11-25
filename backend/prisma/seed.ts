@@ -36,6 +36,7 @@ async function main() {
     data: {
       title: 'Task One',
       desc: 'This is task one',
+      order: 0,
       board: {
         connect: {
           id: board1.id,
