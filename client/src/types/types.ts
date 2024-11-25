@@ -61,6 +61,7 @@ interface EditTaskData {
     title?: string;
     desc?: string;
     status?: TaskStatus;
+    order?: number;
   };
   subtaskData?: {
     id: string;
@@ -92,6 +93,7 @@ interface DiffTaskData {
     title?: string;
     desc?: string;
     status?: TaskStatus;
+    order?: number;
   };
   subtaskData: {
     id: string;
