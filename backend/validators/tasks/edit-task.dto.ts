@@ -17,6 +17,7 @@ export const editTaskDTO = z
           .max(1000, { message: 'Description cannot be longer than 1000 characters' })
           .optional(),
         status: TaskStatus.optional(),
+        order: z.number().optional(),
       })
       .optional(),
     subtaskData: z
@@ -32,7 +33,7 @@ export const editTaskDTO = z
       })
       .array()
       .optional(),
-    subtasksToRemove: z.string().array(),
+    subtasksToRemove: z.string().array().optional(),
   })
   .refine(
     (data) =>
