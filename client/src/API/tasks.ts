@@ -61,9 +61,9 @@ const deleteTaskById = async (taskId: string, token: string) => {
 
 const editTaskById = async (
   { taskData, subtaskData }: DiffTaskData | EditTaskData,
-  subtasksToRemove: string[] | [],
   taskId: string,
-  token: string
+  token: string,
+  subtasksToRemove?: string[]
 ) => {
   try {
     const { data } = await axios.patch(
@@ -234,7 +234,7 @@ const useEditTask = () => {
     }: {
       taskId: string;
       editData: DiffTaskData | EditTaskData;
-      subtasksToRemove: string[] | [];
+      subtasksToRemove?: string[];
     }) => {
       if (!taskId || !uuidValidate(taskId)) throw new Error('Invalid task ID.');
 
@@ -252,7 +252,7 @@ const useEditTask = () => {
       }
 
       try {
-        return editTaskById(editData, subtasksToRemove, taskId, token);
+        return editTaskById(editData, taskId, token, subtasksToRemove);
       } catch (error) {
         throw new Error('Failed to edit the task. Please try again.');
       }
