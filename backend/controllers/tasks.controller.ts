@@ -200,7 +200,7 @@ const TasksController = {
     let validatedData;
 
     try {
-      validatedData = editTaskDTO.parse(req.body);
+      validatedData = editTaskDTO.parse(req.body); // Validate incoming data
     } catch (error) {
       return res.status(400).json({ error: 'Invalid data.' });
     }
@@ -212,92 +212,67 @@ const TasksController = {
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
       await prisma.$transaction(async (tx) => {
-        // Update the task first
-        if (taskData && Object.keys(taskData).length !== 0) {
+        if (taskData && Object.keys(taskData).length > 0) {
           await tx.task.update({
             where: { id: taskId },
-            data: taskData,
+            data: taskData, // Update properties like 'desc', 'title', etc.
           });
         }
 
-        if (taskData && (taskData.order !== undefined || taskData.status !== undefined)) {
-          // Either taskData.order or taskData.status present - (if present it means) changed
-          if (taskData.status !== task.status) {
-            // Task moved to a different column
-            // Decrement order in the old column
-            await tx.task.updateMany({
-              where: {
-                id: {
-                  not: taskId,
-                },
-                boardId: task.boardId,
-                status: task.status,
-                order: { gt: task.order },
-              },
-              data: {
-                order: { decrement: 1 },
-              },
-            });
+        if (taskData && taskData.order !== undefined) {
+          const currentColumnTasks = await tx.task.findMany({
+            where: { boardId: task.boardId, status: task.status },
+            orderBy: { order: 'asc' },
+          });
+          const targetColumnTasks = taskData.status
+            ? await tx.task.findMany({
+                where: { boardId: task.boardId, status: taskData.status },
+                orderBy: { order: 'asc' },
+              })
+            : null;
 
-            // Increment order in the new column
-            await tx.task.updateMany({
-              where: {
-                id: {
-                  not: taskId,
-                },
-                boardId: task.boardId,
-                status: taskData.status,
-                order: { gte: taskData.order },
-              },
-              data: {
-                order: { increment: 1 },
-              },
-            });
-          } else {
-            // Task moved within the same column
-            if (taskData.order && taskData.order > task.order) {
-              // Moving downwards
-              await tx.task.updateMany({
-                where: {
-                  id: {
-                    not: taskId,
-                  },
-                  boardId: task.boardId,
-                  status: taskData.status,
-                  order: {
-                    gt: task.order, // Old order
-                    lte: taskData.order, // New order
-                  },
-                },
-                data: {
-                  order: { decrement: 1 },
-                },
+          // Insert the task into the correct position in the target column (if moving)
+          if (taskData.status && targetColumnTasks && taskData.status !== task.status) {
+            // Recalculate orders for target column (moved task is already included)
+            for (let i = 0; i < targetColumnTasks.length; i++) {
+              await tx.task.update({
+                where: { id: targetColumnTasks[i].id },
+                data: { order: i },
               });
-            } else if (taskData.order && taskData.order < task.order) {
-              // Moving upwards
-              await tx.task.updateMany({
-                where: {
-                  id: {
-                    not: taskId,
-                  },
-                  boardId: task.boardId,
-                  status: taskData.status,
-                  order: {
-                    gte: taskData.order,
-                    lt: task.order,
-                  },
-                },
-                data: {
-                  order: { increment: 1 },
-                },
+            }
+
+            // Recalculate orders for the current column (if task was moved)
+            for (let i = 0; i < currentColumnTasks.length; i++) {
+              // console.log('oldColumn', i);
+              await tx.task.update({
+                where: { id: currentColumnTasks[i].id },
+                data: { order: i }, // Recalculate order based on index
+              });
+            }
+          }
+          // If the task remains in the same column, handle its order update
+          if (!taskData.status || taskData.status === task.status) {
+            console.log(taskData.status);
+            console.log('movedWithin');
+            const arrayWithoutMovedTask = currentColumnTasks.filter((task) => task.id !== taskId);
+            const orderedTasks = [
+              ...arrayWithoutMovedTask.slice(0, taskData.order),
+              task,
+              ...arrayWithoutMovedTask.slice(taskData.order),
+            ];
+            // Recalculate orders
+            for (let i = 0; i < orderedTasks.length; i++) {
+              // console.log(i);
+              await tx.task.update({
+                where: { id: orderedTasks[i].id },
+                data: { order: i }, // Recalculate order based on index
               });
             }
           }
         }
       });
 
-      // Delete subtasks based on subtasksToRemove array
-      // There is no point checking if every subtask exists in the db, if not found then the id will be omitted
+      // Handle subtasks (creation, update, removal)
       if (subtasksToRemove && subtasksToRemove.length !== 0) {
         await prisma.subtask.deleteMany({
           where: {
@@ -308,7 +283,6 @@ const TasksController = {
         });
       }
 
-      // Update or create subtasks only if subtaskData exists and is not an empty array
       if (subtaskData && subtaskData.length !== 0) {
         const existingSubtasks = await prisma.subtask.findMany({
           where: { taskId },
@@ -341,7 +315,7 @@ const TasksController = {
           }
         }
 
-        // Reorder subtasks if new subtasks were added (it accounts for past deletions as well)
+        // Reorder subtasks if new subtasks were added
         if (subtaskData.length > existingSubtasks.length) {
           const updatedSubtasks = await prisma.subtask.findMany({
             where: { taskId },
@@ -358,16 +332,12 @@ const TasksController = {
       }
 
       const updatedTask = await prisma.task.findUnique({
-        where: {
-          id: taskId,
-        },
+        where: { id: taskId },
         include: {
           subtasks: {
-            orderBy: {
-              order: 'asc', // Ensures subtasks are ordered correctly
-            },
+            orderBy: { order: 'asc' }, // Ensures subtasks are ordered correctly
           },
-          assignedUsers: true, // include assigned users to data structure with getById
+          assignedUsers: true,
         },
       });
 
