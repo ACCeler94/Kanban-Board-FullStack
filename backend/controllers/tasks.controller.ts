@@ -243,7 +243,6 @@ const TasksController = {
 
             // Recalculate orders for the current column (if task was moved)
             for (let i = 0; i < currentColumnTasks.length; i++) {
-              // console.log('oldColumn', i);
               await tx.task.update({
                 where: { id: currentColumnTasks[i].id },
                 data: { order: i }, // Recalculate order based on index
@@ -252,8 +251,6 @@ const TasksController = {
           }
           // If the task remains in the same column, handle its order update
           if (!taskData.status || taskData.status === task.status) {
-            console.log(taskData.status);
-            console.log('movedWithin');
             const arrayWithoutMovedTask = currentColumnTasks.filter((task) => task.id !== taskId);
             const orderedTasks = [
               ...arrayWithoutMovedTask.slice(0, taskData.order),
@@ -262,7 +259,6 @@ const TasksController = {
             ];
             // Recalculate orders
             for (let i = 0; i < orderedTasks.length; i++) {
-              // console.log(i);
               await tx.task.update({
                 where: { id: orderedTasks[i].id },
                 data: { order: i }, // Recalculate order based on index
@@ -352,7 +348,6 @@ const TasksController = {
     const { taskId } = req.params;
 
     try {
-      console.log(taskId);
       const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
 
