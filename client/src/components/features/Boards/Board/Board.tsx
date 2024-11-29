@@ -190,7 +190,7 @@ const Board = () => {
     if (activeTask!.status !== overContainer) {
       const changedData: EditTaskData = { taskData: {} };
       changedData.taskData!.status = overContainer;
-      if (activeTask!.order !== overIndex) changedData.taskData!.order = overIndex;
+      changedData.taskData!.order = overIndex;
 
       mutate({ taskId: activeTask!.id, editData: changedData });
       // when only order was changed
