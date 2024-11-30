@@ -26,6 +26,7 @@ import Error from '../../../common/Error/Error';
 import TaskCard from '../../Tasks/TaskCard/TaskCard';
 import styles from './Board.module.css';
 import LoadingOverlay from '../../../common/LoadingOverlay/LoadingOverlay';
+import { Alert } from '@mui/material';
 
 const Board = () => {
   const { id } = useParams();
@@ -34,8 +35,9 @@ const Board = () => {
   const [inProgress, setInProgress] = useState<TaskTypePartial[]>([]);
   const [done, setDone] = useState<TaskTypePartial[]>([]);
   const [activeTask, setActiveTask] = useState<TaskTypePartial | null>(null); // Track active task for overlay
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
 
-  const { mutate, isSuccess, error: editError, isPending: isEditPending } = useEditTask();
+  const { mutate, error: editError, isPending: isEditPending } = useEditTask();
 
   const mouseSensor = useSensor(MouseSensor);
   const touchSensor = useSensor(TouchSensor, {
@@ -64,6 +66,16 @@ const Board = () => {
       setDone(tasksDone);
     }
   }, [boardData, error, isPending]);
+
+  // show edit error alert for 5 seconds
+  useEffect(() => {
+    if (editError) setShowErrorAlert(true);
+    const timeout = setTimeout(() => {
+      setShowErrorAlert(false);
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [editError]);
 
   const handleDragStart = (event: DragStartEvent) => {
     const task = event.active.data.current as TaskTypePartial | undefined;
@@ -211,6 +223,19 @@ const Board = () => {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
+      {showErrorAlert && editError ? (
+        <Alert
+          severity='error'
+          variant='filled'
+          onClose={() => {
+            setShowErrorAlert(false);
+          }}
+        >
+          {editError.message}
+        </Alert>
+      ) : (
+        ''
+      )}
       <div className={styles.boardGrid}>
         <Column tasks={toDos} status={TaskStatus.TO_DO} />
         <Column tasks={inProgress} status={TaskStatus.IN_PROGRESS} />
