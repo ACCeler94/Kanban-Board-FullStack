@@ -206,7 +206,7 @@ const useBoardById = (id: string | undefined) => {
       }
     },
     enabled: !!id && uuidValidate(id) && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchBoardById
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 3 * 60 * 1000, // 3 minutes
   });
 
   return { data, error, isPending, refetch, isFetching };
@@ -410,6 +410,7 @@ const useDeleteUserFromBoard = (boardId: string) => {
           queryKey: ['task'],
           predicate: (query) => taskIds.includes(query.queryKey[1] as string),
         });
+        queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // Invalidate board as well to update cards
       }
     },
   });
