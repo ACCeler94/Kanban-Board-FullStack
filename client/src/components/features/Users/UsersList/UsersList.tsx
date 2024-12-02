@@ -43,7 +43,7 @@ const UsersList = ({
                 className={styles.avatar}
                 src={
                   user.picture
-                    ? user.picture
+                    ? `${import.meta.env.VITE_SERVER_URL}/images/userAvatars/${user.picture}`
                     : `${import.meta.env.VITE_SERVER_URL}/images/default-avatar.png`
                 }
               />
