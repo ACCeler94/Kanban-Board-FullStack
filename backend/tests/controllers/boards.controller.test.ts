@@ -21,7 +21,10 @@ describe('BoardsController', () => {
     name: 'John Smith',
     email: 'john@example.com',
     auth0Sub: 'auth0|123456789',
+    picture:
+      'lh3_googleusercontent_com_a_ACg8ocJnKucGUckPYzMgMqRABe7_QgIIPUX_caPK0rURrDAyrrNwaw_s96_c.png',
   };
+  const mockCreatedAt: Date = new Date('2024-06-12 16:04:21.778');
 
   describe('getById', () => {
     let req: Partial<Request>;
@@ -48,6 +51,7 @@ describe('BoardsController', () => {
       prisma.userOnBoard.findUnique.mockResolvedValue({
         userId: mockUser.id,
         boardId: mockBoard.id,
+        createdAt: mockCreatedAt,
       });
       prisma.board.findUnique.mockResolvedValue(mockBoard);
 
@@ -63,24 +67,34 @@ describe('BoardsController', () => {
               name: true,
             },
           },
-          users: {
-            select: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
           tasks: {
             orderBy: {
-              createdAt: 'asc',
+              order: 'asc',
             },
-            include: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              order: true,
+              assignedUsers: {
+                orderBy: {
+                  createdAt: 'asc',
+                },
+                select: {
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
               subtasks: {
                 orderBy: {
                   createdAt: 'asc',
+                },
+                select: {
+                  finished: true,
                 },
               },
             },
@@ -114,6 +128,7 @@ describe('BoardsController', () => {
       prisma.userOnBoard.findUnique.mockResolvedValue({
         userId: mockUser.id,
         boardId: mockBoard.id,
+        createdAt: mockCreatedAt,
       });
       prisma.board.findUnique.mockResolvedValue(null);
 
@@ -125,7 +140,7 @@ describe('BoardsController', () => {
 
     it('should call next with an error if an exception occurs', async () => {
       const error = new Error('Database error');
-      prisma.board.findUnique.mockRejectedValue(error);
+      prisma.userOnBoard.findUnique.mockRejectedValue(error);
 
       await BoardsController.getById(req as Request, res as Response, next);
 
@@ -162,6 +177,7 @@ describe('BoardsController', () => {
       prisma.userOnBoard.create.mockResolvedValue({
         userId: userId,
         boardId: '1',
+        createdAt: mockCreatedAt,
       });
 
       await BoardsController.createBoard(req as Request, res as Response, next);
@@ -180,7 +196,7 @@ describe('BoardsController', () => {
       await BoardsController.createBoard(req as Request, res as Response, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid board data!' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid board data.' });
     });
 
     it('should call next with an error if transaction fails', async () => {
@@ -286,8 +302,9 @@ describe('BoardsController', () => {
 
     beforeEach(() => {
       req = {
-        params: { boardId: '1', userId: '101bb551-a405-4e38-aa86-e9d102b288ed' },
+        params: { boardId: '1' },
         session: { userId } as Session & Partial<SessionData>,
+        body: { email: 'johnSmith@gmail.com' },
       };
 
       res = {
@@ -298,13 +315,14 @@ describe('BoardsController', () => {
       next = vi.fn() as unknown as NextFunction;
     });
 
-    it('should return 201 status and success message if the user was added to the board', async () => {
+    it('should return 201 status and added user if the user was successfully added to the board', async () => {
       prisma.board.findUnique.mockResolvedValue(mockBoard);
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.userOnBoard.findUnique.mockResolvedValue(null);
       prisma.userOnBoard.create.mockResolvedValue({
         userId: '101bb551-a405-4e38-aa86-e9d102b288ed',
         boardId: '1',
+        createdAt: mockCreatedAt,
       });
 
       await BoardsController.addUserToBoard(req as Request, res as Response, next);
@@ -312,12 +330,12 @@ describe('BoardsController', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(prisma.userOnBoard.create).toHaveBeenCalledWith({
         data: {
-          userId: req.params!.userId,
+          userId: mockUser.id,
           boardId: req.params!.boardId,
         },
       });
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({ message: 'User assigned to the board!' });
+      expect(res.json).toHaveBeenCalledWith(mockUser);
     });
 
     it('should return 404 status and error message if board was not found', async () => {
@@ -357,6 +375,7 @@ describe('BoardsController', () => {
       prisma.userOnBoard.findUnique.mockResolvedValue({
         userId: '101bb551-a405-4e38-aa86-e9d102b288ed',
         boardId: '1',
+        createdAt: mockCreatedAt,
       });
 
       await BoardsController.addUserToBoard(req as Request, res as Response, next);
@@ -460,16 +479,35 @@ describe('BoardsController', () => {
       next = vi.fn() as unknown as NextFunction;
     });
 
-    it('should return 200 status and success message if user was removed from the board', async () => {
+    it('should return 200 status and ids of tasks from which the user was deleted if user was removed from the board', async () => {
+      prisma.$transaction.mockImplementation(async (fn) => {
+        const result = await fn(prisma);
+        return result;
+      });
       prisma.board.findUnique.mockResolvedValue(mockBoard);
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.userOnBoard.findUnique.mockResolvedValue({
         userId: req.params!.userId,
         boardId: req.params!.boardId,
+        createdAt: mockCreatedAt,
       });
+      prisma.task.findMany.mockResolvedValue([
+        {
+          id: '123',
+          createdAt: mockCreatedAt,
+          updatedAt: new Date(),
+          title: 'abc',
+          desc: 'abc',
+          order: 0,
+          boardId: mockBoard.id,
+          authorId: mockUser.id,
+          status: 'IN_PROGRESS',
+        },
+      ]);
       prisma.userOnBoard.delete.mockResolvedValue({
         userId: req.params!.userId,
         boardId: req.params!.boardId,
+        createdAt: mockCreatedAt,
       });
 
       await BoardsController.deleteUserFromBoard(req as Request, res as Response, next);
@@ -484,7 +522,7 @@ describe('BoardsController', () => {
         },
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'User removed from the board!' });
+      expect(res.json).toHaveBeenCalledWith(['123']); // The controller returns the array of taskIds to delete
     });
 
     it('should return 404 status and error status if board was not found', async () => {
@@ -531,6 +569,25 @@ describe('BoardsController', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'User is not assigned to this board!',
       });
+    });
+
+    it('should call next with an error if transaction fails', async () => {
+      const error = new Error('Transaction failed');
+      prisma.$transaction.mockImplementation(() => {
+        throw error;
+      });
+      prisma.board.findUnique.mockResolvedValue(mockBoard);
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.userOnBoard.findUnique.mockResolvedValue({
+        userId: req.params!.userId,
+        boardId: req.params!.boardId,
+        createdAt: mockCreatedAt,
+      });
+      prisma.task.findMany.mockResolvedValue([]);
+
+      await BoardsController.deleteUserFromBoard(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
     });
 
     it('should call next with an error if an exception occurs', async () => {
