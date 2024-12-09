@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Board, Task, User } from '@prisma/client';
+import { NextFunction, Request, Response } from 'express';
+import { Session, SessionData } from 'express-session';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import UsersController from '../../controllers/users.controller';
 import prisma from '../../prisma/__mocks__/prisma';
-import { Board, Task, User } from '@prisma/client';
-import { Session, SessionData } from 'express-session';
 
 vi.mock('../../prisma/prisma.ts');
 
@@ -13,8 +13,21 @@ describe('UsersController', () => {
     name: 'John Doe',
     email: 'john@example.com',
     auth0Sub: 'auth0|123456789',
+    picture: 'abc.png',
   };
 
+  const mockUserWithBoard = {
+    ...mockUser,
+    boards: [
+      {
+        board: {
+          id: '1',
+          createdAt: new Date('2024-06-12 16:04:21.778'),
+          title: 'abc',
+        },
+      },
+    ],
+  };
   const userId = '83d9930a-bdbe-4d70-9bb3-540910cb7ff4';
 
   describe('getById', () => {
@@ -41,6 +54,7 @@ describe('UsersController', () => {
         id: mockUser.id,
         name: mockUser.name,
         email: mockUser.email,
+        picture: mockUser.picture,
       } as User);
 
       await UsersController.getById(req as Request, res as Response, next);
@@ -52,6 +66,7 @@ describe('UsersController', () => {
           id: true,
           name: true,
           email: true,
+          picture: true,
         },
       });
       expect(res.status).toHaveBeenCalledWith(200);
@@ -59,6 +74,7 @@ describe('UsersController', () => {
         id: mockUser.id,
         name: mockUser.name,
         email: mockUser.email,
+        picture: mockUser.picture,
       });
     });
 
@@ -76,6 +92,74 @@ describe('UsersController', () => {
       prisma.user.findUnique.mockRejectedValue(error);
 
       await UsersController.getById(req as Request, res as Response, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('getUserBoards', () => {
+    let req: Partial<Request>;
+    let res: Partial<Response>;
+    let next: NextFunction;
+
+    beforeEach(() => {
+      req = {
+        session: { userId } as Session & Partial<SessionData>,
+      };
+
+      res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn(),
+      };
+
+      next = vi.fn() as unknown as NextFunction;
+    });
+
+    it('should return the user and status 200', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUserWithBoard);
+
+      await UsersController.getUserBoards(req as Request, res as Response, next);
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: userId },
+        include: {
+          boards: {
+            select: {
+              board: {
+                select: {
+                  title: true,
+                  id: true,
+                  createdAt: true,
+                },
+              },
+            },
+            orderBy: {
+              board: {
+                createdAt: 'asc',
+              },
+            },
+          },
+        },
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockUserWithBoard);
+    });
+
+    it('should return 404 if user is not found', async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await UsersController.getUserBoards(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ error: 'User not found...' });
+    });
+
+    it('should call next with an error if an exception occurs', async () => {
+      const error = new Error('Database error');
+      prisma.user.findUnique.mockRejectedValue(error);
+
+      await UsersController.getUserBoards(req as Request, res as Response, next);
 
       expect(next).toHaveBeenCalledWith(error);
     });
@@ -172,172 +256,6 @@ describe('UsersController', () => {
       prisma.user.findUnique.mockRejectedValue(error);
 
       await UsersController.getUserData(req as Request, res as Response, next);
-
-      expect(next).toHaveBeenCalledWith(error);
-    });
-  });
-
-  describe('getBySub', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let next: NextFunction;
-
-    beforeEach(() => {
-      req = {
-        session: {
-          auth0User: {
-            sub: 'auth0|66d094172fa4b2a600a5533b',
-            nickname: 'test12345',
-            name: 'test12345@gmail.com',
-            picture:
-              'https://s.gravatar.com/avatar/674ffcfe49d3c0a8343e089464fc1d02?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fte.png',
-            email: 'test12345@gmail.com',
-            email_verified: false,
-          },
-          userId: '034ff530-bb54-4526-877c-4fba3a83e8fe',
-        } as Session & Partial<SessionData>,
-      };
-
-      res = {
-        status: vi.fn().mockReturnThis(),
-        json: vi.fn(),
-      };
-
-      next = vi.fn() as unknown as NextFunction;
-    });
-
-    it('should return the user and 200 status', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockUser);
-
-      await UsersController.getBySub(req as Request, res as Response, next);
-
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(prisma.user.findUnique).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { auth0Sub: req.session?.auth0User?.sub },
-        })
-      );
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockUser);
-    });
-
-    it('should return 400 status and the error message if the user object is not in the request', async () => {
-      req.session!.auth0User = undefined;
-
-      await UsersController.getBySub(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        error: 'User information is missing or incomplete. Try again. ',
-      });
-    });
-
-    it('should return 404 status and the error message if the user was not found', async () => {
-      prisma.user.findUnique.mockResolvedValue(null);
-
-      await UsersController.getBySub(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({
-        error: 'User not found...',
-      });
-    });
-
-    it('should call next with an error if an exception occurs', async () => {
-      const error = new Error('Database error');
-      prisma.user.findUnique.mockRejectedValue(error);
-
-      await UsersController.getBySub(req as Request, res as Response, next);
-
-      expect(next).toHaveBeenCalledWith(error);
-    });
-  });
-
-  describe('findByEmail', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let next: NextFunction;
-
-    beforeEach(() => {
-      req = {
-        query: { email: 'john' },
-      };
-
-      res = {
-        status: vi.fn().mockReturnThis(),
-        json: vi.fn(),
-      };
-
-      next = vi.fn() as unknown as NextFunction;
-    });
-
-    it('should return the users array and 200 status', async () => {
-      const mockUserArr: User[] = [
-        {
-          id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          auth0Sub: 'auth0|123456789',
-        },
-        {
-          id: '2',
-          name: 'John Smith',
-          email: 'johnSmith@example.com',
-          auth0Sub: 'auth0|123456789',
-        },
-      ];
-      prisma.user.findMany.mockResolvedValue(mockUserArr);
-
-      await UsersController.findByEmail(req as Request, res as Response, next);
-
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(prisma.user.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: {
-            email: {
-              contains: req.query!.email,
-            },
-          },
-        })
-      );
-      expect(res.status).toBeCalledWith(200);
-      expect(res.json).toBeCalledWith(mockUserArr);
-    });
-
-    it('should return 404 status and not found message if no users were found', async () => {
-      req.query!.email = 'abc';
-      prisma.user.findMany.mockResolvedValue([]);
-
-      await UsersController.findByEmail(req as Request, res as Response, next);
-
-      expect(res.status).toBeCalledWith(404);
-      expect(res.json).toBeCalledWith({ error: 'No users found...' });
-    });
-
-    it('should return 400 Bad Request if email query is not provided', async () => {
-      req.query = {};
-
-      await UsersController.findByEmail(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid search query.' });
-    });
-
-    it('should return 400 Bad Request if email query is not a string', async () => {
-      req.query!.email = ['abc', 'cde'];
-
-      await UsersController.findByEmail(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid search query.' });
-    });
-
-    it('should call next with an error if an exception occurs', async () => {
-      const error = new Error('Database error');
-      prisma.user.findMany.mockRejectedValue(error);
-
-      await UsersController.findByEmail(req as Request, res as Response, next);
 
       expect(next).toHaveBeenCalledWith(error);
     });
