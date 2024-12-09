@@ -20,20 +20,23 @@ describe('TasksController', () => {
     boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
     authorId: userId,
     status: TaskStatus.TO_DO,
+    order: 0,
   };
 
   const mockSubtask: Subtask = {
-    id: '2',
+    id: '1dac7ee4-88a1-45a7-b745-64121fdff258',
     createdAt: new Date('2024-06-12 16:04:21.778'),
     updatedAt: new Date('2024-06-12 16:04:21.778'),
     taskId: '1',
     desc: 'Test subtask',
     finished: false,
+    order: 0,
   };
 
-  const mockTaskWithSubtask: Task & { subtasks: Subtask[] } = {
+  const mockTaskWithSubtask: Task & { subtasks: Subtask[]; assignedUsers: [] } = {
     ...mockTask,
     subtasks: [mockSubtask],
+    assignedUsers: [],
   };
 
   const mockBoard: Board = {
@@ -48,11 +51,15 @@ describe('TasksController', () => {
     name: 'John Smith',
     email: 'john@example.com',
     auth0Sub: 'auth0|123456789',
+    picture:
+      'lh3_googleusercontent_com_a_ACg8ocJnKucGUckPYzMgMqRABe7_QgIIPUX_caPK0rURrDAyrrNwaw_s96_c.png',
   };
+  const mockCreatedAt: Date = new Date('2024-06-12 16:04:21.778');
 
   const mockUserOnBoard: UserOnBoard = {
     userId: mockUser.id,
     boardId: mockBoard.id,
+    createdAt: mockCreatedAt,
   };
 
   describe('getById', () => {
@@ -85,9 +92,32 @@ describe('TasksController', () => {
       expect(prisma.task.findUnique).toHaveBeenCalledWith({
         where: { id: '1' },
         include: {
-          author: { select: { id: true, name: true } },
-          assignedUsers: { select: { user: { select: { id: true, name: true } } } },
-          subtasks: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          assignedUsers: {
+            orderBy: {
+              createdAt: 'asc',
+            },
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  picture: true,
+                },
+              },
+            },
+          },
+          subtasks: {
+            orderBy: {
+              order: 'asc', // Ensures subtasks are ordered correctly
+            },
+          },
         },
       });
       expect(res.status).toHaveBeenCalledWith(200);
@@ -125,6 +155,7 @@ describe('TasksController', () => {
             title: 'Task one',
             desc: 'this is task one',
             boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
+            status: TaskStatus.TO_DO,
           },
         },
         session: { userId } as Session & Partial<SessionData>,
@@ -145,8 +176,11 @@ describe('TasksController', () => {
             title: 'Task one',
             desc: 'this is task one',
             boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
+            status: TaskStatus.TO_DO,
           },
-          subtaskData: [{ desc: 'Test subtask' }],
+          subtaskData: [
+            { id: '1dac7ee4-88a1-45a7-b745-64121fdff258', desc: 'Test subtask', finished: false },
+          ],
         },
         session: { userId } as Session & Partial<SessionData>,
       };
@@ -169,17 +203,19 @@ describe('TasksController', () => {
           desc: 'this is task one',
           authorId: req.session!.userId,
           boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
+          status: TaskStatus.TO_DO,
+          order: 0,
         },
       });
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(prisma.subtask.createMany).toHaveBeenCalledWith({
-        data: [
-          {
-            desc: 'Test subtask',
-            taskId: mockTaskWithSubtask.id,
-            finished: false,
-          },
-        ],
+      expect(prisma.subtask.create).toHaveBeenCalledWith({
+        data: {
+          id: '1dac7ee4-88a1-45a7-b745-64121fdff258',
+          desc: 'Test subtask',
+          taskId: '1',
+          finished: false,
+          order: 0,
+        },
       });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(mockTaskWithSubtask);
@@ -202,6 +238,8 @@ describe('TasksController', () => {
           desc: 'this is task one',
           authorId: req.session!.userId,
           boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
+          order: 0,
+          status: TaskStatus.TO_DO,
         },
       });
       expect(res.status).toHaveBeenCalledWith(201);
@@ -215,8 +253,11 @@ describe('TasksController', () => {
             title: 'Task one',
             desc: 'this is task one',
             boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
+            status: TaskStatus.TO_DO,
           },
-          subtaskData: [{ desc: 'Test subtask' }],
+          subtaskData: [
+            { id: '1dac7ee4-88a1-45a7-b745-64121fdff258', desc: 'Test subtask', finished: false },
+          ],
         },
         session: { userId } as Session & Partial<SessionData>,
       };
@@ -227,9 +268,10 @@ describe('TasksController', () => {
 
       prisma.board.findUnique.mockResolvedValue(mockBoard);
       prisma.userOnBoard.findUnique.mockResolvedValue(mockUserOnBoard);
-      prisma.task.create.mockResolvedValue(mockTaskWithSubtask);
+      prisma.task.create.mockResolvedValue(mockTask);
       const subtaskError = new Error('Subtask creation failed');
-      prisma.subtask.createMany.mockRejectedValue(subtaskError);
+      prisma.subtask.create.mockRejectedValue(subtaskError);
+      prisma.task.findUnique.mockResolvedValue(mockTask);
 
       await TasksController.createTask(req as Request, res as Response, next);
 
@@ -240,12 +282,12 @@ describe('TasksController', () => {
     });
 
     it('should return 400 status and error message if task data is invalid', async () => {
-      req.body = undefined;
+      req.body = {};
 
       await TasksController.createTask(req as Request, res as Response, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid data.' });
+      expect(res.json).toHaveBeenCalledWith([{ message: 'Required', path: ['taskData'] }]);
     });
 
     it('should return 404 status and error message if board where the task is being created does not exist', async () => {
@@ -295,6 +337,7 @@ describe('TasksController', () => {
       boardId: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
       authorId: userId,
       status: TaskStatus.TO_DO,
+      order: 0,
       board: {
         id: '8e96a8d2-8b3d-4c3a-aa21-dada91dcda83',
         createdAt: new Date('2024-06-12 16:04:21.778'),
@@ -308,8 +351,8 @@ describe('TasksController', () => {
       req = {
         params: {
           taskId: mockTask.id,
-          userId: mockUser.id,
         },
+        body: { email: 'john@example.com' },
       };
 
       res = {
@@ -320,20 +363,24 @@ describe('TasksController', () => {
       next = vi.fn() as unknown as NextFunction;
     });
 
-    it('should return 201 status and success message if the user was added to the task', async () => {
+    it('should return 201 status and added user if the operation was successful', async () => {
       prisma.task.findUnique.mockResolvedValue(mockTaskExtended);
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.userOnTask.findUnique.mockResolvedValue(null);
-      prisma.userOnTask.create.mockResolvedValue({ userId: mockUser.id, taskId: mockTask.id });
+      prisma.userOnTask.create.mockResolvedValue({
+        userId: mockUser.id,
+        taskId: mockTask.id,
+        createdAt: mockCreatedAt,
+      });
 
       await TasksController.addUserToTask(req as Request, res as Response, next);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(prisma.userOnTask.create).toHaveBeenCalledWith({
-        data: { userId: req.params!.userId, taskId: req.params!.taskId },
+        data: { userId: mockUser.id, taskId: req.params!.taskId },
       });
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({ message: 'User assigned to the task!' });
+      expect(res.json).toHaveBeenCalledWith(mockUser);
     });
 
     it('should return 404 status and error message if task was not found', async () => {
@@ -343,6 +390,23 @@ describe('TasksController', () => {
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({ error: 'Task not found...' });
+    });
+
+    it('should return 400 status and error message if user email has invalid format', async () => {
+      req = {
+        params: {
+          taskId: mockTask.id,
+        },
+        body: { email: 1 },
+      };
+
+      prisma.task.findUnique.mockResolvedValue(mockTaskExtended);
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await TasksController.addUserToTask(req as Request, res as Response, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid email data.' });
     });
 
     it('should return 404 status and error message if user was not found', async () => {
@@ -371,19 +435,23 @@ describe('TasksController', () => {
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({
-        error: 'Access forbidden! User is not assigned to the board.',
+        error: 'User is not assigned to the board. Please add the user to the board first.',
       });
     });
 
     it('should return 409 status and error message if user is already assigned to the task', async () => {
       prisma.task.findUnique.mockResolvedValue(mockTaskExtended);
       prisma.user.findUnique.mockResolvedValue(mockUser);
-      prisma.userOnTask.findUnique.mockResolvedValue({ userId: mockUser.id, taskId: mockTask.id });
+      prisma.userOnTask.findUnique.mockResolvedValue({
+        userId: mockUser.id,
+        taskId: mockTask.id,
+        createdAt: mockCreatedAt,
+      });
 
       await TasksController.addUserToTask(req as Request, res as Response, next);
 
       expect(res.status).toHaveBeenCalledWith(409);
-      expect(res.json).toHaveBeenCalledWith({ error: 'User is already added to the task!' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'User is already added to this task!' });
     });
 
     it('should call next with an error if an exception occurs', async () => {
@@ -416,12 +484,22 @@ describe('TasksController', () => {
         json: vi.fn(),
       };
 
+      prisma.$transaction.mockImplementation(async (fn) => {
+        const result = await fn(prisma);
+        return result;
+      });
+
       next = vi.fn() as unknown as NextFunction;
     });
 
-    it('should return 200 status and success message if task was updated - only taskData was provided', async () => {
-      const mockTaskUpdated = { ...mockTask, title: 'Task One edited' };
-      prisma.task.findUnique.mockResolvedValue(mockTask);
+    it('should return 200 status and updated task if task was updated - only taskData was provided', async () => {
+      const mockTaskUpdated = {
+        ...mockTask,
+        title: 'Task One edited',
+        assignedUsers: [],
+        subtasks: [],
+      };
+      prisma.task.findUnique.mockResolvedValue(mockTask).mockResolvedValue(mockTaskUpdated);
       prisma.task.update.mockResolvedValue(mockTaskUpdated);
 
       await TasksController.editTask(req as Request, res as Response, next);
@@ -430,20 +508,113 @@ describe('TasksController', () => {
       expect(prisma.task.update).toHaveBeenCalledWith({
         where: { id: req.params!.taskId },
         data: {
-          ...mockTask,
           title: 'Task One edited',
         },
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Task updated!' });
+      expect(res.json).toHaveBeenCalledWith(mockTaskUpdated);
     });
 
-    it('should return 200 status and success message if task was updated with new subtask', async () => {
-      req.body = {
-        taskData: {},
-        subtaskData: [{ desc: 'Test subtask' }],
+    it('should return 200 status and updated task if only task order changed', async () => {
+      req = {
+        params: {
+          taskId: '1',
+        },
+        body: {
+          taskData: { order: 1 },
+        },
       };
+
+      const mockTaskUpdated = {
+        ...mockTask,
+        assignedUsers: [],
+        subtasks: [],
+        order: 1,
+      };
+      prisma.task.findUnique.mockResolvedValue(mockTask).mockResolvedValue(mockTaskUpdated);
+      prisma.task.update.mockResolvedValue(mockTaskUpdated);
+      // Mock findMany call for current/origin column - target column is empty as only order changed
+      prisma.task.findMany.mockResolvedValue([mockTaskUpdated]);
+
+      await TasksController.editTask(req as Request, res as Response, next);
+
+      // First update call
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.task.update).toHaveBeenCalledWith({
+        where: { id: req.params!.taskId },
+        data: {
+          order: 1,
+        },
+      });
+      // Second update call after all tasks within the column were reordered
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.task.update).toHaveBeenCalledWith({
+        where: { id: req.params!.taskId },
+        data: {
+          order: 0,
+        },
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockTaskUpdated);
+    });
+
+    it('should return 200 status and updated task if both task order and task status changed', async () => {
+      req = {
+        params: {
+          taskId: '1',
+        },
+        body: {
+          taskData: { order: 1, status: TaskStatus.IN_PROGRESS },
+        },
+      };
+
+      const mockTaskUpdated = {
+        ...mockTask,
+        order: 0,
+      };
+
       prisma.task.findUnique.mockResolvedValue(mockTask);
+      prisma.task.update.mockResolvedValue(mockTaskUpdated);
+      // Mock findMany call for current column
+      prisma.task.findMany
+        .mockResolvedValueOnce([mockTask]) // Current column before the move
+        .mockResolvedValueOnce([]); // Target column (empty)
+
+      await TasksController.editTask(req as Request, res as Response, next);
+
+      // First update call - directly setting `order` and `status`
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.task.update).toHaveBeenCalledWith({
+        where: { id: req.params!.taskId },
+        data: {
+          order: 1,
+          status: TaskStatus.IN_PROGRESS,
+        },
+      });
+
+      // Second update call - reordering in the target column
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(prisma.task.update).toHaveBeenCalledWith({
+        where: { id: req.params!.taskId },
+        data: {
+          order: 0, // Correctly recalculated as the first task in the target column
+        },
+      });
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockTaskUpdated);
+    });
+
+    it('should return 200 status and updated task if task was updated with new subtask', async () => {
+      req.body = {
+        params: {
+          taskId: '1',
+        },
+        taskData: {},
+        subtaskData: [{ id: mockSubtask.id, desc: 'Test subtask' }],
+      };
+      prisma.task.findUnique.mockResolvedValue(mockTask).mockResolvedValue(mockTaskWithSubtask);
+      prisma.subtask.findMany.mockResolvedValue([]);
       prisma.subtask.create.mockResolvedValue({ ...mockSubtask, taskId: mockTask.id });
 
       await TasksController.editTask(req as Request, res as Response, next);
@@ -451,31 +622,44 @@ describe('TasksController', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(prisma.subtask.create).toHaveBeenCalledWith({
         data: {
+          id: mockSubtask.id,
           taskId: mockTask.id,
           desc: mockSubtask.desc,
           finished: false,
+          order: 0,
         },
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Task updated!' });
+      expect(res.json).toHaveBeenCalledWith(mockTaskWithSubtask);
     });
 
     it('should return 400 status and error message if provided data is not in a valid format', async () => {
-      req.body = { subtaskData: { title: 1 } }; // object instead of array - zod validation fails
+      req = {
+        params: {
+          taskId: '1',
+        },
+        body: {
+          taskData: { title: 12 }, // one property is enough as the method allows partial updates
+        },
+      };
 
       await TasksController.editTask(req as Request, res as Response, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid data' });
+      expect(res.json).toHaveBeenCalledWith([
+        { message: 'Expected string, received number', path: ['taskData', 'title'] },
+      ]);
     });
 
-    it('should return 400 status and error message if task data is an empty object', async () => {
+    it('should return 400 status and error message if task data and subtask data are empty', async () => {
       req.body = {};
 
       await TasksController.editTask(req as Request, res as Response, next);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Updated task data cannot be empty!' });
+      expect(res.json).toHaveBeenCalledWith([
+        { message: 'No changes detected. You must modify the task to save changes!', path: [] },
+      ]);
     });
 
     it('should return 404 status and error message if task was not found', async () => {
@@ -575,10 +759,12 @@ describe('TasksController', () => {
       prisma.userOnTask.findUnique.mockResolvedValue({
         userId: '3713d558-d107-4c4b-b651-a99676e4315e',
         taskId: '1',
+        createdAt: mockCreatedAt,
       });
       prisma.userOnTask.delete.mockResolvedValue({
         userId: '3713d558-d107-4c4b-b651-a99676e4315e',
         taskId: '1',
+        createdAt: mockCreatedAt,
       });
 
       await TasksController.deleteUserFromTask(req as Request, res as Response, next);
@@ -631,57 +817,6 @@ describe('TasksController', () => {
       prisma.task.findUnique.mockRejectedValue(error);
 
       await TasksController.deleteUserFromTask(req as Request, res as Response, next);
-
-      expect(next).toHaveBeenCalledWith(error);
-    });
-  });
-
-  describe('deleteSubtask', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let next: NextFunction;
-
-    beforeEach(() => {
-      req = {
-        params: {
-          subtaskId: '1',
-        },
-      };
-
-      res = {
-        status: vi.fn().mockReturnThis(),
-        json: vi.fn(),
-      };
-
-      next = vi.fn() as unknown as NextFunction;
-    });
-
-    it('should return 200 status and success message if subtask was successfully deleted', async () => {
-      prisma.subtask.findUnique.mockResolvedValue(mockSubtask);
-      prisma.subtask.delete.mockResolvedValue(mockSubtask);
-
-      await TasksController.deleteSubtask(req as Request, res as Response, next);
-
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(prisma.subtask.delete).toHaveBeenCalledWith({ where: { id: req.params!.subtaskId } });
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Subtask successfully removed!' });
-    });
-
-    it('should return 404 status and error message if subtask was not found', async () => {
-      prisma.subtask.findUnique.mockResolvedValue(null);
-
-      await TasksController.deleteSubtask(req as Request, res as Response, next);
-
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Subtask not found...' });
-    });
-
-    it('should call next with an error if an exception occurs', async () => {
-      const error = new Error('Database error');
-      prisma.subtask.findUnique.mockRejectedValue(error);
-
-      await TasksController.deleteSubtask(req as Request, res as Response, next);
 
       expect(next).toHaveBeenCalledWith(error);
     });
