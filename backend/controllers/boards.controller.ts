@@ -5,17 +5,6 @@ import UpdateBoardTitleDTO from '../validators/boards/update-board-title.dto';
 import EmailSchema from '../validators/EmailSchema';
 
 const BoardsController = {
-  // [TODO - delete this endpoint for production]
-  getAll: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const boards = await prisma.board.findMany({ include: { users: true } });
-
-      res.status(200).json(boards);
-    } catch (error) {
-      next(error);
-    }
-  },
-
   // Getting board by ID is allowed only for  assigned users
   getById: async (req: Request, res: Response, next: NextFunction) => {
     const { boardId } = req.params;
@@ -140,7 +129,7 @@ const BoardsController = {
     try {
       boardData = createBoardDTO.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid board data!' });
+      return res.status(400).json({ error: 'Invalid board data.' });
     }
 
     const requestAuthorId = req.session.userId;
