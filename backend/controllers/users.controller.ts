@@ -1,21 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../prisma/prisma';
 import createUserDTO from '../validators/users/create-user.dto';
-import EmailSchema from '../validators/EmailSchema';
 
 const UsersController = {
   // GET
-  // [TODO - delete this endpoint for production]
-  getAll: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const users = await prisma.user.findMany({ include: { boards: true, assignedTasks: true } });
-
-      res.status(200).json(users);
-    } catch (error) {
-      next(error);
-    }
-  },
-
   getById: async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
 
@@ -123,58 +111,6 @@ const UsersController = {
       res.status(200).json(user);
     } catch (error) {
       next(error);
-    }
-  },
-
-  getBySub: async (req: Request, res: Response, next: NextFunction) => {
-    const authUser = req.session.auth0User;
-
-    // Check if user object is available in request
-    if (!authUser || !authUser.sub) {
-      return res
-        .status(400)
-        .json({ error: 'User information is missing or incomplete. Try again. ' });
-    }
-
-    try {
-      const user = await prisma.user.findUnique({ where: { auth0Sub: authUser.sub } });
-
-      if (!user) return res.status(404).json({ error: 'User not found...' });
-
-      res.status(200).json(user);
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  findByEmail: async (req: Request, res: Response, next: NextFunction) => {
-    let email;
-
-    try {
-      ({ email } = EmailSchema.parse(req.body));
-    } catch (error) {
-      return res.status(400).json({ error: 'Invalid email data.' });
-    }
-
-    try {
-      const user = await prisma.user.findUnique({
-        where: {
-          email,
-        },
-        select: {
-          name: true,
-          email: true,
-          picture: true,
-        },
-      });
-
-      if (!user) {
-        return res.status(404).json({ error: 'User not found...' });
-      }
-
-      return res.status(200).json(user);
-    } catch (error) {
-      return next(error);
     }
   },
 
