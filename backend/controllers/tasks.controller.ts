@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
 import prisma from '../prisma/prisma';
 import EmailSchema from '../validators/EmailSchema';
 import { createTaskDTO } from '../validators/tasks/create-task.dto';
@@ -60,7 +61,14 @@ const TasksController = {
     try {
       validatedData = createTaskDTO.parse(req.body);
     } catch (error) {
-      return res.status(400).json({ error: 'Invalid data.' });
+      if (error instanceof ZodError) {
+        const formattedErrors = error.errors.map(({ message, path }) => ({
+          message,
+          path,
+        }));
+        return res.status(400).json(formattedErrors);
+      }
+      return res.status(400).json({ error: 'Invalid task data.' });
     }
 
     const { taskData, subtaskData } = validatedData;
@@ -82,23 +90,20 @@ const TasksController = {
         },
       });
       if (!isUserAssigned)
-        return res.status(403).json({ error: 'User not assigned to the board.' });
+        return res
+          .status(403)
+          .json({ error: 'Access forbidden! User is not assigned to the board.' });
 
-      // Find the highest current order for tasks in the same board and status - newly created tasks are always added as the last within the column/status
+      // Find the highest current order for tasks in the same board and status
       const maxOrder = await prisma.task.findFirst({
         where: { boardId: taskData.boardId, status: taskData.status },
         orderBy: { order: 'desc' },
         select: { order: true },
       });
 
-      let newOrder;
-      if (maxOrder && typeof maxOrder.order === 'number') {
-        newOrder = maxOrder.order + 1;
-      } else {
-        newOrder = 0;
-      }
+      const newOrder = maxOrder && typeof maxOrder.order === 'number' ? maxOrder.order + 1 : 0;
 
-      // Create the task with the calculated order
+      // Create the task
       const task = await prisma.task.create({
         data: {
           ...taskData,
@@ -107,26 +112,43 @@ const TasksController = {
         },
       });
 
-      // Handle subtasks if provided
-      if (subtaskData && subtaskData.length > 0) {
-        await prisma.$transaction(async (tx) => {
-          for (let index = 0; index < subtaskData.length; index++) {
-            const subtask = subtaskData[index];
-            await tx.subtask.create({
-              data: {
-                ...subtask,
-                taskId: task.id,
-                order: index,
-              },
-            });
-          }
+      let taskWithSubtasks;
+      let subtaskError = null;
+
+      // Attempt to create subtasks
+      try {
+        if (subtaskData && subtaskData.length > 0) {
+          await prisma.$transaction(async (tx) => {
+            for (let index = 0; index < subtaskData.length; index++) {
+              const subtask = subtaskData[index];
+              await tx.subtask.create({
+                data: {
+                  ...subtask,
+                  taskId: task.id,
+                  order: index,
+                },
+              });
+            }
+          });
+        }
+
+        // Fetch task with subtasks
+        taskWithSubtasks = await prisma.task.findUnique({
+          where: { id: task.id },
+          include: { subtasks: { orderBy: { order: 'asc' } } },
+        });
+      } catch (subtaskCreationError) {
+        subtaskError =
+          'Failed to create some or all subtasks. The main task was created successfully.';
+        taskWithSubtasks = task; // Return the task without subtasks
+        console.error('Subtask creation error:', subtaskCreationError);
+      }
+
+      if (subtaskError) {
+        return res.status(500).json({
+          error: subtaskError,
         });
       }
-      // Fetch the task with subtasks
-      const taskWithSubtasks = await prisma.task.findUnique({
-        where: { id: task.id },
-        include: { subtasks: { orderBy: { order: 'asc' } } },
-      });
 
       res.status(201).json(taskWithSubtasks);
     } catch (error) {
@@ -202,11 +224,17 @@ const TasksController = {
     try {
       validatedData = editTaskDTO.parse(req.body); // Validate incoming data
     } catch (error) {
+      if (error instanceof ZodError) {
+        const formattedErrors = error.errors.map(({ message, path }) => ({
+          message,
+          path,
+        }));
+        return res.status(400).json(formattedErrors);
+      }
       return res.status(400).json({ error: 'Invalid data.' });
     }
 
     const { taskData, subtaskData, subtasksToRemove } = validatedData;
-
     try {
       const task = await prisma.task.findUnique({ where: { id: taskId } });
       if (!task) return res.status(404).json({ error: 'Task not found...' });
@@ -392,20 +420,6 @@ const TasksController = {
         },
       });
       res.status(200).json({ message: 'User removed from the task!' });
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  deleteSubtask: async (req: Request, res: Response, next: NextFunction) => {
-    const { subtaskId } = req.params;
-
-    try {
-      const subtask = await prisma.subtask.findUnique({ where: { id: subtaskId } });
-      if (!subtask) return res.status(404).json({ error: 'Subtask not found...' });
-
-      await prisma.subtask.delete({ where: { id: subtaskId } });
-      return res.status(200).json({ message: 'Subtask successfully removed!' });
     } catch (error) {
       next(error);
     }
