@@ -10,10 +10,6 @@ const router = Router();
 router.use(verifyJwt); // Add to all board routes
 
 // GET
-
-// [TODO - delete this endpoint for production]
-router.get('/boards', BoardsController.getAll);
-
 router.route('/boards/:boardId').get(validateBoardIdParams, BoardsController.getById);
 
 router.route('/boards/:boardId/users').get(validateBoardIdParams, BoardsController.getBoardUsers);
