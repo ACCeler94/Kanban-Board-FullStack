@@ -4,7 +4,7 @@ import styles from './LoadingOverlay.module.css';
 const LoadingOverlay = () => {
   return (
     <div className={styles.overlay}>
-      <CircularProgress />
+      <CircularProgress aria-label='Loading spinner' />
     </div>
   );
 };
