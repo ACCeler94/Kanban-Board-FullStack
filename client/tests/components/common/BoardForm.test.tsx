@@ -59,4 +59,14 @@ describe('BoardForm', () => {
     expect(titleInput).toHaveAttribute('MaxLength', '100');
     expect(submitHandler).toHaveBeenCalledWith('a'.repeat(100));
   });
+
+  it('should not call submitHandler if the enter button is pressed', async () => {
+    const { submitHandler, titleInput, user } = renderComponent();
+    const title = 'abc';
+    await user.type(titleInput, title);
+
+    await user.type(titleInput, '{Enter}');
+
+    expect(submitHandler).not.toBeCalled();
+  });
 });
