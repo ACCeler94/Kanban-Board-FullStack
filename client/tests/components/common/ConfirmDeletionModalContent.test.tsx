@@ -6,10 +6,10 @@ import deletionModalStyles from '../../../src/components/common/ConfirmDeleteMod
 import AllProviders from '../../AllProviders';
 
 describe('ConfirmDeletionModalContent', () => {
-  const handleDelete = vi.fn();
-  const handleClose = vi.fn();
-
   const renderComponent = (subject: string) => {
+    const handleDelete = vi.fn();
+    const handleClose = vi.fn();
+
     render(
       <Dialog open>
         <ConfirmDeletionModalContent
@@ -22,6 +22,8 @@ describe('ConfirmDeletionModalContent', () => {
     );
 
     return {
+      handleClose,
+      handleDelete,
       user: userEvent.setup(),
       cancelBtn: screen.getByRole('button', { name: /cancel/i }),
       deleteBtn: screen.getByRole('button', { name: /delete/i }),
@@ -56,7 +58,7 @@ describe('ConfirmDeletionModalContent', () => {
   });
 
   it('should call handleDelete when delete button is clicked', async () => {
-    const { user, deleteBtn } = renderComponent('user');
+    const { handleDelete, user, deleteBtn } = renderComponent('user');
 
     await user.click(deleteBtn);
 
@@ -64,7 +66,7 @@ describe('ConfirmDeletionModalContent', () => {
   });
 
   it('should call handleClose if cancel button is clicked', async () => {
-    const { user, cancelBtn } = renderComponent('user');
+    const { handleClose, user, cancelBtn } = renderComponent('user');
 
     await user.click(cancelBtn);
 
@@ -72,7 +74,7 @@ describe('ConfirmDeletionModalContent', () => {
   });
 
   it('should call handleClose if close button is clicked', async () => {
-    const { user, closeBtn } = renderComponent('user');
+    const { handleClose, user, closeBtn } = renderComponent('user');
 
     await user.click(closeBtn);
 
