@@ -25,7 +25,7 @@ const LoadingModalContent = ({ handleClose }: LoadingModalProps) => {
       </div>
       <div className={modalStyles.modalContent}>
         <div className={modalStyles.spinnerWrapper}>
-          <CircularProgress />
+          <CircularProgress aria-label='Loading spinner' />
         </div>
       </div>
     </>
