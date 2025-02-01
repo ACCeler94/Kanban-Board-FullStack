@@ -69,7 +69,7 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
               <button
                 className={styles.deleteButton}
                 type='button'
-                aria-label='Delete Subtask'
+                aria-label={`Delete Subtask ${subtask.id}`}
                 onClick={() => handleSubtaskDelete(subtask.id)}
               >
                 <FaTrash />
@@ -81,6 +81,7 @@ const SubtasksInputs = ({ subtasks, setSubtasks, originalSubtasks }: SubtasksInp
           <TextField
             aria-label='New Subtask'
             fullWidth
+            inputProps={{ maxLength: 200 }}
             placeholder='Break down this task into smaller steps...'
             sx={{ marginRight: '10px' }}
             value={newSubtask.desc}
