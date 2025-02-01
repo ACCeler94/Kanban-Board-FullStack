@@ -1,5 +1,6 @@
 import { Button, MenuItem } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import useStore from '../../../store/useStore';
 import {
@@ -33,6 +34,8 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
   const [desc, setDesc] = useState(taskDesc || '');
   const [status, setStatus] = useState(taskStatus || TaskStatus.TO_DO);
   const [subtasks, setSubtasks] = useState<(Subtask | NewSubtaskData)[]>(taskSubtasks || []);
+  const [isChanged, setIsChanged] = useState(false);
+  const setSubtasksToRemove = useStore((state) => state.setSubtasksToRemove);
   const selectOptions = [
     {
       value: TaskStatus.TO_DO,
@@ -44,7 +47,18 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
     },
     { value: TaskStatus.DONE, label: 'Done' },
   ];
-  const setSubtasksToRemove = useStore((state) => state.setSubtasksToRemove);
+
+  // Check for valid changes to enable submission
+  useEffect(() => {
+    const initialState = {
+      title: taskTitle || '',
+      desc: taskDesc || '',
+      status: taskStatus || TaskStatus.TO_DO,
+      subtasks: taskSubtasks || [],
+    };
+    const hasValidChanges = !_.isEqual({ title, desc, status, subtasks }, initialState);
+    setIsChanged(hasValidChanges && title.trim().length > 0);
+  }, [title, desc, status, subtasks, taskTitle, taskDesc, taskStatus, taskSubtasks]);
 
   // Reset subtasksToRemove global state when the task form unmounts (either on close or when submitted)
   useEffect(() => {
@@ -55,6 +69,7 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!isChanged) return;
     submitHandler({ taskData: { title, desc, status }, subtaskData: subtasks } as T);
   };
 
@@ -125,6 +140,7 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
         color='primary'
         variant='contained'
         className='button-small'
+        disabled={!isChanged}
         onKeyDown={(e) => {
           if (e.key === 'Enter') e.preventDefault();
         }}
