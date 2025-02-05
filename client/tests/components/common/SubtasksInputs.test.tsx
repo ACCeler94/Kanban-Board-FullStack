@@ -51,7 +51,7 @@ describe('SubtasksInputs', () => {
   it('should render subtask input and delete button for every existing subtask', () => {
     renderComponent({ subtasks: existingSubtasks, originalSubtasks: existingSubtasks });
 
-    const subtaskInputs = screen.getAllByLabelText(/edit/i);
+    const subtaskInputs = screen.getAllByLabelText(/edit subtask/i);
     const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
 
     expect(subtaskInputs.length).toBe(2);

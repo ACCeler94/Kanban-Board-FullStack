@@ -67,6 +67,7 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
     };
   }, [setSubtasksToRemove]);
 
+  // Data validation and removal of unchanged properties is done within the query hook
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isChanged) return;
