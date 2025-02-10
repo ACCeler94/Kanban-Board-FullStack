@@ -28,6 +28,7 @@ const BoardMenu = ({ isAuthor }: BoardMenuProps) => {
     <div className={styles.menuWrapper}>
       <button
         type='button'
+        aria-label='Menu button'
         id='board-menu-button'
         aria-controls={open ? 'board-menu-button' : undefined}
         aria-haspopup='true'
