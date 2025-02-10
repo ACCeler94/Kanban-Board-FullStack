@@ -2,12 +2,16 @@ import { IoMdClose } from 'react-icons/io';
 import modalStyles from '../../../styles/modal.module.css';
 
 interface ErrorModalProps {
-  error: Error;
+  error: Error | string;
   handleClose: () => void;
 }
 
 // The Dialog component must be provided by the parent - otherwise the modal will be flashing when mounting and unmounting
 const ErrorModalContent = ({ handleClose, error }: ErrorModalProps) => {
+  let errorToDisplay;
+  if (typeof error === 'string') errorToDisplay = error;
+  else errorToDisplay = error.message;
+
   return (
     <>
       <div className={modalStyles.modalHeaderWrapper}>
@@ -23,7 +27,7 @@ const ErrorModalContent = ({ handleClose, error }: ErrorModalProps) => {
           </button>
         </div>
       </div>
-      <div className={modalStyles.modalContent}>Error: {error.message}</div>
+      <div className={modalStyles.modalContent}>Error: {errorToDisplay}</div>
     </>
   );
 };

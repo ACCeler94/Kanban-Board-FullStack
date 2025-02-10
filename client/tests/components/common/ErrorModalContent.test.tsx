@@ -5,7 +5,7 @@ import AllProviders from '../../AllProviders';
 import ErrorModalContent from '../../../src/components/common/ErrorModalContent/ErrorModalContent';
 
 describe('ErrorModalContent', () => {
-  const renderComponent = (error: Error) => {
+  const renderComponent = (error: Error | string) => {
     const handleClose = vi.fn();
 
     render(
@@ -22,13 +22,26 @@ describe('ErrorModalContent', () => {
     };
   };
 
-  it('should render dialog with correct header and message', () => {
+  it('should render dialog with correct header', () => {
     const error = new Error('abc');
     renderComponent(error);
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /error/i })).toBeInTheDocument();
+  });
+
+  it('should display the correct message if the error is in the Error format', () => {
+    const error = new Error('abc');
+    renderComponent(error);
+
     expect(screen.getByText(`Error: ${error.message}`));
+  });
+
+  it('should display the correct message if the error is passed as a string', () => {
+    const error = 'abc';
+    renderComponent(error);
+
+    expect(screen.getByText(`Error: ${error}`));
   });
 
   it('should render close modal button', () => {
