@@ -48,7 +48,10 @@ const AddBoardModal = () => {
           },
         }}
       >
-        <ErrorModalContent handleClose={handleClose} error={error} />
+        <ErrorModalContent
+          handleClose={handleClose}
+          error={'There was a problem creating the board. Please try again...'}
+        />
       </Dialog>
     );
   }
