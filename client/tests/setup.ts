@@ -1,6 +1,7 @@
 import { PropsWithChildren, ReactNode } from 'react';
 import '@testing-library/jest-dom/vitest';
 import { server } from './mocks/server';
+import { mockedUseNavigate } from './utils';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
@@ -15,5 +16,13 @@ vi.mock('@auth0/auth0-react', () => {
     }),
     Auth0Provider: ({ children }: PropsWithChildren) => children,
     withAuthenticationRequired: (component: ReactNode) => component,
+  };
+});
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockedUseNavigate,
   };
 });

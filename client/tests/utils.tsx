@@ -18,3 +18,5 @@ export const mockAuthState = (authState: AuthState) => {
     handleRedirectCallback: vi.fn(),
   });
 };
+
+export const mockedUseNavigate = vi.fn();
