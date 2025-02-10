@@ -20,3 +20,4 @@ export const mockAuthState = (authState: AuthState) => {
 };
 
 export const mockedUseNavigate = vi.fn();
+export const mockedUseParams = vi.fn(() => ({})); // Default empty object

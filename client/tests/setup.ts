@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactNode } from 'react';
 import '@testing-library/jest-dom/vitest';
 import { server } from './mocks/server';
-import { mockedUseNavigate } from './utils';
+import { mockedUseNavigate, mockedUseParams } from './utils';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
@@ -24,5 +24,6 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => mockedUseNavigate,
+    useParams: mockedUseParams,
   };
 });
