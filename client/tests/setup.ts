@@ -2,10 +2,19 @@ import { PropsWithChildren, ReactNode } from 'react';
 import '@testing-library/jest-dom/vitest';
 import { server } from './mocks/server';
 import { mockedUseNavigate, mockedUseParams } from './utils';
+import useStore from '../src/store/useStore';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
+
+// Reset Zustand store state before each test
+beforeEach(() => {
+  useStore.setState({
+    activeBoard: null,
+    subtasksToRemove: [],
+  });
+});
 
 vi.mock('@auth0/auth0-react', () => {
   return {
@@ -25,5 +34,23 @@ vi.mock('react-router-dom', async () => {
     ...actual,
     useNavigate: () => mockedUseNavigate,
     useParams: mockedUseParams,
+  };
+});
+
+vi.mock('zustand', () => ({
+  create: vi.fn((store) => store()),
+}));
+
+// Mock Zustand store
+vi.mock('../src/store/useStore.ts', async () => {
+  const actualCreate = (await vi.importActual<typeof import('zustand')>('zustand')).create;
+
+  return {
+    default: actualCreate(() => ({
+      activeBoard: null,
+      subtasksToRemove: [],
+      setActiveBoard: vi.fn(),
+      setSubtasksToRemove: vi.fn(),
+    })),
   };
 });
