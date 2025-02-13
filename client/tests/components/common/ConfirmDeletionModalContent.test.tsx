@@ -26,7 +26,7 @@ describe('ConfirmDeletionModalContent', () => {
       handleDelete,
       user: userEvent.setup(),
       cancelBtn: screen.getByRole('button', { name: /cancel/i }),
-      deleteBtn: screen.getByRole('button', { name: /delete/i }),
+      deleteBtn: screen.getByRole('button', { name: /confirm/i }),
       closeBtn: screen.getByRole('button', { name: /close modal/i }),
     };
   };
