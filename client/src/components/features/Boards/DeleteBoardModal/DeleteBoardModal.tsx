@@ -35,6 +35,7 @@ const DeleteBoardModal = () => {
   if (error)
     return (
       <Dialog
+        slotProps={{ backdrop: { 'aria-label': 'Modal Backdrop' } }}
         open={isOpen}
         onClose={handleClose}
         maxWidth='sm'
@@ -52,6 +53,7 @@ const DeleteBoardModal = () => {
   if (isPending)
     return (
       <Dialog
+        slotProps={{ backdrop: { 'aria-label': 'Modal Backdrop' } }}
         open={isOpen}
         onClose={handleClose}
         maxWidth='sm'
@@ -69,6 +71,7 @@ const DeleteBoardModal = () => {
   if (isSuccess)
     return (
       <Dialog
+        slotProps={{ backdrop: { 'aria-label': 'Modal Backdrop' } }}
         open={isOpen}
         onClose={handleClose}
         maxWidth='sm'
@@ -88,6 +91,7 @@ const DeleteBoardModal = () => {
 
   return (
     <Dialog
+      slotProps={{ backdrop: { 'aria-label': 'Modal Backdrop' } }}
       open={isOpen}
       onClose={handleClose}
       maxWidth='sm'
