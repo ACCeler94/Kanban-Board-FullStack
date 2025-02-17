@@ -38,7 +38,10 @@ export const db = factory({
     createdAt: faker.date.anytime,
     title: faker.word.sample,
     authorId: faker.string.uuid,
-    author: oneOf('user'),
+    author: {
+      id: faker.string.uuid,
+      name: faker.person.firstName,
+    },
     users: () => [],
     tasks: manyOf('task'),
   },
