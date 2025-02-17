@@ -101,6 +101,7 @@ const BoardUsersModal = () => {
   if (error || userDataError || boardUsersError) {
     return (
       <Dialog
+        slotProps={{ backdrop: { 'aria-label': 'Modal Backdrop' } }}
         open={isOpen}
         onClose={handleClose}
         maxWidth='sm'
@@ -122,6 +123,7 @@ const BoardUsersModal = () => {
   if (isPending || isPendingUserData || isBoardUsersPending)
     return (
       <Dialog
+        slotProps={{ backdrop: { 'aria-label': 'Modal Backdrop' } }}
         open={isOpen}
         onClose={handleClose}
         maxWidth='sm'
@@ -139,6 +141,7 @@ const BoardUsersModal = () => {
   if (boardData)
     return (
       <Dialog
+        slotProps={{ backdrop: { 'aria-label': 'Modal Backdrop' } }}
         open={isOpen}
         onClose={handleClose}
         maxWidth='sm'
@@ -165,7 +168,7 @@ const BoardUsersModal = () => {
         <div className={modalStyles.modalContent}>
           {isPendingDelete || isPendingAdd ? (
             <Alert severity='info' variant='filled'>
-              Processing....
+              Processing...
             </Alert>
           ) : (
             ''
