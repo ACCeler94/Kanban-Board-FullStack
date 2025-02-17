@@ -8,7 +8,7 @@ import AllProviders from '../../../AllProviders';
 import { server } from '../../../mocks/server';
 import { mockAuthState, mockedUseNavigate, mockedUseParams } from '../../../utils';
 
-describe('BoardUserModal', () => {
+describe('DeleteBoardModal', () => {
   const paramsId = '373d5aa1-4084-4328-8435-e3b1771c0dc2';
 
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe('BoardUserModal', () => {
     server.use(
       http.delete(`${apiUrl}/boards/${paramsId}`, async () => {
         await delay();
-        HttpResponse.json();
+        return HttpResponse.json();
       })
     );
     const { user, deleteButton } = renderComponent();
