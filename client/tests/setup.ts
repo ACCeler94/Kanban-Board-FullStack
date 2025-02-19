@@ -4,7 +4,7 @@ import { server } from './mocks/server';
 import { mockedUseNavigate, mockedUseParams } from './utils';
 import useStore from '../src/store/useStore';
 
-beforeAll(() => server.listen());
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
