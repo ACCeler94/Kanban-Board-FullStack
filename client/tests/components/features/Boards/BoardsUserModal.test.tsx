@@ -1,6 +1,6 @@
 import { render, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import { delay, http, HttpResponse } from 'msw';
-import { MemoryRouter } from 'react-router-dom'; // Import Routes and Route
+import { MemoryRouter } from 'react-router-dom';
 import { apiUrl } from '../../../../src/API/config';
 import BoardUsersModal from '../../../../src/components/features/Boards/BoardUsersModal/BoardUsersModal';
 import { BoardQuery, User, UserBoardData } from '../../../../src/types/types';
@@ -204,7 +204,7 @@ describe('BoardUserModal', () => {
     );
 
     const { user } = renderComponent();
-    await waitForElementToBeRemoved(() => screen.getByText(/loading.../i)); // Wait for the component to fully load
+    await waitForElementToBeRemoved(() => screen.getByText(/loading.../i));
 
     const modalBackdrop = screen.getByLabelText(/modal backdrop/i);
     await user.click(modalBackdrop);
@@ -272,6 +272,16 @@ describe('BoardUserModal', () => {
 
   it('should display a "processing" alert when deletion is pending', async () => {
     server.use(
+      http.options(`${apiUrl}/boards/:boardId/users`, () => {
+        return new HttpResponse(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+        });
+      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -279,7 +289,7 @@ describe('BoardUserModal', () => {
       ),
       http.delete(`${apiUrl}/boards/${paramsId}/users/${users[1].id}`, async () => {
         await delay(1000);
-        return HttpResponse.json([]);
+        return HttpResponse.json({});
       })
     );
     const { user } = renderComponent();
@@ -313,6 +323,16 @@ describe('BoardUserModal', () => {
 
   it('should refetch user data after successful deletion', async () => {
     server.use(
+      http.options(`${apiUrl}/boards/:boardId/users/add`, () => {
+        return new HttpResponse(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+        });
+      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -338,6 +358,18 @@ describe('BoardUserModal', () => {
 
   it('should display a "processing" alert when adding user is pending', async () => {
     server.use(
+      http.options(`${apiUrl}/boards/:boardId/users`, () => {
+        return new HttpResponse(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers':
+              'Content-Type, Authorization, x-interceptors-internal-request-id',
+            'Access-Control-Allow-Credentials': 'true',
+          },
+        });
+      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -345,7 +377,7 @@ describe('BoardUserModal', () => {
       ),
       http.post(`${apiUrl}/boards/${paramsId}/users/add`, async () => {
         await delay(1000);
-        return HttpResponse.json();
+        return HttpResponse.json({});
       })
     );
     const { user } = renderComponent();
@@ -360,6 +392,18 @@ describe('BoardUserModal', () => {
 
   it('should display an error alert when adding user was unsuccessful', async () => {
     server.use(
+      http.options(`${apiUrl}/boards/${paramsId}/users`, () => {
+        return new HttpResponse(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers':
+              'Content-Type, Authorization, x-interceptors-internal-request-id',
+            'Access-Control-Allow-Credentials': 'true',
+          },
+        });
+      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -379,6 +423,18 @@ describe('BoardUserModal', () => {
 
   it('should close alerts on close button click', async () => {
     server.use(
+      http.options(`${apiUrl}/boards/:boardId/users`, () => {
+        return new HttpResponse(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers':
+              'Content-Type, Authorization, x-interceptors-internal-request-id',
+            'Access-Control-Allow-Credentials': 'true',
+          },
+        });
+      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -403,38 +459,34 @@ describe('BoardUserModal', () => {
   });
 
   // Test skipped because of issues with fake timers and user event library https://github.com/testing-library/user-event/issues/1115 - without fake timers it passes but with long timeout values, with fake timers enabled the test runs indefinitely
-  it.skip(
-    'should close the error alert after 5 seconds',
-    async () => {
-      server.use(
-        http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
-        http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
-        http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
-          HttpResponse.json({ users: [{ user: users[1] }] })
-        ),
-        http.post(`${apiUrl}/boards/${paramsId}/users/add`, async () => HttpResponse.error())
-      );
-      // vi.useFakeTimers();
-      const { user } = renderComponent();
-      const addButton = await screen.findByRole('button', { name: /add/i });
-      const newUserInput = screen.getByRole('textbox');
-      await user.type(newUserInput, 'abcdef@email.com');
-      await user.click(addButton);
-      expect(screen.getByText(/error/i)).toBeInTheDocument();
+  it.skip('should close the error alert after 5 seconds', async () => {
+    server.use(
+      http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
+      http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
+      http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
+        HttpResponse.json({ users: [{ user: users[1] }] })
+      ),
+      http.post(`${apiUrl}/boards/${paramsId}/users/add`, async () => HttpResponse.error())
+    );
+    // vi.useFakeTimers();
+    const { user } = renderComponent();
+    const addButton = await screen.findByRole('button', { name: /add/i });
+    const newUserInput = screen.getByRole('textbox');
+    await user.type(newUserInput, 'abcdef@email.com');
+    await user.click(addButton);
+    expect(screen.getByText(/error/i)).toBeInTheDocument();
 
-      // vi.advanceTimersByTime(5000);
+    // vi.advanceTimersByTime(5000);
 
-      await waitFor(
-        async () => {
-          expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
-        },
-        { timeout: 6000 }
-      );
+    await waitFor(
+      async () => {
+        expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
+      },
+      { timeout: 6000 }
+    );
 
-      // vi.useRealTimers();
-    },
-    { timeout: 6000 }
-  );
+    // vi.useRealTimers();
+  }, 6000);
 
   it('should refetch user data after successfully adding the user', async () => {
     const newUserEmail = 'abcdef@email.com';
