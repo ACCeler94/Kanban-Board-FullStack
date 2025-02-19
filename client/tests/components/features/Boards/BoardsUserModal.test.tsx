@@ -58,6 +58,15 @@ describe('BoardUserModal', () => {
 
     return {
       user: userEvent.setup(),
+      waitForTheComponentToLoad: async () => {
+        await waitForElementToBeRemoved(() => screen.getByText(/loading.../i));
+
+        return {
+          deleteButton: screen.queryByRole('button', { name: /delete/i }),
+          addButton: screen.queryByRole('button', { name: /add/i }),
+          addInput: screen.queryByRole('textbox'),
+        };
+      },
     };
   };
 
@@ -85,12 +94,13 @@ describe('BoardUserModal', () => {
       )
     );
 
-    renderComponent();
+    const { waitForTheComponentToLoad } = renderComponent();
+    const { addButton, addInput, deleteButton } = await waitForTheComponentToLoad();
 
-    expect(await screen.findByText(users[0].email)).toBeInTheDocument();
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add/i }));
-    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+    expect(screen.getByText(users[0].email)).toBeInTheDocument();
+    expect(addInput).toBeInTheDocument();
+    expect(addButton);
+    expect(deleteButton).toBeInTheDocument();
   });
 
   it('should not show add field and delete button if user is not the boards author', async () => {
@@ -111,12 +121,13 @@ describe('BoardUserModal', () => {
       )
     );
 
-    renderComponent();
+    const { waitForTheComponentToLoad } = renderComponent();
+    const { addButton, addInput, deleteButton } = await waitForTheComponentToLoad();
 
-    expect(await screen.findByText(users[0].email)).toBeInTheDocument();
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /add/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+    expect(screen.getByText(users[0].email)).toBeInTheDocument();
+    expect(addInput).not.toBeInTheDocument();
+    expect(addButton).not.toBeInTheDocument();
+    expect(deleteButton).not.toBeInTheDocument();
   });
 
   it('should render loading indicator when fetching data', () => {
@@ -183,8 +194,8 @@ describe('BoardUserModal', () => {
         HttpResponse.json({ users: [{ user: users[0] }] })
       )
     );
-    const { user } = renderComponent();
-    await waitForElementToBeRemoved(() => screen.getByText(/loading.../i)); // Wait for the component to fully load
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    await waitForTheComponentToLoad();
 
     const closeModalBtn = screen.getByRole('button', { name: /close modal/i });
     await user.click(closeModalBtn);
@@ -203,8 +214,8 @@ describe('BoardUserModal', () => {
       )
     );
 
-    const { user } = renderComponent();
-    await waitForElementToBeRemoved(() => screen.getByText(/loading.../i));
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    await waitForTheComponentToLoad();
 
     const modalBackdrop = screen.getByLabelText(/modal backdrop/i);
     await user.click(modalBackdrop);
@@ -222,10 +233,10 @@ describe('BoardUserModal', () => {
         HttpResponse.json({ users: [{ user: users[0] }] })
       )
     );
-    const { user } = renderComponent();
-    const deleteButton = await screen.findByRole('button', { name: /delete/i });
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { deleteButton } = await waitForTheComponentToLoad();
 
-    await user.click(deleteButton);
+    await user.click(deleteButton!);
 
     expect(screen.getByRole('heading', { name: /remove/i })).toBeInTheDocument();
   });
@@ -238,9 +249,10 @@ describe('BoardUserModal', () => {
         HttpResponse.json({ users: [{ user: users[0] }] })
       )
     );
-    const { user } = renderComponent();
-    const deleteButton = await screen.findByRole('button', { name: /delete/i });
-    await user.click(deleteButton);
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { deleteButton } = await waitForTheComponentToLoad();
+
+    await user.click(deleteButton!);
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     await user.click(cancelButton);
@@ -258,9 +270,9 @@ describe('BoardUserModal', () => {
         HttpResponse.json({ users: [{ user: users[0] }] })
       )
     );
-    const { user } = renderComponent();
-    const deleteButton = await screen.findByRole('button', { name: /delete/i });
-    await user.click(deleteButton);
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { deleteButton } = await waitForTheComponentToLoad();
+    await user.click(deleteButton!);
 
     const closeButton = screen.getByRole('button', { name: /close/i, hidden: false }); // Close button from the original modal is hidden by the nested modal
     await user.click(closeButton);
@@ -292,10 +304,10 @@ describe('BoardUserModal', () => {
         return HttpResponse.json({});
       })
     );
-    const { user } = renderComponent();
-    const deleteButton = await screen.findByRole('button', { name: /delete/i });
-    await user.click(deleteButton);
-    const confirmDeleteButton = await screen.findByRole('button', { name: /confirm/i });
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { deleteButton } = await waitForTheComponentToLoad();
+    await user.click(deleteButton!);
+    const confirmDeleteButton = screen.getByRole('button', { name: /confirm/i });
 
     await user.click(confirmDeleteButton);
 
@@ -311,9 +323,9 @@ describe('BoardUserModal', () => {
       ),
       http.delete(`${apiUrl}/boards/${paramsId}/users/${users[1].id}`, () => HttpResponse.error())
     );
-    const { user } = renderComponent();
-    const deleteButton = await screen.findByRole('button', { name: /delete/i });
-    await user.click(deleteButton);
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { deleteButton } = await waitForTheComponentToLoad();
+    await user.click(deleteButton!);
     const confirmDeleteButton = await screen.findByRole('button', { name: /confirm/i });
 
     await user.click(confirmDeleteButton);
@@ -340,9 +352,10 @@ describe('BoardUserModal', () => {
       ),
       http.delete(`${apiUrl}/boards/${paramsId}/users/${users[1].id}`, () => HttpResponse.json([]))
     );
-    const { user } = renderComponent();
-    const deleteButton = await screen.findByRole('button', { name: /delete/i });
-    await user.click(deleteButton);
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { deleteButton } = await waitForTheComponentToLoad();
+
+    await user.click(deleteButton!);
     const confirmDeleteButton = await screen.findByRole('button', { name: /confirm/i });
 
     // Override the response for the refetch after deletion
@@ -380,12 +393,11 @@ describe('BoardUserModal', () => {
         return HttpResponse.json({});
       })
     );
-    const { user } = renderComponent();
-    const addButton = await screen.findByRole('button', { name: /add/i });
-    const newUserInput = screen.getByRole('textbox');
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { addInput, addButton } = await waitForTheComponentToLoad();
 
-    await user.type(newUserInput, 'abcdef@email.com');
-    await user.click(addButton);
+    await user.type(addInput!, 'abcdef@email.com');
+    await user.click(addButton!);
 
     expect(screen.getByText(/processing.../i)).toBeInTheDocument();
   });
@@ -411,12 +423,11 @@ describe('BoardUserModal', () => {
       ),
       http.post(`${apiUrl}/boards/${paramsId}/users/add`, async () => HttpResponse.error())
     );
-    const { user } = renderComponent();
-    const addButton = await screen.findByRole('button', { name: /add/i });
-    const newUserInput = screen.getByRole('textbox');
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { addInput, addButton } = await waitForTheComponentToLoad();
 
-    await user.type(newUserInput, 'abcdef@email.com');
-    await user.click(addButton);
+    await user.type(addInput!, 'abcdef@email.com');
+    await user.click(addButton!);
 
     expect(screen.getByText(/error/i)).toBeInTheDocument();
   });
@@ -442,11 +453,10 @@ describe('BoardUserModal', () => {
       ),
       http.post(`${apiUrl}/boards/${paramsId}/users/add`, async () => HttpResponse.error())
     );
-    const { user } = renderComponent();
-    const addButton = await screen.findByRole('button', { name: /add/i });
-    const newUserInput = screen.getByRole('textbox');
-    await user.type(newUserInput, 'abcdef@email.com');
-    await user.click(addButton);
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { addInput, addButton } = await waitForTheComponentToLoad();
+    await user.type(addInput!, 'abcdef@email.com');
+    await user.click(addButton!);
     expect(screen.getByText(/error/i)).toBeInTheDocument();
     const alert = await screen.findByRole('alert');
     const closeButton = await within(alert).findByRole('button', { name: /close/i });
@@ -469,11 +479,10 @@ describe('BoardUserModal', () => {
       http.post(`${apiUrl}/boards/${paramsId}/users/add`, async () => HttpResponse.error())
     );
     // vi.useFakeTimers();
-    const { user } = renderComponent();
-    const addButton = await screen.findByRole('button', { name: /add/i });
-    const newUserInput = screen.getByRole('textbox');
-    await user.type(newUserInput, 'abcdef@email.com');
-    await user.click(addButton);
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { addInput, addButton } = await waitForTheComponentToLoad();
+    await user.type(addInput!, 'abcdef@email.com');
+    await user.click(addButton!);
     expect(screen.getByText(/error/i)).toBeInTheDocument();
 
     // vi.advanceTimersByTime(5000);
@@ -499,17 +508,16 @@ describe('BoardUserModal', () => {
       ),
       http.post(`${apiUrl}/boards/${paramsId}/users/add`, async () => HttpResponse.json({}))
     );
-    const { user } = renderComponent();
-    const addButton = await screen.findByRole('button', { name: /add/i });
-    const newUserInput = screen.getByRole('textbox');
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { addInput, addButton } = await waitForTheComponentToLoad();
 
     server.use(
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
         HttpResponse.json({ users: [{ user: users[1] }, { user: newUser }] })
       )
     );
-    await user.type(newUserInput, newUserEmail);
-    await user.click(addButton);
+    await user.type(addInput!, newUserEmail);
+    await user.click(addButton!);
 
     expect(screen.getByText(newUserEmail)).toBeInTheDocument();
   });
