@@ -9,9 +9,10 @@ import styles from './Column.module.css';
 interface ColumnProps {
   tasks: TaskTypePartial[];
   status: TaskStatus;
+  label: string;
 }
 
-const Column = ({ tasks, status }: ColumnProps) => {
+const Column = ({ tasks, status, label }: ColumnProps) => {
   return (
     <SortableContext
       id={status}
@@ -23,7 +24,7 @@ const Column = ({ tasks, status }: ColumnProps) => {
           <div className={`${styles.columnHeaderWrapper} ${styles[status]}`}>
             <FaCircle />
             <h2 className={styles.columnHeader}>
-              {status} ({tasks.length})
+              {label} ({tasks.length})
             </h2>
           </div>
           <ul className={styles.tasksList}>

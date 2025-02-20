@@ -237,9 +237,9 @@ const Board = () => {
         ''
       )}
       <div className={styles.boardGrid}>
-        <Column tasks={toDos} status={TaskStatus.TO_DO} />
-        <Column tasks={inProgress} status={TaskStatus.IN_PROGRESS} />
-        <Column tasks={done} status={TaskStatus.DONE} />
+        <Column tasks={toDos} status={TaskStatus.TO_DO} label={'TO DO'} />
+        <Column tasks={inProgress} status={TaskStatus.IN_PROGRESS} label={'IN PROGRESS'} />
+        <Column tasks={done} status={TaskStatus.DONE} label={'DONE'} />
 
         <DragOverlay modifiers={[restrictToWindowEdges]}>
           {activeTask ? <TaskCard taskData={activeTask} /> : null}
