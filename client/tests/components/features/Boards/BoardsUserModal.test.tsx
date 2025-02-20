@@ -142,7 +142,7 @@ describe('BoardUserModal', () => {
       }),
       http.get(`${apiUrl}/boards/${paramsId}/users`, async () => {
         await delay(1000);
-        HttpResponse.json({ users: [] });
+        return HttpResponse.json({ users: [] });
       })
     );
     renderComponent();
