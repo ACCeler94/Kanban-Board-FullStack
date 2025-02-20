@@ -91,7 +91,7 @@ const editBoard = async (
   token: string
 ): Promise<JsonResponseType> => {
   try {
-    const { data } = await axios.put(
+    const { data } = await axios.patch(
       `${apiUrl}/boards/${boardId}`,
       {
         title,

@@ -22,7 +22,7 @@ router
   .post(validateBoardIdParams, BoardsController.addUserToBoard); // post used as it is creating a relation on UserOnBoard table
 
 // PATCH
-router.route('/boards/:boardId').put(validateBoardIdParams, BoardsController.editBoardTitle);
+router.route('/boards/:boardId').patch(validateBoardIdParams, BoardsController.editBoardTitle);
 
 // DELETE
 router
