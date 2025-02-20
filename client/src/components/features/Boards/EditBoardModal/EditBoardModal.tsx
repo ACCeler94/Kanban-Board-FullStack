@@ -128,7 +128,7 @@ const EditBoardModal = () => {
       </div>
       <div className={modalStyles.modalContent}>
         <BoardForm
-          buttonText='Edit Board'
+          buttonText='Save changes'
           submitHandler={submitHandler}
           boardTitle={boardData?.title}
         />
