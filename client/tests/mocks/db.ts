@@ -10,7 +10,7 @@ export const db = factory({
     taskId: faker.string.uuid,
     task: oneOf('task'),
     desc: () => faker.lorem.sentence(5),
-    finished: () => false,
+    finished: (finished?: boolean) => (finished ? true : false),
   },
   task: {
     id: primaryKey(faker.string.uuid),
