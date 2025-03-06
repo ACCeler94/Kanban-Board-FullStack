@@ -52,7 +52,7 @@ const TaskCard = ({ taskData }: TaskCardProps) => {
           </p>
         </div>
       </Link>
-      <div className={styles.dragHandle} {...listeners} tabIndex={0}>
+      <div className={styles.dragHandle} {...listeners} tabIndex={0} aria-label='Drag handle'>
         <RxDragHandleDots2 />
       </div>
     </div>
