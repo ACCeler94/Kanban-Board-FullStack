@@ -43,7 +43,7 @@ const SubtasksList = ({ subtasks, setIsModified, setSubtaskData }: SubtasksListP
                 aria-label={subtask.finished ? 'Finished subtask' : 'Unfinished subtask'}
                 onChange={() => {}} // Empty handler to silence the warning - actual change is handled by the parent component -> li element
               />
-              <span>{subtask.desc}</span>
+              {subtask.desc}
             </li>
           );
         })}
