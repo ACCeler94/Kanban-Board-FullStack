@@ -21,6 +21,7 @@ const TaskMenu = () => {
   return (
     <div>
       <button
+        aria-label='Task menu button'
         type='button'
         id='task-menu-button'
         aria-controls={open ? 'task-menu-button' : undefined}
