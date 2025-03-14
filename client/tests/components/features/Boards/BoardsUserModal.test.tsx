@@ -31,11 +31,6 @@ describe('BoardUserModal', () => {
     };
   });
 
-  afterAll(() => {
-    db.board.delete({ where: { id: { equals: board.id } } });
-    db.user.deleteMany({ where: { id: { in: users.map((u) => u.id) } } });
-  });
-
   beforeEach(() => {
     mockAuthState({
       isAuthenticated: true,

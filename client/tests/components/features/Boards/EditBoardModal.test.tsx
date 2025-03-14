@@ -27,14 +27,6 @@ describe('EditBoardModal', () => {
     mockedUseParams.mockReturnValue({ id: paramsId });
   });
 
-  afterAll(() => {
-    db.board.delete({
-      where: {
-        id: { equals: board.id },
-      },
-    });
-  });
-
   const renderComponent = () => {
     render(
       <MemoryRouter>

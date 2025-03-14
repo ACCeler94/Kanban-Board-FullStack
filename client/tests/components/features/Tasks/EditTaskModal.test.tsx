@@ -68,10 +68,6 @@ describe('EditTaskModal', () => {
     mockedUseParams.mockReturnValue({ id: boardId, taskId });
   });
 
-  afterAll(() => {
-    db.task.delete({ where: { id: { equals: task.id } } });
-  });
-
   it('should render a modal with task form, proper button text and heading', async () => {
     server.use(http.get(`${apiUrl}/tasks/${taskId}`, () => HttpResponse.json(task)));
     const { waitForTheFormToLoad } = renderComponent();

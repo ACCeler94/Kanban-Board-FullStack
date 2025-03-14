@@ -19,17 +19,6 @@ describe('SubtasksInputs', () => {
     });
   });
 
-  afterAll(() => {
-    const subtaskIds = existingSubtasks.map((s) => s.id);
-    db.subtask.deleteMany({
-      where: {
-        id: {
-          in: subtaskIds,
-        },
-      },
-    });
-  });
-
   const renderComponent = ({ subtasks, originalSubtasks }: Props) => {
     const setSubtasks = vi.fn();
     render(

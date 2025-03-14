@@ -24,22 +24,6 @@ describe('TaskForm', () => {
     task = db.task.create();
   });
 
-  afterAll(() => {
-    const subtaskIds = existingSubtasks.map((s) => s.id);
-    db.subtask.deleteMany({
-      where: {
-        id: {
-          in: subtaskIds,
-        },
-      },
-    });
-    db.task.delete({
-      where: {
-        id: { equals: task.id },
-      },
-    });
-  });
-
   const renderComponent = ({
     taskTitle,
     taskDesc,

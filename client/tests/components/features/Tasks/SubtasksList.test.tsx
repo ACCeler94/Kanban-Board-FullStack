@@ -38,15 +38,6 @@ describe('SubtasksList', () => {
     vi.resetAllMocks();
   });
 
-  afterAll(() => {
-    const subtasksIds = subtasks.map((s) => s.id);
-    db.subtask.deleteMany({
-      where: {
-        id: { in: subtasksIds },
-      },
-    });
-  });
-
   it('should display a heading, a list of subtasks wih subtasks descriptions and checkboxes to track their status', () => {
     const { listItems, checkboxes } = renderComponent();
 
