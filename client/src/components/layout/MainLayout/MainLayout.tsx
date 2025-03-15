@@ -20,7 +20,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           toggleIsHidden={() => setIsSidebarHidden(!isSidebarHidden)}
         />
         {isSidebarHidden ? (
-          <button className={styles.showButton} onClick={() => setIsSidebarHidden(false)}>
+          <button
+            className={styles.showButton}
+            onClick={() => setIsSidebarHidden(false)}
+            aria-label='Show Sidebar'
+          >
             <FaEye />
           </button>
         ) : (
