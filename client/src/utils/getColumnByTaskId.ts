@@ -13,4 +13,3 @@ export const getColumnByTaskId = ({ taskId, toDos, inProgress, done }: getColumn
   if (done.some((task) => task.id === taskId)) return TaskStatus.DONE;
   return null;
 };
-0;
