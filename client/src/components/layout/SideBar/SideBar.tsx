@@ -40,7 +40,6 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
       logout();
       setLogoutError('');
     } catch (error) {
-      console.log(error);
       setLogoutError('Logout failed. Please try again.');
     }
   };
@@ -63,7 +62,7 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
           <Error message={error ? error.message : logoutError} />
           <div className={styles.actionButtons}>
-            <button id={styles.hideButton} onClick={toggleIsHidden}>
+            <button id={styles.hideButton} onClick={toggleIsHidden} aria-label='Hide sidebar'>
               <FaEyeSlash />
               Hide Sidebar
             </button>
@@ -88,7 +87,7 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
           <BoardsList boards={userBoardData.boards} />
           <div className={styles.actionButtons}>
-            <button id={styles.hideButton} onClick={toggleIsHidden}>
+            <button id={styles.hideButton} onClick={toggleIsHidden} aria-label='Hide sidebar'>
               <FaEyeSlash />
               Hide Sidebar
             </button>
