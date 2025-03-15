@@ -11,7 +11,7 @@ import { db } from '../../mocks/db';
 import { server } from '../../mocks/server';
 import { mockAuth0Logout, mockAuthState } from '../../utils';
 
-describe('Sidebar', () => {
+describe('SideBar', () => {
   const toggleIsHidden = vi.fn();
 
   let board: BoardQuery;
@@ -69,14 +69,39 @@ describe('Sidebar', () => {
     });
   });
 
-  it('should render a list of boards, hide sidebar button and a logout button ', async () => {
+  it('should render a  heading, list of boards, hide sidebar button and a logout button ', async () => {
     server.use(http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)));
     const { waitForTheComponentToLoad } = renderComponent();
     const { hideButton, logoutButton } = await waitForTheComponentToLoad();
 
+    expect(screen.getByRole('heading', { name: 'All Boards (1)' }));
     expect(screen.getByText(board.title)).toBeInTheDocument();
     expect(hideButton).toBeInTheDocument();
     expect(logoutButton).toBeInTheDocument();
+  });
+
+  it('should change the "All Boards" heading based on the number of boards', async () => {
+    const board1 = db.board.create({ authorId: user.id }) as BoardQuery;
+    const board2 = db.board.create({ authorId: user.id }) as BoardQuery;
+
+    const changedUserBoardData = {
+      id: user.id,
+      auth0Sub: '111',
+      assignedTasks: [],
+      boards: [{ board: board1 }, { board: board2 }],
+      name: 'abc',
+      email: 'abc',
+      picture: '',
+    };
+    server.use(
+      http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(changedUserBoardData))
+    );
+    const { waitForTheComponentToLoad } = renderComponent();
+    await waitForTheComponentToLoad();
+
+    expect(
+      screen.getByRole('heading', { name: `All Boards (${changedUserBoardData.boards.length})` })
+    );
   });
 
   it('should show a loading indicator if user data is pending', async () => {
