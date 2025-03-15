@@ -52,6 +52,7 @@ const Navbar = () => {
             <div className={styles.buttonsWrapper}>
               {!!boardError || !id ? null : <BoardMenu isAuthor={isAuthor} />}
               <Button
+                aria-label='Add new task'
                 color='primary'
                 variant='contained'
                 className='button-small'
