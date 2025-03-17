@@ -1,0 +1,21 @@
+.errorWrapper {
+  margin-top: 5%;
+  text-align: center;
+}
+
+.errorWrapper h1 {
+  margin-bottom: 10px;
+}
+
+.errorWrapper h2 {
+  margin-top: 10px;
+}
+
+.buttonWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.buttonWrapper button {
+  margin: 20px 10px;
+}
