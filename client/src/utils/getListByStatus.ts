@@ -9,7 +9,6 @@ interface getListByStatusProps {
   done: TaskTypePartial[];
   setDone: React.Dispatch<React.SetStateAction<TaskTypePartial[]>>;
 }
-0;
 
 export const getListByStatus = ({
   status,
