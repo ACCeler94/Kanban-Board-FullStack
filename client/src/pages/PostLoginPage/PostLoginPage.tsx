@@ -25,9 +25,7 @@ const PostLoginPage = () => {
 
         navigate('/boards');
       } catch (error) {
-        // [TODO - change to logout and ErrorPage redirect]
-        console.log('Login failed');
-        console.log(error);
+        navigate('/login-error');
       }
     };
 
