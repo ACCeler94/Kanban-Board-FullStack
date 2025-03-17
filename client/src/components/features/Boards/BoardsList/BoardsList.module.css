@@ -10,9 +10,13 @@
 }
 
 .boardItem {
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 100%;
+  overflow: clip;
+  text-overflow: ellipsis;
+  display: inline-block;
+  margin: 5px 0;
   color: var(--medium-grey);
   padding: 10px 0;
   padding-left: 20px;
