@@ -32,6 +32,11 @@
   justify-content: space-between;
   width: 100%;
   align-items: center;
+  overflow: hidden;
+}
+
+.utilityBar h2 {
+  overflow: hidden;
 }
 
 .buttonsWrapper {
