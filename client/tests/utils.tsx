@@ -7,6 +7,7 @@ type AuthState = {
 };
 
 export const mockAuth0Logout = vi.fn();
+export const mockLoginWithRedirect = vi.fn();
 
 export const mockAuthState = (authState: AuthState) => {
   vi.mocked(useAuth0).mockReturnValue({
@@ -14,7 +15,7 @@ export const mockAuthState = (authState: AuthState) => {
     getAccessTokenSilently: vi.fn().mockResolvedValue('a'),
     getAccessTokenWithPopup: vi.fn(),
     getIdTokenClaims: vi.fn(),
-    loginWithRedirect: vi.fn(),
+    loginWithRedirect: mockLoginWithRedirect,
     loginWithPopup: vi.fn(),
     logout: mockAuth0Logout,
     handleRedirectCallback: vi.fn(),
