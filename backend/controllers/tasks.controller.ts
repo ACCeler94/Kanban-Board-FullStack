@@ -252,6 +252,7 @@ const TasksController = {
             where: { boardId: task.boardId, status: task.status },
             orderBy: { order: 'asc' },
           });
+          // targetColumnTask already includes the updated task since it was already updated earlier - useful only when moving between columns
           const targetColumnTasks = taskData.status
             ? await tx.task.findMany({
                 where: { boardId: task.boardId, status: taskData.status },
@@ -261,12 +262,24 @@ const TasksController = {
 
           // Insert the task into the correct position in the target column (if moving)
           if (taskData.status && targetColumnTasks && taskData.status !== task.status) {
+            // Since the task is already in targetColumnTasks it needs to be removed and inserted at index of [order] to assume its correct position, otherwise after the initial update of the edited task, target column consists 2 elements with the same order - editedTask and old task that had this order. If not reinserted it could randomly be placed in the array before or after the element with the same order number
+            const taskIndex = targetColumnTasks.findIndex((t) => t.id === taskId);
+            if (taskIndex !== -1) {
+              // Make sure it exists in the target column
+              targetColumnTasks.splice(taskIndex, 1); // Remove it from the old column
+            }
+            // Insert the moved task into the correct position
+            targetColumnTasks.splice(taskData.order, 0, task);
+
             // Recalculate orders for target column (moved task is already included)
             for (let i = 0; i < targetColumnTasks.length; i++) {
-              await tx.task.update({
-                where: { id: targetColumnTasks[i].id },
-                data: { order: i },
-              });
+              // Only update the order of tasks that are not the edited task
+              if (targetColumnTasks[i].id !== taskId) {
+                await tx.task.update({
+                  where: { id: targetColumnTasks[i].id },
+                  data: { order: i },
+                });
+              }
             }
 
             // Recalculate orders for the current column (if task was moved)
