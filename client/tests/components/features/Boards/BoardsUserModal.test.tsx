@@ -279,16 +279,6 @@ describe('BoardUserModal', () => {
 
   it('should display a "processing" alert when deletion is pending', async () => {
     server.use(
-      http.options(`${apiUrl}/boards/:boardId/users`, () => {
-        return new HttpResponse(null, {
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          },
-        });
-      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -330,16 +320,6 @@ describe('BoardUserModal', () => {
 
   it('should refetch user data after successful deletion', async () => {
     server.use(
-      http.options(`${apiUrl}/boards/:boardId/users/add`, () => {
-        return new HttpResponse(null, {
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          },
-        });
-      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -366,18 +346,6 @@ describe('BoardUserModal', () => {
 
   it('should display a "processing" alert when adding user is pending', async () => {
     server.use(
-      http.options(`${apiUrl}/boards/:boardId/users`, () => {
-        return new HttpResponse(null, {
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers':
-              'Content-Type, Authorization, x-interceptors-internal-request-id',
-            'Access-Control-Allow-Credentials': 'true',
-          },
-        });
-      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -399,18 +367,6 @@ describe('BoardUserModal', () => {
 
   it('should display an error alert when adding user was unsuccessful', async () => {
     server.use(
-      http.options(`${apiUrl}/boards/${paramsId}/users`, () => {
-        return new HttpResponse(null, {
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers':
-              'Content-Type, Authorization, x-interceptors-internal-request-id',
-            'Access-Control-Allow-Credentials': 'true',
-          },
-        });
-      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -427,20 +383,8 @@ describe('BoardUserModal', () => {
     expect(screen.getByText(/error/i)).toBeInTheDocument();
   });
 
-  it('should close alerts on close button click', async () => {
+  it('should close add alert on close button click', async () => {
     server.use(
-      http.options(`${apiUrl}/boards/:boardId/users`, () => {
-        return new HttpResponse(null, {
-          status: 204,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers':
-              'Content-Type, Authorization, x-interceptors-internal-request-id',
-            'Access-Control-Allow-Credentials': 'true',
-          },
-        });
-      }),
       http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
       http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
       http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
@@ -456,6 +400,30 @@ describe('BoardUserModal', () => {
     const alert = await screen.findByRole('alert');
     const closeButton = await within(alert).findByRole('button', { name: /close/i });
 
+    await user.click(closeButton);
+
+    await waitFor(async () => {
+      expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it('should close delete alert on close button click', async () => {
+    server.use(
+      http.get(`${apiUrl}/users/profile/boards`, () => HttpResponse.json(userBoardData)),
+      http.get(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json(board)),
+      http.get(`${apiUrl}/boards/${paramsId}/users`, () =>
+        HttpResponse.json({ users: [{ user: users[0] }] })
+      ),
+      http.delete(`${apiUrl}/boards/${paramsId}/users/${users[0].id}`, () => HttpResponse.error())
+    );
+    const { user, waitForTheComponentToLoad } = renderComponent();
+    const { deleteButton } = await waitForTheComponentToLoad();
+    await user.click(deleteButton!);
+    const confirmDeleteButton = await screen.findByRole('button', { name: /confirm/i });
+
+    await user.click(confirmDeleteButton);
+    const alert = await screen.findByRole('alert');
+    const closeButton = await within(alert).findByRole('button', { name: /close/i });
     await user.click(closeButton);
 
     await waitFor(async () => {
