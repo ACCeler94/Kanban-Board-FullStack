@@ -37,15 +37,7 @@ const BoardForm = ({ boardTitle, submitHandler, buttonText }: BoardFormProps) =>
         />
       </div>
 
-      <Button
-        type='submit'
-        color='primary'
-        variant='contained'
-        className='button-small'
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') e.preventDefault();
-        }}
-      >
+      <Button type='submit' color='primary' variant='contained' className='button-small'>
         {buttonText}
       </Button>
     </form>
