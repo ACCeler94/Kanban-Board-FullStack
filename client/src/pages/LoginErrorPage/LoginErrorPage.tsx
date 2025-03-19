@@ -20,8 +20,8 @@ const LoginErrorPage = () => {
   const handleReturnToHomepage = async () => {
     // For safety reasons if isAuthenticated is true but some error still happened - logout the user, clear cookies
     if (isAuthenticated) {
-      const token = await getAccessTokenSilently();
       try {
+        const token = await getAccessTokenSilently();
         await axios.get(`${authUrl}/logout`, {
           headers: {
             authorization: `Bearer ${token}`,

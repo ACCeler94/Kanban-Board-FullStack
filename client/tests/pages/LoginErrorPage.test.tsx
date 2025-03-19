@@ -12,8 +12,12 @@ import { mockAuth0Logout, mockAuthState, mockedUseNavigate, mockLoginWithRedirec
 vi.mock('axios');
 
 describe('LoginErrorPage', () => {
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.resetAllMocks();
+
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     mockAuthState({
       isAuthenticated: false,
@@ -93,6 +97,25 @@ describe('LoginErrorPage', () => {
     await user.click(homepageButton);
 
     await waitFor(() => {
+      expect(mockedUseNavigate).toHaveBeenCalledWith('/');
+    });
+  });
+
+  it('should log the error and redirect to "/" if request fails', async () => {
+    const error = new Error();
+    mockAuthState({
+      isAuthenticated: true,
+      isLoading: false,
+      user: {},
+    });
+    vi.mocked(axios, true).get.mockRejectedValueOnce(error);
+    server.use(http.get(`${authUrl}/logout`, () => HttpResponse.json({})));
+    const { user, homepageButton } = renderComponent();
+
+    await user.click(homepageButton);
+
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith(error);
       expect(mockedUseNavigate).toHaveBeenCalledWith('/');
     });
   });
