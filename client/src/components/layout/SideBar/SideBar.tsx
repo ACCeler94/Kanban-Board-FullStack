@@ -20,16 +20,8 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
   const [logoutError, setLogoutError] = useState('');
 
   const handleLogout = async () => {
-    let token: string | undefined;
     try {
-      token = await getAccessTokenSilently();
-    } catch (error) {
-      console.log(error);
-      setLogoutError('Logout failed. Please try again.');
-      return;
-    }
-
-    try {
+      const token = await getAccessTokenSilently();
       await axios.get(`${authUrl}/logout`, {
         headers: {
           authorization: `Bearer ${token}`,
