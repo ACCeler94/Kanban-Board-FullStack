@@ -1,12 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import PostLoginPage from '../../src/pages/PostLoginPage/PostLoginPage';
+import axios from 'axios';
 import { MemoryRouter } from 'react-router-dom';
+import { authUrl } from '../../src/API/config';
+import PostLoginPage from '../../src/pages/PostLoginPage/PostLoginPage';
 import AllProviders from '../AllProviders';
 import { mockAuthState, mockedUseNavigate } from '../utils';
-import axios from 'axios';
-import { authUrl } from '../../src/API/config';
-import { server } from '../mocks/server';
-import { http, HttpResponse } from 'msw';
 
 vi.mock('axios');
 
@@ -20,7 +18,9 @@ describe('PostLoginPage', () => {
     );
   };
 
-  beforeEach(() => vi.resetAllMocks());
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
 
   it('should display "Processing login..." message when fetching authentication status', () => {
     mockAuthState({
@@ -34,13 +34,12 @@ describe('PostLoginPage', () => {
   });
 
   it('should make a request to post-login endpoint and redirect to /boards on success', async () => {
-    vi.mocked(axios, true).get.mockResolvedValueOnce({});
+    vi.mocked(axios, true).post.mockResolvedValueOnce({}); // Simulate success
     mockAuthState({
       isAuthenticated: false,
       isLoading: false,
       user: {},
     });
-    server.use(http.post(`${authUrl}/post-login`, () => HttpResponse.json({}))); // Simulate success
     renderComponent();
 
     await waitFor(() => {
@@ -56,6 +55,19 @@ describe('PostLoginPage', () => {
       );
 
       expect(mockedUseNavigate).toHaveBeenCalledWith('/boards');
+    });
+  });
+  it('should make redirect to /login-error when an error occurs', async () => {
+    vi.mocked(axios, true).post.mockRejectedValueOnce(new Error()); // Simulate error
+    mockAuthState({
+      isAuthenticated: false,
+      isLoading: false,
+      user: {},
+    });
+    renderComponent();
+
+    await waitFor(() => {
+      expect(mockedUseNavigate).toHaveBeenCalledWith('/login-error');
     });
   });
 });
