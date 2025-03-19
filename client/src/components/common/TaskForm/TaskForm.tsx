@@ -142,9 +142,6 @@ const TaskForm = <T extends NewTaskFormData | EditTaskData>({
         variant='contained'
         className='button-small'
         disabled={!isChanged}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') e.preventDefault();
-        }}
       >
         {buttonText}
       </Button>
