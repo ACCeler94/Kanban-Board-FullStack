@@ -34,8 +34,7 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         headers: {
           authorization: `Bearer ${token}`,
         },
-        // [TODO - add withCredentials:true in production, in development cors blocks the request]
-        // withCredentials: true,
+        withCredentials: process.env.NODE_ENV === 'production', // In development cors blocks the request withCredentials true so enable only in production
       });
       logout();
       setLogoutError('');

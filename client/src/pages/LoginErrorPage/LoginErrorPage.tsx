@@ -9,7 +9,7 @@ const LoginErrorPage = () => {
   const navigate = useNavigate();
   const { loginWithRedirect, logout, getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-  const handleRetry = async () => {
+  const handleRetry = () => {
     loginWithRedirect({
       authorizationParams: {
         redirect_uri: import.meta.env.VITE_ROOT_URL + '/post-login',
@@ -26,8 +26,7 @@ const LoginErrorPage = () => {
           headers: {
             authorization: `Bearer ${token}`,
           },
-          // [TODO - add withCredentials:true in production, in development cors blocks the request]
-          // withCredentials: true,
+          withCredentials: process.env.NODE_ENV === 'production', // In development cors blocks the request withCredentials true so enable only in production
         });
         await logout();
       } catch (error) {
