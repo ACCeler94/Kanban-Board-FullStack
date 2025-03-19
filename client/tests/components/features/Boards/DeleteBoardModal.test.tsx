@@ -71,8 +71,17 @@ describe('DeleteBoardModal', () => {
     expect(screen.getByText(/error:/i)).toBeInTheDocument();
   });
 
+  it('should render a success message when deletion is successful', async () => {
+    server.use(http.delete(`${apiUrl}/boards/${paramsId}`, async () => HttpResponse.json({})));
+    const { user, deleteButton } = renderComponent();
+
+    await user.click(deleteButton);
+
+    expect(screen.getByText(/board removed/i)).toBeInTheDocument();
+  });
+
   // Test skipped because of issues with fake timers and user event library https://github.com/testing-library/user-event/issues/1115 - without fake timers it passes but with long timeout values, with fake timers enabled the test runs indefinitely
-  it.skip('should display success message redirect to /boards if board deletion is successful', async () => {
+  it.skip('should redirect to /boards after a delay if board deletion is successful', async () => {
     server.use(http.delete(`${apiUrl}/boards/${paramsId}`, () => HttpResponse.json()));
     // vi.useFakeTimers();
     const { user, deleteButton } = renderComponent();
@@ -82,7 +91,6 @@ describe('DeleteBoardModal', () => {
 
     await waitFor(
       () => {
-        expect(screen.getByText(/successfully/)).toBeInTheDocument();
         expect(mockedUseNavigate).toHaveBeenCalledWith('/boards');
       },
       { timeout: 1600 }
