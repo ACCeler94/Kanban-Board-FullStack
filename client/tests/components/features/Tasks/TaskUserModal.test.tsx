@@ -1,14 +1,14 @@
-import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
-import { mockAuthState, mockedUseNavigate, mockedUseParams } from '../../../utils';
-import { MemoryRouter } from 'react-router-dom';
-import TaskUsersModal from '../../../../src/components/features/Tasks/TaskUsersModal/TaskUsersModal';
-import AllProviders from '../../../AllProviders';
-import { TaskType, User } from '../../../../src/types/types';
-import { db } from '../../../mocks/db';
-import { delay, http, HttpResponse } from 'msw';
-import { apiUrl } from '../../../../src/API/config';
-import { server } from '../../../mocks/server';
+import { render, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { delay, http, HttpResponse } from 'msw';
+import { MemoryRouter } from 'react-router-dom';
+import { apiUrl } from '../../../../src/API/config';
+import TaskUsersModal from '../../../../src/components/features/Tasks/TaskUsersModal/TaskUsersModal';
+import { TaskType, User } from '../../../../src/types/types';
+import AllProviders from '../../../AllProviders';
+import { db } from '../../../mocks/db';
+import { server } from '../../../mocks/server';
+import { mockAuthState, mockedUseNavigate, mockedUseParams } from '../../../utils';
 
 describe('TaskUserModal', () => {
   const boardId = '0e6e9c2c-c7f0-4e03-a101-2c09a7031f08';
@@ -141,7 +141,23 @@ describe('TaskUserModal', () => {
     expect(screen.getByText(/processing.../i)).toBeInTheDocument();
   });
 
-  it('should display an error message if adding user failed', async () => {
+  it('should display an error alert if adding user failed', async () => {
+    server.use(
+      http.get(`${apiUrl}/tasks/${taskId}`, () => HttpResponse.json(task)),
+      http.post(`${apiUrl}/tasks/${taskId}/users/add`, () => HttpResponse.error())
+    );
+    const { waitForTheComponentToLoad, user } = renderComponent();
+    const { emailInput, addBtn } = await waitForTheComponentToLoad();
+
+    await user.type(emailInput!, newUser.email);
+    await user.click(addBtn!);
+    const alert = await screen.findByRole('alert');
+
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveTextContent(/error/i);
+  });
+
+  it('should close the add error alert when close button is clicked', async () => {
     server.use(
       http.get(`${apiUrl}/tasks/${taskId}`, () => HttpResponse.json(task)),
       http.post(`${apiUrl}/tasks/${taskId}/users/add`, () => HttpResponse.error())
@@ -152,7 +168,13 @@ describe('TaskUserModal', () => {
     await user.type(emailInput!, newUser.email);
     await user.click(addBtn!);
 
-    await waitFor(() => expect(screen.getByText(/error/i)).toBeInTheDocument());
+    const alert = await screen.findByRole('alert');
+    const closeButton = await within(alert).findByRole('button', { name: /close/i });
+    await user.click(closeButton);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 
   it('should display a confirmation modal when delete button is clicked', async () => {
@@ -165,6 +187,22 @@ describe('TaskUserModal', () => {
 
     expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /confirm/i })).toBeInTheDocument();
+  });
+
+  it('should close nested modal if close button is clicked', async () => {
+    server.use(http.get(`${apiUrl}/tasks/${taskId}`, () => HttpResponse.json(task)));
+    const { waitForTheComponentToLoad, user } = renderComponent();
+    await waitForTheComponentToLoad();
+    const deleteBtns = screen.getAllByRole('button', { name: /delete/i });
+
+    await user.click(deleteBtns[0]);
+    const closeNestedBtn = screen.getByRole('button', { name: /cancel/i });
+    await user.click(closeNestedBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/are you sure/i)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /confirm/i })).not.toBeInTheDocument();
+    });
   });
 
   it('should refetch task data after successful deletion', async () => {
@@ -216,7 +254,29 @@ describe('TaskUserModal', () => {
 
     await user.click(deleteBtns[0]);
     await user.click(screen.getByRole('button', { name: /confirm/i }));
+    const alert = await screen.findByRole('alert');
 
-    expect(screen.getByText(/error/i)).toBeInTheDocument();
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveTextContent(/error/i);
+  });
+
+  it('should close the delete error alert when close button is clicked', async () => {
+    server.use(
+      http.get(`${apiUrl}/tasks/${taskId}`, () => HttpResponse.json(task)),
+      http.delete(`${apiUrl}/tasks/${taskId}/users/${users[0].id}`, () => HttpResponse.error())
+    );
+    const { waitForTheComponentToLoad, user } = renderComponent();
+    await waitForTheComponentToLoad();
+    const deleteBtns = screen.getAllByRole('button', { name: /delete/i });
+    await user.click(deleteBtns[0]);
+    await user.click(screen.getByRole('button', { name: /confirm/i }));
+
+    const alert = await screen.findByRole('alert');
+    const closeButton = await within(alert).findByRole('button', { name: /close/i });
+    await user.click(closeButton);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 });
