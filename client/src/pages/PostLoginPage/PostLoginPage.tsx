@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
 
 const PostLoginPage = () => {
-  const { getAccessTokenSilently, isLoading, isAuthenticated } = useAuth0();
+  const { getAccessTokenSilently, isLoading } = useAuth0();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const PostLoginPage = () => {
     };
 
     if (!isLoading) handlePostLogin();
-  }, [isLoading, isAuthenticated, getAccessTokenSilently, navigate]);
+  }, [isLoading, getAccessTokenSilently, navigate]);
 
   return <div>Processing login...</div>;
 };
