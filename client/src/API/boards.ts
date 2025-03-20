@@ -30,7 +30,7 @@ const fetchBoardById = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to fetch board data: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to fetch board data: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred');
     }
@@ -52,7 +52,7 @@ const fetchBoardUsers = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to fetch users' data: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to fetch users' data: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred');
     }
@@ -78,7 +78,7 @@ const createBoard = async (title: string, token: string): Promise<NewBoardData> 
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to create board: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to create board: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -108,7 +108,7 @@ const editBoard = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to edit board: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to edit board: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -128,7 +128,7 @@ const deleteBoardById = async (boardId: string, token: string): Promise<JsonResp
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to fetch board data: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to fetch board data: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -156,7 +156,7 @@ const addUserToBoard = async (boardId: string, email: string, token: string): Pr
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to add user to the board: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to add user to the board: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -180,9 +180,7 @@ const deleteUserFromBoard = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(
-        `Failed to delete user from the board: ${error.response?.status} ${errorMessage}`
-      );
+      throw new Error(`Failed to delete user from the board: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }

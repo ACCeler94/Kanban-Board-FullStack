@@ -17,7 +17,7 @@ const fetchUserBoardData = async (token: string): Promise<UserBoardData | undefi
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to fetch user data: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to fetch user data: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred');
     }

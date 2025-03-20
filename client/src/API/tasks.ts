@@ -31,7 +31,7 @@ const fetchTaskById = async (taskId: string, token: string): Promise<TaskType | 
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to fetch task data: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to fetch task data: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -52,7 +52,7 @@ const deleteTaskById = async (taskId: string, token: string) => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to fetch task data: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to fetch task data: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -81,7 +81,7 @@ const editTaskById = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to update task data: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to update task data: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -105,7 +105,7 @@ const addNewTask = async ({ taskData, subtaskData }: NewTaskData, token: string)
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to create task: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to create task: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -133,7 +133,7 @@ const addUserToTask = async (taskId: string, email: string, token: string): Prom
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(`Failed to add user to the task: ${error.response?.status} ${errorMessage}`);
+      throw new Error(`Failed to add user to the task: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
@@ -157,9 +157,7 @@ const deleteUserFromTask = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.error || 'An unexpected error occurred';
-      throw new Error(
-        `Failed to delete user from the task: ${error.response?.status} ${errorMessage}`
-      );
+      throw new Error(`Failed to delete user from the task: ${errorMessage}`);
     } else {
       throw new Error('An unexpected error occurred.');
     }
