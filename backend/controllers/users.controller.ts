@@ -29,7 +29,7 @@ const UsersController = {
   getUserBoards: async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.session.userId;
 
-    if (!userId) return res.status(400).json({ error: 'Invalid user data.' });
+    if (!userId) return res.status(401).json({ error: 'Unauthorized, please login.' }); // If the userId does not exist in req.session.userId it means that the user is not logged in
 
     try {
       const user = await prisma.user.findUnique({
