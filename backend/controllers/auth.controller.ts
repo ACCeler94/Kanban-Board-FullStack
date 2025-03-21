@@ -7,8 +7,6 @@ import path from 'path';
 const AuthController = {
   // Fetch user by auth0 sub and attach userId from the db to the session to authorize certain operations based on userId
   postLogin: async (req: Request, res: Response, next: NextFunction) => {
-    console.log('Callback route reached');
-
     const authUser = req.session.auth0User;
 
     // Check if user object is available in the request
