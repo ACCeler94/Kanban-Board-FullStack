@@ -11,8 +11,9 @@ import EditTaskModal from './components/features/Tasks/EditTaskModal/EditTaskMod
 import TaskModal from './components/features/Tasks/TaskModal/TaskModal';
 import TaskUsersModal from './components/features/Tasks/TaskUsersModal/TaskUsersModal';
 import BoardsPage from './pages/BoardsPage/BoardsPage';
-import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
+import HomePage from './pages/HomePage/HomePage';
 import LoginErrorPage from './pages/LoginErrorPage/LoginErrorPage';
+import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
         </Route>
         <Route path='/post-login' element={<PostLoginPage />} />
         <Route path='/login-error' element={<LoginErrorPage />} />
+        <Route path='/' element={<HomePage />} />
       </Routes>
       <ReactQueryDevtools initialIsOpen={false} />
     </>
