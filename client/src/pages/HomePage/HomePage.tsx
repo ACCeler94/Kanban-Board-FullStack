@@ -137,8 +137,8 @@ const HomePage = () => {
             </div>
           </div>
 
-          <Container>
-            <div className={styles.featuresCentered}>
+          <div className={styles.featuresCentered}>
+            <Container>
               <p className={styles.featureText}>
                 Create tasks and assign them to one or multiple users -{' '}
                 <span className={styles.featureTextThin}>always know who is responsible</span>
@@ -149,8 +149,8 @@ const HomePage = () => {
                   you decide who sees your board, add and remove users at will
                 </span>
               </p>
-            </div>
-          </Container>
+            </Container>
+          </div>
         </section>
 
         <section id='pricing'>
