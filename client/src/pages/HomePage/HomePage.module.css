@@ -1,0 +1,578 @@
+.navbar {
+  height: 90px;
+  border-bottom: 1px solid var(--light-blue);
+  background-color: var(--white);
+}
+
+.linksWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.link {
+  font-size: 1.35em;
+  margin: 0 20px;
+  font-weight: 700;
+  color: var(--main-purple);
+}
+
+.link:hover {
+  filter: brightness(75%)
+}
+
+.navbar .button {
+  font-size: 1em;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  font-weight: 800;
+  margin: 0 15px;
+}
+
+section:not(.hero) {
+  max-width: 2000px;
+  margin: auto;
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  min-height: 80vh;
+  background-image: url('/images/board-images/columns.jpeg');
+  background-position: center;
+  z-index: 1;
+  color: var(--off-white);
+  padding: 0 2.5%;
+  background-size: cover;
+  background-position: top;
+  z-index: 2;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: -1;
+}
+
+.heroTitle {
+  font-size: 5em;
+  background: linear-gradient(to right, #6A5ACD, #B19CD9, #E0E8F0);
+  -webkit-background-clip: text; /* For Safari and Chrome */
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.heroSubTitle {
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.heroText {
+  padding: 0 15%;
+  font-size: 1.5em;
+  font-weight: 500;
+  line-height: 1.75em;
+}
+
+.underline {
+  position: relative;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: 100% 40px;
+  background-position: center bottom;
+  padding-bottom: 20px;
+}
+
+.brush {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="50"><path d="M 10 30 Q 30 35, 50 30 T 90 30 T 130 32 T 170 28 T 190 30" stroke="%23635FC7" stroke-width="8" fill="none" stroke-linecap="round"/></svg>');
+}
+
+.arch {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="50"><path d="M 10 33 Q 50 25, 100 28 T 190 33" stroke="%23635FC7" stroke-width="8" fill="none" stroke-linecap="round"/></svg>');
+  margin-left: 5px;
+}
+
+
+.sectionTitle {
+  font-size: 3em;
+  color: var(--main-purple);
+  margin: 50px 0;
+}
+
+
+.parallaxWrapper {
+  position: relative;
+  height: 100vh;
+  min-height: 700px;
+  margin-bottom: -30vh;
+}
+
+/* Style the outer Parallax div */
+.parallaxWrapper > div {
+  scrollbar-width: none;
+}
+
+ .parallaxContent, .featureContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30%;
+  text-align: center;
+}
+
+.parallaxRight {
+  margin-right: 20%;
+}
+
+
+.stickyLeft {
+  margin-left: 7.5%;
+}
+
+.parallaxLayer {
+  display: flex;
+  align-items: center;
+}
+
+.parallaxLayerLeft {
+  justify-content: flex-start;
+}
+
+.parallaxLayerRight {
+  justify-content: flex-end;
+}
+
+.parallaxRight {
+  position: absolute;
+  top: 250px;
+  transform: translateY(-50%)
+}
+
+.stickyLeft {
+  position: absolute;
+  top: 0;
+}
+
+.featureImage {
+  width: 600px;
+  border-radius: 10px;
+}
+
+.columnTitle {
+  display: inline-block;
+  font-size: 0.8em;
+  color: var(--grey);
+  margin: 0 10px;
+}
+
+.columnTitle svg {
+  font-size: 0.8em;
+  margin-right: 10px;
+}
+
+.todoWrapper svg {
+  color: var(--todo-dot);
+}
+
+.inProgressWrapper svg {
+  color: var(--in-progress-dot);
+}
+
+.doneWrapper svg {
+  color: var(--done-dot);
+}
+
+.featureText {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.featuresCentered {
+  text-align: center;
+  margin: 150px 0;
+}
+
+.featureTextThin {
+  font-weight: 400;
+}
+
+.featureWithImg {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 3;
+  /* Added to better hide parallax text coming from behind of this element */
+  background-color: var(--very-light-blue);
+  /* Transparent shadow added to remove vertical artifact caused by the background color */
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.01);
+}
+
+.imageRight {
+  margin-right:10%;
+}
+
+.textLeft{
+  margin-left:10%;
+}
+
+.shadow {
+  -webkit-box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.07);
+  box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.07);
+}
+
+.highlight {
+  color: var(--main-purple);
+}
+
+.cardsWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  width: 25%;
+  padding: 30px 60px;
+  background-color: var(--white);
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.cardTitle {
+  font-size: 2rem;
+  margin: 0;
+}
+.cardSubTitle {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.card ul {
+  font-size: 1.25rem;
+  padding: 20px;
+}
+
+.primary {
+  padding: 50px 60px;
+  margin: 0px -5px;
+  z-index: 2;
+}
+
+footer {
+  background-color: var(--white);
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+  margin-top: 150px;
+}
+
+.straight {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="50"><path d="M 10 33 Q 100 28, 190 33" stroke="%23635FC7" stroke-width="8" fill="none" stroke-linecap="round"/></svg>');
+  position: relative;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: 100% 40px;
+  background-position: center bottom;
+  padding-bottom: 12.5px;
+}
+
+
+@media only screen and (max-width: 1800px){
+  .stickyLeft {
+    margin-left: 10%;
+  }
+}
+
+
+@media only screen and (max-width: 1600px){
+  .textLeft {
+    margin-left: 10%;
+  }
+
+  .parallaxRight {
+    margin-right: 10%;
+  }
+}
+
+
+@media only screen and (max-width: 1300px){
+  .sectionTitle {
+    font-size: 2.5rem;
+  }
+
+  .textLeft {
+    margin-left: 2.5%;
+  }
+
+  .featureContent {
+    width: 45%;
+  }
+
+  .featureImage {
+    min-width: 400px;
+  }
+
+  .featureText {
+    font-size: 1.6rem;
+  }
+
+  .parallaxRight {
+    margin-right: 2.5%;
+    top: 200px;
+  }
+
+  .imageRight {
+    margin-right: 2.5%;
+  }
+
+  .parallaxContent {
+    width: 45%;
+  }
+
+  .stickyLeft {
+    margin-left: 2.5%;
+  }
+  .card {
+    width: 33.3%;
+  }
+}
+
+@media only screen and (max-width: 1024px){
+  .heroTitle {
+    font-size: 4em;
+    margin-top: 0;
+  }
+  
+  .heroSubTitle {
+    font-size: 1.5em;
+  }
+
+  .heroText {
+    font-size: 1.15em;
+    padding: 0 10%;
+    margin-top: 0;
+  }
+
+
+  .cardTitle {
+    font-size: 1.75rem;
+    margin: 0;
+  }
+  .cardSubTitle {
+    font-size: 1.15rem;
+    margin: 0;
+  }
+  
+  .bold {
+    font-weight: 700;
+  }
+  
+  .card ul {
+    font-size: 1.15rem;
+    padding: 20px;
+  }
+}
+
+@media only screen and (max-width: 940px) {
+
+  .sectionTitle {
+    font-size: 2em;
+  }
+
+  .parallaxWrapper {
+    min-height: 950px;
+  }
+
+  .parallaxLayer {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .parallaxContent {
+    width: 80%;
+    margin: 20px 0 0 0;
+  }
+
+  .parallaxLayerLeft {
+    justify-content: flex-start;
+  }
+  
+  .parallaxLayerRight {
+    justify-content: center;
+  }
+
+  .stickyLeft {
+    margin: 0;
+  }
+
+  .parallaxRight {
+    top: 500px;
+  }
+
+  .featureWithImg {
+    flex-direction: column-reverse;
+    align-items: center;
+
+  }
+
+  .featureContent {
+    width: 80%;
+    margin: 25px 0;
+  }
+
+  .cardsWrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card, .primary {
+    width: 60%;
+    margin: 50px 0;
+    padding: 30px 50px;
+  }
+
+
+  footer {
+    margin-top: 100px;
+  }
+}
+
+
+@media only screen and (max-width: 700px) {
+  nav {
+    font-size: 0.85rem;
+  }
+  .link {
+    margin: 0 10px;
+  }
+  
+  .navbar .button {
+    width: 10rem;
+  }
+
+  .parallaxContent, .featureContent {
+    width: 95%;
+  }
+
+  .card {
+    width: 85%;
+  }
+
+  .parallaxContent.stickyLeft {
+    /* Larger width to accommodate for visible in the photo padding */
+    width: 98.5%;
+  }
+
+  .titleContainer svg {
+    height: 25px;
+  }
+
+  .titleContainer .title {
+    margin: 0 10px;
+  }
+
+
+  .cardTitle {
+    font-size: 1.5rem;
+  }
+
+  .cardSubTitle {
+    font-size: 1.1rem;
+  }
+
+  .card ul {
+    font-size: 1rem;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  nav {
+    font-size: 0.65rem;
+  }
+  
+  .navbar .button {
+    width: 6rem;
+    padding: 0;
+  }
+
+  .titleContainer svg {
+    display: hidden;
+    width: 0;
+  }
+
+  .hero {
+    font-size: 0.75rem;
+  }
+
+  .sectionTitle {
+    margin-bottom: 25px;
+  }
+
+
+  .featureImage {
+    min-width: 200px;
+  }
+
+  .featureText {
+    font-size: 1.2em;
+  }
+
+  .parallaxWrapper {
+    min-height: 650px;
+    margin-bottom: -20vh;
+  }
+
+  .parallaxRight {
+    top: 450px;
+  }
+
+  .parallaxLayerLeft, .parallaxLayerRight {
+    padding: 0;
+  }
+
+
+  .featuresCentered {
+    margin: 100px 0;
+  }
+
+  .card {
+    width: 95%;
+  }
+}
+
+@media only screen and (max-width: 450px) {
+  .parallaxWrapper {
+    margin-bottom: -30vh;
+  }
+
+  .parallaxRight {
+    top: 350px;
+  }
+}
