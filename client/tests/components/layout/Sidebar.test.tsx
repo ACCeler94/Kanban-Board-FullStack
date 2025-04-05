@@ -9,7 +9,7 @@ import { BoardQuery, UserBoardData } from '../../../src/types/types';
 import AllProviders from '../../AllProviders';
 import { db } from '../../mocks/db';
 import { server } from '../../mocks/server';
-import { mockAuth0Logout, mockAuthState } from '../../utils';
+import { mockAuth0Logout, mockAuthState, mockedUseNavigate } from '../../utils';
 
 describe('SideBar', () => {
   const toggleIsHidden = vi.fn();
@@ -156,5 +156,18 @@ describe('SideBar', () => {
     await waitFor(() => {
       expect(screen.getByText(/failed/i)).toBeInTheDocument();
     });
+  });
+
+  it('should navigate to "/post-login" to refresh session if received "Failed to fetch user data: Unauthorized, please login." error message', async () => {
+    server.use(
+      http.get(`${apiUrl}/users/profile/boards`, () => {
+        return HttpResponse.json({ error: 'Unauthorized, please login.' }, { status: 401 });
+      })
+    );
+    const { waitForTheComponentToLoad } = renderComponent();
+
+    await waitForTheComponentToLoad();
+
+    expect(mockedUseNavigate).toHaveBeenCalledWith('/post-login');
   });
 });

@@ -1,13 +1,14 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import Button from '@mui/material/Button';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaEyeSlash } from 'react-icons/fa';
 import { authUrl } from '../../../API/config';
 import { useUserBoardData } from '../../../API/users';
 import Error from '../../common/Error/Error';
 import BoardsList from '../../features/Boards/BoardsList/BoardsList';
 import styles from './SideBar.module.css';
+import { useNavigate } from 'react-router-dom';
 
 interface SideBarProps {
   isHidden: boolean;
@@ -18,6 +19,14 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
   const { isPending, error, data: userBoardData } = useUserBoardData();
   const { logout, getAccessTokenSilently } = useAuth0();
   const [logoutError, setLogoutError] = useState('');
+  const navigate = useNavigate();
+
+  // Refresh server session if it expired before Auth0 session did
+  useEffect(() => {
+    if (error?.message === 'Failed to fetch user data: Unauthorized, please login.') {
+      navigate('/post-login');
+    }
+  }, [error?.message, navigate]);
 
   const handleLogout = async () => {
     try {
