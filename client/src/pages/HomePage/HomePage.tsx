@@ -18,34 +18,36 @@ const HomePage = () => {
 
   return (
     <>
-      <nav className={styles.navbar}>
-        <Container>
-          <div className={styles.wrapper}>
-            <div className={styles.titleContainer}>
-              <Icon />
-              <h1 className={styles.title}>kanban</h1>
+      <header>
+        <nav className={styles.navbar}>
+          <Container>
+            <div className={styles.wrapper}>
+              <div className={styles.titleContainer}>
+                <Icon />
+                <h1 className={styles.title}>kanban</h1>
+              </div>
+              <div className={styles.linksWrapper}>
+                <a href='#features' onClick={handleClick} className={styles.link}>
+                  Features
+                </a>
+                <a href='#pricing' onClick={handleClick} className={styles.link}>
+                  Pricing
+                </a>
+                <Button
+                  aria-label='My Boards'
+                  color='primary'
+                  variant='contained'
+                  className={`button-small ${styles.button}`}
+                  component={Link}
+                  to={'/boards'}
+                >
+                  My Boards
+                </Button>
+              </div>
             </div>
-            <div className={styles.linksWrapper}>
-              <a href='#features' onClick={handleClick} className={styles.link}>
-                Features
-              </a>
-              <a href='#pricing' onClick={handleClick} className={styles.link}>
-                Pricing
-              </a>
-              <Button
-                aria-label='My Boards'
-                color='primary'
-                variant='contained'
-                className={`button-small ${styles.button}`}
-                component={Link}
-                to={'/boards'}
-              >
-                My Boards
-              </Button>
-            </div>
-          </div>
-        </Container>
-      </nav>
+          </Container>
+        </nav>
+      </header>
       <main>
         <section className={styles.hero}>
           <h1 className={styles.heroTitle}>Productivity redefined</h1>
@@ -81,7 +83,7 @@ const HomePage = () => {
               </ParallaxLayer>
               <ParallaxLayer
                 offset={0}
-                speed={1}
+                speed={1.2}
                 className={`${styles.parallaxLayer} ${styles.parallaxLayerRight}`}
               >
                 <div className={`${styles.parallaxContent} ${styles.parallaxRight}`}>
