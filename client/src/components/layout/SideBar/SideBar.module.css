@@ -22,6 +22,7 @@
   transform: translateX(0);
   transition: transform var(--duration) ease-in-out;
   overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 .sideBar.hidden {
