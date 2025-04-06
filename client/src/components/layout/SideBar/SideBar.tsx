@@ -9,6 +9,7 @@ import Error from '../../common/Error/Error';
 import BoardsList from '../../features/Boards/BoardsList/BoardsList';
 import styles from './SideBar.module.css';
 import { useNavigate } from 'react-router-dom';
+import Icon from '../../../assets/icon.svg?react';
 
 interface SideBarProps {
   isHidden: boolean;
@@ -60,6 +61,10 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         className={isHidden ? `${styles.sideBarWrapper} ${styles.hidden}` : styles.sideBarWrapper}
       >
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
+          <div className={styles.titleContainer}>
+            <Icon />
+            <h1 className={styles.title}>kanban</h1>
+          </div>
           <Error message={error ? error.message : logoutError} />
           <div className={styles.actionButtons}>
             <button id={styles.hideButton} onClick={toggleIsHidden} aria-label='Hide sidebar'>
@@ -85,7 +90,13 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
         className={isHidden ? `${styles.sideBarWrapper} ${styles.hidden}` : styles.sideBarWrapper}
       >
         <aside className={isHidden ? `${styles.sideBar} ${styles.hidden}` : styles.sideBar}>
-          <BoardsList boards={userBoardData.boards} />
+          <div>
+            <div className={styles.titleContainer}>
+              <Icon />
+              <h1 className={styles.title}>kanban</h1>
+            </div>
+            <BoardsList boards={userBoardData.boards} />
+          </div>
           <div className={styles.actionButtons}>
             <button id={styles.hideButton} onClick={toggleIsHidden} aria-label='Hide sidebar'>
               <FaEyeSlash />

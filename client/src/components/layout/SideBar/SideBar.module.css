@@ -10,7 +10,7 @@
 
 .sideBar {
   background-color: var(--white);
-  width: calc(250px + 3vw);
+  width: calc(250px + 2.5vw);
   height: calc(100vh - 90px);
   border-right: 1px solid var(--light-blue);
   margin-top: -1px;
@@ -21,6 +21,7 @@
   position: static;
   transform: translateX(0);
   transition: transform var(--duration) ease-in-out;
+  overflow-y: scroll;
 }
 
 .sideBar.hidden {
@@ -55,4 +56,43 @@
 #hideButton:hover {
   color: var(--light-grey);
   transition-duration: var(--duration);
+}
+
+
+.titleContainer {
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
+  height: 0;
+  visibility: hidden;
+}
+
+.title {
+  font-weight: 800;
+  margin: 0 15px;
+}
+
+
+@media only screen and (max-width: 1200px){
+  .sideBarWrapper {
+    position: absolute;
+    z-index: 99;
+  }
+}
+
+@media only screen and (max-width: 800px){
+  .sideBarWrapper {
+    top: 0;
+  }
+
+  .sideBar {
+    padding-top: 0;
+    height: 100vh;
+  }
+
+  .titleContainer {
+    visibility: visible;
+    height: 90px;
+    margin-bottom: 10px;
+  }
 }
