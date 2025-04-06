@@ -4,15 +4,15 @@
 
 .contentWrapper {
   transition: margin var(--duration) ease-in-out;
-  margin-left: 40px;
-  margin-right: 40px;
   width: 100%;
-  padding: 1.5% 0;
+  padding: 1.5% 40px;
+  height: calc(100vh - 90px);
+  overflow-y: scroll;
 }
 
 .contentWrapper.sidebarHidden {
   margin-left: -250px;
-  margin-right: 3%;
+  padding-right: calc(40px + 2.5%);
 }
 
 .showButton {
@@ -37,4 +37,31 @@
 .showButton:focus {
   background-color: var(--light-purple);
   transition-duration: var(--duration);
+}
+
+@media only screen and (max-width: 1200px) {
+  .contentWrapper.sidebarHidden {
+    margin-left: 0;
+    padding-right: 40px;
+  }
+
+  .contentWrapper:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .contentWrapper:not(.sidebarHidden):before {
+    opacity: 1;
+    pointer-events: auto;
+    width: calc(100% - (250px + 2.5vw));
+  }
 }
