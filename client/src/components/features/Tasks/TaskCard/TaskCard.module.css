@@ -57,3 +57,11 @@
 .taskCard:hover {
   background-color: rgba(0, 0, 0, 15%);
 }
+
+
+@media only screen and (max-width: 992px){
+  .taskCard a, .dragHandle {
+    padding: 15px;
+  }
+}
+
