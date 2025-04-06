@@ -103,7 +103,7 @@ const AuthController = {
         res.clearCookie('connect.sid');
       }
       // Redirect to auth0 logout endpoint
-      res.redirect(process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:3000/');
+      res.status(204).send();
     });
   },
 };

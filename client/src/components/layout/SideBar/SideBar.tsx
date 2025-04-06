@@ -40,6 +40,7 @@ const SideBar = ({ isHidden, toggleIsHidden }: SideBarProps) => {
       });
       logout();
       setLogoutError('');
+      navigate('/');
     } catch (error) {
       setLogoutError('Logout failed. Please try again.');
     }
