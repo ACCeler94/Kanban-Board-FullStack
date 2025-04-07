@@ -170,6 +170,10 @@ const useTaskData = (taskId: string) => {
   const { data, error, isPending, refetch } = useQuery({
     queryKey: ['task', taskId],
     queryFn: async () => {
+      if (!uuidValidate(taskId)) {
+        throw new Error('Invalid Task ID.');
+      }
+
       let token;
       try {
         token = await getAccessTokenSilently();
@@ -183,7 +187,7 @@ const useTaskData = (taskId: string) => {
         throw new Error('Failed to fetch the task data. Please try again.');
       }
     },
-    enabled: !!taskId && uuidValidate(taskId) && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchTaskById
+    enabled: !!taskId && isAuthenticated, // Check for the existence of the id and if it's valid uuid to prevent unnecessary calls to fetchTaskById
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 
