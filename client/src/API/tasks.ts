@@ -362,7 +362,6 @@ const useAddUserToTask = (boardId: string, taskId: string) => {
         };
       });
       queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // invalidate board data in the background so the counter on the card is updated
-      // [TODO - rethink query invalidation]
     },
   });
 
@@ -394,7 +393,6 @@ const useDeleteUserFromTask = (boardId: string, taskId: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['task', taskId] });
       queryClient.invalidateQueries({ queryKey: ['board', boardId] }); // invalidate board data in the background so the counter on the card is updated
-      // [TODO - rethink query invalidation]
     },
   });
 

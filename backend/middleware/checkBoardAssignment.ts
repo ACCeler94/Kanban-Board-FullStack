@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../prisma/prisma';
 
-// [TODO - consider caching to improve performance]
 const checkBoardAssignment = async (req: Request, res: Response, next: NextFunction) => {
   const requestAuthorId = req.session.userId;
 
