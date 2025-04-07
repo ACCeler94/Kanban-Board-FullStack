@@ -31,3 +31,14 @@
   margin: 0;
   margin-top: 20px;
 }
+
+
+@media only screen and (max-width: 768px) {
+  .columnWrapper {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    padding-inline: 1rem;
+    box-sizing: border-box;
+    position: relative;
+  }
+}

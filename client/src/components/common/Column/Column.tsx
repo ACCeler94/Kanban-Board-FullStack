@@ -19,7 +19,7 @@ const Column = ({ tasks, status, label }: ColumnProps) => {
       items={tasks.map((task) => task.id)}
       strategy={verticalListSortingStrategy}
     >
-      <Droppable id={status}>
+      <Droppable id={status} className={styles.columnWrapper}>
         <div className={styles.column}>
           <div className={`${styles.columnHeaderWrapper} ${styles[status]}`}>
             <FaCircle />

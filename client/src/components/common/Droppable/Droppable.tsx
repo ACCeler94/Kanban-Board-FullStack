@@ -4,16 +4,17 @@ import React, { HTMLAttributes } from 'react';
 interface DroppableProps extends HTMLAttributes<HTMLDivElement> {
   id: string;
   children: React.ReactNode;
-  handleDragLeave?: () => void; // Add the onDragLeave prop
+  handleDragLeave?: () => void;
+  className: string;
 }
 
-const Droppable = ({ id, children, ...props }: DroppableProps) => {
+const Droppable = ({ id, children, className, ...props }: DroppableProps) => {
   const { setNodeRef } = useDroppable({
     id,
   });
 
   return (
-    <div ref={setNodeRef} {...props}>
+    <div ref={setNodeRef} {...props} className={className}>
       {children}
     </div>
   );
