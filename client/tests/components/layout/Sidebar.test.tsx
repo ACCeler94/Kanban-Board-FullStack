@@ -1,5 +1,5 @@
 import { User } from '@auth0/auth0-react';
-import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { delay, http, HttpResponse } from 'msw';
 import { MemoryRouter } from 'react-router-dom';
@@ -10,6 +10,11 @@ import AllProviders from '../../AllProviders';
 import { db } from '../../mocks/db';
 import { server } from '../../mocks/server';
 import { mockAuth0Logout, mockAuthState, mockedUseNavigate } from '../../utils';
+
+// Mock the logo as it is imported as a react component by vite svgr plugin - if not mocked it throws an error
+vi.mock('/src/assets/icon.svg?react', () => ({
+  default: () => <div>Mocked Logo</div>,
+}));
 
 describe('SideBar', () => {
   const toggleIsHidden = vi.fn();
@@ -27,7 +32,7 @@ describe('SideBar', () => {
     );
 
     const waitForTheComponentToLoad = async () => {
-      await waitForElementToBeRemoved(screen.getByText(/loading.../i));
+      await screen.findByRole('button', { name: /logout/i }); // Look for logout button which does not appear when the component is loading
 
       return {
         hideButton: screen.getByRole('button', { name: /hide/i }),
@@ -57,8 +62,6 @@ describe('SideBar', () => {
   });
 
   beforeEach(() => {
-    vi.resetAllMocks();
-
     mockAuthState({
       isAuthenticated: true,
       isLoading: false,

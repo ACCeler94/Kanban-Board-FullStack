@@ -78,7 +78,7 @@ describe('MainLayout', () => {
     await waitForTheComponentToLoad();
 
     expect(screen.getByRole('heading', { name: /all boards/i })).toBeInTheDocument(); // A part of Sidebar component
-    expect(screen.getByText('Mocked Logo')).toBeInTheDocument(); // Logo is a part of Navbar component
+    expect(screen.getAllByText('Mocked Logo').length).toBe(2); // One logo for Navbar and one for Sidebar
   });
 
   it('should render show sidebar button if hide sidebar button is clicked', async () => {
