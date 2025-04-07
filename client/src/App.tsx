@@ -14,6 +14,7 @@ import BoardsPage from './pages/BoardsPage/BoardsPage';
 import HomePage from './pages/HomePage/HomePage';
 import LoginErrorPage from './pages/LoginErrorPage/LoginErrorPage';
 import PostLoginPage from './pages/PostLoginPage/PostLoginPage';
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
         <Route path='/post-login' element={<PostLoginPage />} />
         <Route path='/login-error' element={<LoginErrorPage />} />
         <Route path='/' element={<HomePage />} />
+        <Route path='*' element={<NotFoundPage />} />
       </Routes>
       <ReactQueryDevtools initialIsOpen={false} />
     </>

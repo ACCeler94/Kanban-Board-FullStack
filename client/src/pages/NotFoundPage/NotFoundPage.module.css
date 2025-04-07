@@ -1,0 +1,14 @@
+.notFoundContent {
+  text-align: center;
+  align-content: center;
+  padding: 0 2.5%;
+  height: 100vh;
+}
+
+.notFoundContent h1, h2 {
+  margin: 0;
+}
+
+.notFoundContent a {
+  margin-top: 50px;
+}
