@@ -23,6 +23,7 @@ describe('checkBoardAssignment', () => {
     boardId: '84f1a2b9-eecc-44e1-88e3-d59f349708fc',
     authorId: userId,
     status: TaskStatus.IN_PROGRESS,
+    order: 0,
   };
 
   const mockBoard = {
@@ -35,6 +36,7 @@ describe('checkBoardAssignment', () => {
   const mockUserOnBoard = {
     userId,
     boardId: mockBoard.id,
+    createdAt: new Date('2023-12-01T10:30:00Z'),
   };
 
   beforeEach(() => {
