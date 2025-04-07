@@ -10,8 +10,8 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { arrayMove } from '@dnd-kit/sortable';
+import { Alert } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 import { validate as uuidValidate } from 'uuid';
@@ -23,10 +23,9 @@ import { getListByStatus } from '../../../../utils/getListByStatus';
 import Loader from '../../../common/BoardLoader/BoardLoader';
 import Column from '../../../common/Column/Column';
 import Error from '../../../common/Error/Error';
+import LoadingOverlay from '../../../common/LoadingOverlay/LoadingOverlay';
 import TaskCard from '../../Tasks/TaskCard/TaskCard';
 import styles from './Board.module.css';
-import LoadingOverlay from '../../../common/LoadingOverlay/LoadingOverlay';
-import { Alert } from '@mui/material';
 
 const Board = () => {
   const { id } = useParams();
@@ -85,6 +84,10 @@ const Board = () => {
   const handleDragOver = (event: DragOverEvent) => {
     const { over, active } = event;
     if (!over) return;
+
+    // Disable scroll snap on drag start to prevent flickering when moving between columns
+    const boardGrid = document.querySelector(`.${styles.boardGrid}`);
+    boardGrid?.classList.add(styles.noSnap);
 
     const activeContainer = getColumnByTaskId({
       toDos,
@@ -210,6 +213,10 @@ const Board = () => {
       mutate({ taskId: activeTask!.id, editData: { taskData: { order: overIndex } } });
     }
     setActiveTask(null);
+
+    // Re-enable scroll snap on drag end
+    const boardGrid = document.querySelector(`.${styles.boardGrid}`);
+    boardGrid?.classList.remove(styles.noSnap);
   };
 
   if (!id || !uuidValidate(id)) return <Error message='Error. Invalid board ID!' />;
@@ -241,10 +248,9 @@ const Board = () => {
         <Column tasks={inProgress} status={TaskStatus.IN_PROGRESS} label={'IN PROGRESS'} />
         <Column tasks={done} status={TaskStatus.DONE} label={'DONE'} />
 
-        <DragOverlay modifiers={[restrictToWindowEdges]}>
+        <DragOverlay className={styles.dragOverlay}>
           {activeTask ? <TaskCard taskData={activeTask} /> : null}
         </DragOverlay>
-
         {
           // Loading overlay added to prevent drag and dropping tasks while the data is refreshing to avoid inconsistencies
         }

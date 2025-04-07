@@ -6,3 +6,38 @@
   height: 100%;
   position: relative;
 }
+
+.drag-overlay {
+  pointer-events: none;
+  touch-action: none;
+  will-change: transform;
+}
+
+.noSnap {
+  scroll-snap-type: none !important;
+}
+
+@media only screen and (max-width: 1300px){
+  .boardGrid {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .boardGrid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+  }
+
+  .boardGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .boardGrid {
+    scrollbar-width: none;
+  }
+}
