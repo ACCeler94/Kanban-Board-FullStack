@@ -26,3 +26,11 @@ a {
   height: 48px;
   width: 200px;
 }
+
+
+@media only screen and (max-width: 500px){
+ .button-small {
+    font-size: 8px;
+    max-width: 150px !important;
+  }
+}
