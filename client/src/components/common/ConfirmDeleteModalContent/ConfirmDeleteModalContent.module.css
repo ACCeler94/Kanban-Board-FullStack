@@ -9,6 +9,10 @@
   justify-content: space-around;
 }
 
+.confirmationButtonsWrapper button {
+  margin: 0 5px;
+}
+
 .bold {
   font-weight: 600;
 }
