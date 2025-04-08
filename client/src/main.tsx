@@ -17,6 +17,7 @@ const queryClient = new QueryClient();
 
 const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+const frontEndUrl = import.meta.env.VITE_SERVER_URL;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -24,7 +25,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       domain={auth0Domain}
       clientId={auth0ClientId}
       authorizationParams={{
-        redirect_uri: window.location.origin,
+        redirect_uri: frontEndUrl,
         audience: 'KanbanBoardAPI',
         scope: 'openid profile email',
       }}
