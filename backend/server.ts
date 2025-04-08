@@ -62,11 +62,12 @@ app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from the client build directory
+app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
 
+// Serve index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'client', 'dist', 'index.html'));
 });
 
 app.use((req, res) => {
