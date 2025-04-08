@@ -25,7 +25,7 @@ const AddTaskModal = () => {
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (isSuccess) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         handleClose();
       }, 1500);
     }

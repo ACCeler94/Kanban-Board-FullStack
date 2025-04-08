@@ -28,7 +28,7 @@ const AddBoardModal = () => {
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (isSuccess && boardData) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         navigate(`/boards/${boardData.id}`);
       }, 1500);
     }

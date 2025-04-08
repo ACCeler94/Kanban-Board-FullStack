@@ -42,7 +42,7 @@ const EditTaskModal = () => {
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (isEditSuccess) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         handleClose();
       }, 1500);
     }
