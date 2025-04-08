@@ -17,14 +17,22 @@ declare module 'express-session' {
 }
 
 const app: Express = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
+
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
 
 // Middleware to enable CORS requests
 app.use(
   cors({
-    origin: 'http://localhost:3000',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   })
 );
 
@@ -45,12 +53,6 @@ app.use(
 app.use(express.urlencoded({ extended: false })); // Required to handle urlencoded requests
 app.use(express.json()); // Required to handle form-data request
 
-// Middleware to log request to the console
-app.use((req, res, next) => {
-  console.log(`Request: ${req.method} ${req.url}`);
-  next();
-});
-
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, '/public')));
 
@@ -60,12 +62,12 @@ app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
 
-// // Serve static files from the React app
-// app.use(express.static(path.join(__dirname, '..', '/client/build')));
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'public')));
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '..', '/client/build/index.html'));
-// });
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.use((req, res) => {
   res.status(404).send('404 not found...');

@@ -1,44 +1,18 @@
-services:
-  client:
-    build: ./client
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./client:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
-    env_file:
-      - .env
+version: "3.8"
 
+services:
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
+      - SESSION_SECRET=${SESSION_SECRET}
       - DATABASE_URL=${DATABASE_URL}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
-    env_file:
-      - .env
-    depends_on:
-      - db
-
-  db:
-    image: mysql:8.0.37
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-    ports:
-      - "16185:3307"
-    volumes:
-      - db_data:/var/lib/mysql
-    env_file:
-      - .env
-
-volumes:
-  db_data:
-    driver: local
+      - AUTH0_SECRET=${AUTH0_SECRET}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}

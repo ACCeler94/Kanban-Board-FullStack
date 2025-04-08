@@ -1,20 +1,32 @@
-FROM node:20.15.0
+FROM node:20.15.0 AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install
+# Install backend dependencies
+COPY backend/package*.json ./backend/
+RUN cd backend && npm install
 
-# Copy the rest of your application code
-COPY . .
+# Install frontend dependencies and build it
+COPY client ./client
+RUN cd client && npm install && npm run build
 
-# Generate Prisma Client within the container
-RUN npx prisma generate
+# Copy backend source code
+COPY backend ./backend
 
-# Expose the application port
+# Copy built frontend to backend's public directory
+RUN rm -rf backend/public && mkdir -p backend/public && \
+    cp -r client/dist/* backend/public/
+
+# Generate Prisma client
+RUN cd backend && npx prisma generate
+
+
+FROM node:20.15.0
+
+WORKDIR /app
+COPY --from=builder /app/backend .
+
+ENV NODE_ENV=production
+
 EXPOSE 8000
-
-# Specify the command to run the application
-CMD ["npm", "start"]
+CMD ["node", "dist/server.js"]
