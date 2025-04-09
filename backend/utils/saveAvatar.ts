@@ -6,6 +6,9 @@ export const saveAvatar = async (avatarUrl: string, avatarName: string) => {
   const avatarPathBase = path.join(__dirname, '../public/images/userAvatars');
 
   try {
+    // Ensure the directory exists
+    await fs.mkdir(avatarPathBase, { recursive: true });
+
     // Fetch the avatar as binary data
     const response: AxiosResponse<ArrayBuffer> = await axios.get(avatarUrl, {
       responseType: 'arraybuffer',
@@ -17,8 +20,8 @@ export const saveAvatar = async (avatarUrl: string, avatarName: string) => {
       console.error('Invalid Content-Type header:', contentType);
       throw new Error('Invalid image type.');
     }
+
     const extension = contentType.split('/')[1];
-    // Construct the full file name with extension
     const avatarFileName = `${avatarName}.${extension}`;
     const avatarPath = path.join(avatarPathBase, avatarFileName);
 
