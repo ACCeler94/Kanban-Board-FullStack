@@ -14,6 +14,7 @@
   
   # Define build arguments for frontend environment variables
   ARG VITE_SERVER_URL
+  ARG VITE_ROOT_URL
   ARG VITE_API_URL
   ARG VITE_AUTH_URL
   ARG ALLOWED_ORIGINS
@@ -22,6 +23,7 @@
   
   # Build the frontend with the build arguments
   RUN VITE_SERVER_URL=$VITE_SERVER_URL \
+      VITE_ROOT_URL=${VITE_ROOT_URL} \
       VITE_API_URL=$VITE_API_URL \
       VITE_AUTH_URL=$VITE_AUTH_URL \
       ALLOWED_ORIGINS=$ALLOWED_ORIGINS \
