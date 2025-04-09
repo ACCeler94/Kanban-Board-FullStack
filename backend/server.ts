@@ -60,12 +60,12 @@ app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
 
-// // Serve static files from the React app
-// app.use(express.static(path.join(__dirname, '..', '/client/build')));
+// Serve static files and front-end
+app.use(express.static(path.join(__dirname, '../public')));
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '..', '/client/build/index.html'));
-// });
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
 
 app.use((req, res) => {
   res.status(404).send('404 not found...');
