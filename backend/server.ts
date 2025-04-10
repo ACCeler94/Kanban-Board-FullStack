@@ -17,22 +17,14 @@ declare module 'express-session' {
 }
 
 const app: Express = express();
-const port = process.env.PORT || 8000;
-
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
+const port = 8000;
 
 // Middleware to enable CORS requests
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
+    origin: 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
   })
 );
 
@@ -46,8 +38,8 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 86400000, // 1 day
+      maxAge: 86400000,
+      sameSite: 'none',
     },
   })
 );
@@ -55,8 +47,11 @@ app.use(
 app.use(express.urlencoded({ extended: false })); // Required to handle urlencoded requests
 app.use(express.json()); // Required to handle form-data request
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, '/public')));
+// Middleware to log request to the console
+app.use((req, res, next) => {
+  console.log(`Request: ${req.method} ${req.url}`);
+  next();
+});
 
 // Endpoints
 app.use('/auth', authRoutes);
@@ -64,14 +59,15 @@ app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve avatar images and other static files
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
-// Serve static files from the client build directory
-app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
+// Serve frontend build
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// Serve index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'client', 'dist', 'index.html'));
+// Serve React index.html
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
 app.use((req, res) => {

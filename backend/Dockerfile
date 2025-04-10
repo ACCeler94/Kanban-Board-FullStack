@@ -23,7 +23,7 @@
   
   # Build the frontend with the build arguments
   RUN VITE_SERVER_URL=$VITE_SERVER_URL \
-      VITE_ROOT_URL=${VITE_ROOT_URL} \
+      VITE_ROOT_URL=$VITE_ROOT_URL \
       VITE_API_URL=$VITE_API_URL \
       VITE_AUTH_URL=$VITE_AUTH_URL \
       ALLOWED_ORIGINS=$ALLOWED_ORIGINS \
@@ -34,10 +34,11 @@
   # Copy backend source and build it
   WORKDIR /app
   COPY backend ./backend
+  
   # Generate Prisma client
   RUN cd backend && npx prisma generate
   
-  # Compile typescript
+  # Compile TypeScript
   RUN cd backend && npm run build
   
   # -------- Production Stage --------
@@ -50,6 +51,9 @@
   COPY --from=builder /app/backend/prisma ./prisma
   COPY --from=builder /app/backend/package*.json ./
   RUN npm install --omit=dev
+  
+  # Copy public folder for serving avatars and other static assets
+  COPY --from=builder /app/backend/public ./public
   
   # Copy built frontend
   COPY --from=builder /app/client/dist ./client/dist
