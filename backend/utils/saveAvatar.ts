@@ -29,6 +29,8 @@ export const saveAvatar = async (avatarUrl: string, avatarName: string) => {
     const buffer = Buffer.from(response.data);
     await fs.writeFile(avatarPath, buffer);
 
+    console.log('path:', avatarPath);
+    console.log('url:', avatarUrl);
     return avatarFileName; // Return the name for further use
   } catch (error) {
     console.error('Error saving avatar:', error);
