@@ -63,8 +63,10 @@ app.use('/api', userRoutes);
 // Serve static files and front-end
 app.use(express.static(path.join(__dirname, '../public')));
 
+app.use(express.static(path.join(__dirname, '../dist/public')));
+
 app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../dist/public/index.html'));
 });
 
 app.use((req, res) => {
