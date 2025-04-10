@@ -28,6 +28,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         audience: 'KanbanBoardAPI',
         scope: 'openid profile email',
       }}
+      cacheLocation='localstorage'
+      useRefreshTokens={true}
     >
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
