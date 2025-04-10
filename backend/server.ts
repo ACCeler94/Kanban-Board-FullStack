@@ -42,10 +42,12 @@ app.use(
     secret: process.env.SESSION_SECRET!,
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 86400000,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 86400000, // 1 day
     },
   })
 );
@@ -61,6 +63,8 @@ app.use('/auth', authRoutes);
 app.use('/api', boardsRoutes);
 app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve static files from the client build directory
 app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
