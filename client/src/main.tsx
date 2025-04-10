@@ -24,6 +24,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Auth0Provider
       domain={auth0Domain}
       clientId={auth0ClientId}
+      cacheLocation='localstorage' // Added to solve issue with non persisting auth0 session and third party cookies
+      useRefreshTokens={true}
       authorizationParams={{
         redirect_uri: frontEndUrl,
         audience: 'KanbanBoardAPI',
