@@ -22,7 +22,7 @@ const port = 8000;
 // Middleware to enable CORS requests
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: process.env.ALLOWED_ORIGINS,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   })

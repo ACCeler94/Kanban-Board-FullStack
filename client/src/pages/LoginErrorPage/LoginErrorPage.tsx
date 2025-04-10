@@ -28,7 +28,8 @@ const LoginErrorPage = () => {
           },
           withCredentials: process.env.NODE_ENV === 'production', // In development cors blocks the request withCredentials true so enable only in production
         });
-        await logout();
+
+        await logout({ logoutParams: { returnTo: import.meta.env.VITE_ROOT_URL } });
       } catch (error) {
         console.error(error);
       }
