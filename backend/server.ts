@@ -1,20 +1,14 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import { RedisStore } from 'connect-redis';
 import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 import session from 'express-session';
 import path from 'path';
+import { createClient } from 'redis';
 import { authRoutes } from './routes/auth.routes';
 import { boardsRoutes } from './routes/boards.routes';
 import { tasksRoutes } from './routes/tasks.routes';
 import { userRoutes } from './routes/users.routes';
-import Auth0User from './types/Auth0User';
-
-declare module 'express-session' {
-  interface SessionData {
-    userId: string;
-    auth0User: Auth0User;
-  }
-}
 
 const app: Express = express();
 const port = 8000;
@@ -28,6 +22,18 @@ app.use(
   })
 );
 
+app.set('trust proxy', 1);
+
+// --- Configure Redis for session storage ---
+const redisClient = createClient({ url: process.env.REDIS_URL });
+redisClient.connect().catch(console.error);
+
+// Initialize store.
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: 'myapp:',
+});
+
 // Express session configuration
 app.use(
   session({
@@ -35,6 +41,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     proxy: true,
+    store: redisStore,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
