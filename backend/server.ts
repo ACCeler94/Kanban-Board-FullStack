@@ -60,6 +60,7 @@ app.use('/api', tasksRoutes);
 app.use('/api', userRoutes);
 
 // Serve avatar images and other static files
+app.use('/images/userAvatars', express.static('/mnt/data/avatars')); // Render persistent disk
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
 // Serve frontend build

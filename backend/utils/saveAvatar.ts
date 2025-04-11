@@ -3,7 +3,7 @@ import path from 'path';
 import axios, { AxiosResponse } from 'axios';
 
 export const saveAvatar = async (avatarUrl: string, avatarName: string) => {
-  const avatarPathBase = path.join(__dirname, '../public/images/userAvatars');
+  const avatarPathBase = '/mnt/data/avatars'; // Render persistent disk
 
   try {
     // Ensure the directory exists
