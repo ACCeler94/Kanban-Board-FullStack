@@ -34,6 +34,7 @@ describe('BoardsPage', () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.clearAllMocks();
 
     server.use(
       http.get(`${apiUrl}/boards/${board.id}`, () => HttpResponse.json(board)),
@@ -74,14 +75,18 @@ describe('BoardsPage', () => {
     expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
   });
 
-  it('should call loginWithRedirect if the user is neither authenticated nor loading the auth data', () => {
+  it('should call loginWithRedirect if the user is neither authenticated nor loading the auth data', async () => {
     mockAuthState({
       isAuthenticated: false,
       isLoading: false,
       user: {},
+      getAccessTokenSilently: vi.fn().mockRejectedValueOnce(new Error('Token fetch failed')),
     });
+
     renderComponent();
 
-    expect(mockLoginWithRedirect).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockLoginWithRedirect).toHaveBeenCalled();
+    });
   });
 });
