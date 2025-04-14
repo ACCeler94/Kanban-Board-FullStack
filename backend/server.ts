@@ -3,6 +3,7 @@ import { RedisStore } from 'connect-redis';
 import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 import session from 'express-session';
+import helmet from 'helmet';
 import path from 'path';
 import { createClient } from 'redis';
 import { authRoutes } from './routes/auth.routes';
@@ -19,6 +20,29 @@ app.use(
     origin: process.env.ALLOWED_ORIGINS,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
+  })
+);
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          'https://cdn.auth0.com',
+          'https://cdn.jsdelivr.net',
+          'https://apis.google.com',
+        ],
+        imgSrc: ["'self'", 'data:', 'https://cdn.auth0.com', 'https://lh3.googleusercontent.com'],
+        connectSrc: ["'self'", `https://${process.env.AUTH0_DOMAIN}`],
+        frameSrc: ["'self'", `https://${process.env.AUTH0_DOMAIN}`],
+      },
+    },
+    hidePoweredBy: true,
   })
 );
 
@@ -51,7 +75,6 @@ app.use(
   })
 );
 
-app.use(express.urlencoded({ extended: false })); // Required to handle urlencoded requests
 app.use(express.json()); // Required to handle form-data request
 
 // Middleware to log request to the console
