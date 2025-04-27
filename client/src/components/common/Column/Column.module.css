@@ -35,10 +35,16 @@
 
 @media only screen and (max-width: 768px) {
   .columnWrapper {
+    overflow-y: scroll;
     flex: 0 0 100%;
     scroll-snap-align: start;
     padding-inline: 1rem;
     box-sizing: border-box;
     position: relative;
+    scrollbar-width: none;
   }
+}
+
+.columnWrapper::-webkit-scrollbar {
+  display: none;
 }

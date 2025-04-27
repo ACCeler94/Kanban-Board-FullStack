@@ -26,6 +26,7 @@
 @media only screen and (max-width: 768px) {
   .boardGrid {
     display: flex;
+    overflow-y: hidden;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
