@@ -12,6 +12,7 @@ export const saveAvatar = async (avatarUrl: string, avatarName: string) => {
     // Fetch the avatar as binary data
     const response: AxiosResponse<ArrayBuffer> = await axios.get(avatarUrl, {
       responseType: 'arraybuffer',
+      timeout: 10000,
     });
 
     // Determine the file extension from the Content-Type header
