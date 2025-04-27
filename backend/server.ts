@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { RedisStore } from 'connect-redis';
 import cors from 'cors';
-import express, { Express, Request, Response } from 'express';
+import express, { Express, Request, RequestHandler, Response } from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
 import path from 'path';
@@ -10,6 +10,7 @@ import { authRoutes } from './routes/auth.routes';
 import { boardsRoutes } from './routes/boards.routes';
 import { tasksRoutes } from './routes/tasks.routes';
 import { userRoutes } from './routes/users.routes';
+import timeout from 'connect-timeout';
 
 const app: Express = express();
 const port = 8000;
@@ -83,11 +84,33 @@ app.use((req, res, next) => {
   next();
 });
 
-// Endpoints
-app.use('/auth', authRoutes);
-app.use('/api', boardsRoutes);
-app.use('/api', tasksRoutes);
-app.use('/api', userRoutes);
+const timeoutMiddleware: RequestHandler = timeout('15s');
+
+// API router
+const apiRouter = express.Router();
+apiRouter.use(timeoutMiddleware);
+apiRouter.use((req, res, next) => {
+  if (req.timedout) {
+    return res.status(408).json({ message: 'Request Timeout' });
+  }
+  next();
+});
+apiRouter.use(boardsRoutes);
+apiRouter.use(tasksRoutes);
+apiRouter.use(userRoutes);
+app.use('/api', apiRouter);
+
+// Auth router
+const authRouterWrapper = express.Router();
+authRouterWrapper.use(timeoutMiddleware);
+authRouterWrapper.use((req, res, next) => {
+  if (req.timedout) {
+    return res.status(408).json({ message: 'Request Timeout' });
+  }
+  next();
+});
+authRouterWrapper.use(authRoutes);
+app.use('/auth', authRouterWrapper);
 
 // Serve avatar images and other static files
 app.use('/images/userAvatars', express.static('/mnt/data/avatars')); // Render persistent disk
