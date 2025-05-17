@@ -14,6 +14,9 @@ module.exports = {
         "plugin:@typescript-eslint/recommended-type-checked",
       ],
       env: { es2020: true },
+      rules: {
+        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      },
     },
     {
       files: ["*.ts"], // Server-side files in the root

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { RedisStore } from 'connect-redis';
 import cors from 'cors';
-import express, { Express, Request, RequestHandler, Response } from 'express';
+import express, { Express, NextFunction, Request, RequestHandler, Response } from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
 import path from 'path';
@@ -128,7 +128,7 @@ app.use((req, res) => {
   res.status(404).send('404 not found...');
 });
 
-app.use((err: Error, req: Request, res: Response) => {
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   const message = err.message || 'Internal server error.';
   res.status(500).json({ message });
 });
