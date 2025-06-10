@@ -51,6 +51,11 @@ app.set('trust proxy', 1);
 
 // --- Configure Redis for session storage ---
 const redisClient = createClient({ url: process.env.REDIS_URL });
+
+redisClient.on('error', (err) => {
+  console.error('Redis Client Error:', err);
+});
+
 redisClient.connect().catch(console.error);
 
 // Initialize store.
